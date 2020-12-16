@@ -3,7 +3,11 @@ package site.minnan.rental.domain.aggretes;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.infrastructure.enumerate.Role;
 
 import java.sql.Timestamp;
 
@@ -13,6 +17,7 @@ import java.sql.Timestamp;
  */
 @TableName("auth_user")
 @Data
+@Builder
 public class AuthUser {
 
     /**
@@ -40,6 +45,11 @@ public class AuthUser {
      * 角色
      */
     private String roleName;
+
+    /**
+     * 角色（英文）
+     */
+    private String role;
 
     /**
      * 是否启用（0-禁用，1-启用）
@@ -90,4 +100,17 @@ public class AuthUser {
      * 更新人姓名
      */
     private String updateUserName;
+
+    public void role(Role role){
+        this.roleName = role.roleName();
+        this.roleId = role.roleId();
+        this.role = role.name();
+    }
+
+    public void createUser(JwtUser user){
+        this.createUserId = user.getId();
+        this.createUserName = user.getRealName();
+        this.updateUserId = user.getId();
+        this.updateUserName = user.getRealName();
+    }
 }

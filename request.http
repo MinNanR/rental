@@ -9,11 +9,22 @@ Content-Type: application/json
 > {% client.global.set("auth_token", response.body.data.token); %}
 
 ###
-POST {{houseUrl}}/rental/house/getHouseList
+POST {{userUrl}}/rental/user/getUserList
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
   "pageIndex": 1,
   "pageSize": 10
+}
+
+###
+POST {{userUrl}}/rental/user/addUser/admin
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "username": "admin",
+  "password": "e10adc3949ba59abbe56e057f20f883e",
+  "realName": "管理员"
 }

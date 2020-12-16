@@ -12,6 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+/**
+ * JWT实体类
+ * created by Minnan on 2020/12/16
+ */
 @Data
 @Builder
 public class JwtUser implements UserDetails {
@@ -45,6 +49,11 @@ public class JwtUser implements UserDetails {
      * 认证是否过期
      */
     private Boolean credentialsNonExpired;
+
+    /**
+     * 真实姓名
+     */
+    private String realName;
 
 
     /**
@@ -92,4 +101,6 @@ public class JwtUser implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
+
+
 }

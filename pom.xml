@@ -23,6 +23,7 @@
         <module>rental-payment</module>
         <module>rental-utilities</module>
         <module>common</module>
+        <module>rental-user</module>
     </modules>
 
     <dependencies>

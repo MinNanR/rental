@@ -4,6 +4,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import site.minnan.rental.domain.vo.LoginVO;
 
+/**
+ * 用户权限service
+ * created by Minnan on 2020/12/16
+ */
 public interface UserService extends UserDetailsService {
 
     /**

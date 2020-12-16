@@ -19,7 +19,7 @@ import site.minnan.rental.infrastructure.utils.JwtUtil;
 import java.util.*;
 
 /**
- * 用户相关操作
+ * 用户权限service
  * created by Minnan on 2020/12/16
  */
 @Slf4j
@@ -52,10 +52,12 @@ public class UserServiceImpl implements UserService {
         String roleName = authUser.getRoleName();
         List<GrantedAuthority> grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(roleName));
         return JwtUser.builder()
+                .id(authUser.getId())
                 .username(username)
                 .password(authUser.getPassword())
                 .authorities(grantedAuthorities)
                 .enabled(authUser.getEnabled().equals(1))
+                .realName(authUser.getRealName())
                 .build();
     }
 
