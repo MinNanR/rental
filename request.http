@@ -1,0 +1,19 @@
+POST {{authUrl}}/rental/auth/login/password
+Content-Type: application/json
+
+{
+  "username": "min",
+  "password": "c663b11dff4be0badcf652212a2c1102"
+}
+
+> {% client.global.set("auth_token", response.body.data.token); %}
+
+###
+POST {{houseUrl}}/rental/house/getHouseList
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "pageIndex": 1,
+  "pageSize": 10
+}

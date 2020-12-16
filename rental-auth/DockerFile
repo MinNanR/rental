@@ -1,0 +1,16 @@
+FROM frolvlad/alpine-java:jdk8-slim
+#FROM frolvlad/alpine-oraclejdk8-slim
+MAINTAINER minnan
+ENV TZ "Asia/Shanghai"
+ENV LANG C.UTF-8
+VOLUME /tmp
+
+# RUN chmod -R 755 ./*
+
+ENV JAVA_OPTS "-Xms256m -Xmx1024m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m"
+ENV JAVA_OPTS "$JAVA_OPTS -Dspring.profiles.active=prod"
+ADD target/rental-auth-1.0.jar rental-auth-1.0.jar
+
+ENTRYPOINT ["java", "-jar", "/rental-auth-1.0.jar"]
+
+EXPOSE 8900
