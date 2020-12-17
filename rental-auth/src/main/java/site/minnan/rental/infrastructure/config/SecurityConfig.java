@@ -19,6 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * Spring Security配置
+ * @author Minnan on 2020/12/16
+ */
 @Configuration
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {

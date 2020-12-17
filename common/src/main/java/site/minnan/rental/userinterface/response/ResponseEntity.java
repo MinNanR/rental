@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 响应实体类
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  *
  * @param <T> 返回数据类型
  */

@@ -14,7 +14,7 @@ import java.util.Collection;
 
 /**
  * JWT实体类
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Data
 @Builder
@@ -76,7 +76,7 @@ public class JwtUser implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return enabled;
+        return true;
     }
 
     /**

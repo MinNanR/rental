@@ -9,6 +9,15 @@ Content-Type: application/json
 > {% client.global.set("auth_token", response.body.data.token); %}
 
 ###
+POST {{authUrl}}/rental/auth/login/password
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "e10adc3949ba59abbe56e057f20f883e"
+}
+
+###
 POST {{userUrl}}/rental/user/getUserList
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
@@ -24,7 +33,36 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "username": "admin",
+  "username": "",
   "password": "e10adc3949ba59abbe56e057f20f883e",
   "realName": "管理员"
+}
+
+###
+POST {{userUrl}}/rental/user/updateUser
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 12,
+  "realName": "王五",
+  "phone": "17328483960"
+}
+
+###
+POST {{userUrl}}/rental/user/disableUser
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 5
+}
+
+###
+POST {{userUrl}}/rental/user/enableUser
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": 5
 }

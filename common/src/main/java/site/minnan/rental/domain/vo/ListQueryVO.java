@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 列表查询返回值基类
  * @param <T> 列表内容
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Getter
 @AllArgsConstructor

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * SpringSecurity配置（仅验证）
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Component
 @Slf4j

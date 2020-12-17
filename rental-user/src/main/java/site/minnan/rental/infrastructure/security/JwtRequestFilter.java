@@ -22,7 +22,7 @@ import java.io.IOException;
 
 /**
  * jwt过滤器（鉴权）
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Component
 @Slf4j

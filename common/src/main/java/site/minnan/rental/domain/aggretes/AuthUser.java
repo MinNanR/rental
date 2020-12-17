@@ -3,6 +3,7 @@ package site.minnan.rental.domain.aggretes;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,14 @@ import java.sql.Timestamp;
 
 /**
  * 用户实体类
- * created by Minnan on 2020/12/16
+ *
+ * @author Minnan on 2020/12/16
  */
 @TableName("auth_user")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthUser {
 
     /**
@@ -101,15 +105,30 @@ public class AuthUser {
      */
     private String updateUserName;
 
-    public void role(Role role){
+    /**
+     * 启用状态
+     */
+    public final static Integer ENABLE = 1;
+
+    /**
+     * 禁用状态
+     */
+    public final static Integer DISABLE = 0;
+
+    public void setRole(Role role) {
         this.roleName = role.roleName();
         this.roleId = role.roleId();
         this.role = role.name();
     }
 
-    public void createUser(JwtUser user){
+    public void setCreateUser(JwtUser user) {
         this.createUserId = user.getId();
         this.createUserName = user.getRealName();
+        this.updateUserId = user.getId();
+        this.updateUserName = user.getRealName();
+    }
+
+    public void setUpdateUser(JwtUser user) {
         this.updateUserId = user.getId();
         this.updateUserName = user.getRealName();
     }

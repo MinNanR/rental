@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 /**
  * 添加用户参数
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Data
 public class AddUserDTO {

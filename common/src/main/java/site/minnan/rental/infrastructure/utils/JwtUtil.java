@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 /**
  * JWT相关操作
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Component
 public class JwtUtil {

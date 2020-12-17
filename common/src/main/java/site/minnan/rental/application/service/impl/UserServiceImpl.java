@@ -1,6 +1,10 @@
 package site.minnan.rental.application.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,12 +19,14 @@ import site.minnan.rental.domain.enitty.JwtUser;
 import site.minnan.rental.domain.mapper.UserMapper;
 import site.minnan.rental.domain.vo.LoginVO;
 import site.minnan.rental.infrastructure.utils.JwtUtil;
+import site.minnan.rental.infrastructure.utils.RedisUtil;
 
 import java.util.*;
 
 /**
  * 用户权限service
- * created by Minnan on 2020/12/16
+ *
+ * @author Minnan on 2020/12/16
  */
 @Slf4j
 @Service("userService")
@@ -31,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     /**
      * Locates the user based on the username. In the actual implementation, the search
@@ -46,9 +55,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        QueryWrapper<AuthUser> wrapper = new QueryWrapper<>();
-        wrapper.eq("username", username);
-        AuthUser authUser = userMapper.selectOne(wrapper);
+        Optional<AuthUser> userOptional = getAuthUser(username);
+        AuthUser authUser = userOptional.orElseThrow(() -> new UsernameNotFoundException("用户名不存在"));
         String roleName = authUser.getRoleName();
         List<GrantedAuthority> grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(roleName));
         return JwtUser.builder()
@@ -72,5 +80,20 @@ public class UserServiceImpl implements UserService {
         JwtUser jwtUser = (JwtUser) authentication.getPrincipal();
         String token = jwtUtil.generateToken(jwtUser);
         return new LoginVO(token);
+    }
+
+    private Optional<AuthUser> getAuthUser(String username) {
+        if (StrUtil.isBlank(username)) return Optional.empty();
+        AuthUser userInRedis = (AuthUser) redisUtil.getValue("authUser::" + username);
+        if (userInRedis != null) {
+            log.info("从redis中取出用户信息: {}", new JSONObject(userInRedis));
+            return Optional.of(userInRedis);
+        }
+        QueryWrapper<AuthUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", username);
+        AuthUser userInDB = userMapper.selectOne(wrapper);
+        Optional<AuthUser> userOptional = Optional.ofNullable(userInDB);
+        userOptional.ifPresent(user -> redisUtil.valueSet("authUser::" + username, user));
+        return userOptional;
     }
 }

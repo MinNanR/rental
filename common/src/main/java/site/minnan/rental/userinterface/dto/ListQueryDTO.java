@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 列表查询参数基类
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 @Data
 public class ListQueryDTO {

@@ -1,11 +1,13 @@
 package site.minnan.rental.userinterface.dto;
 
-import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 import javax.validation.constraints.NotEmpty;
 
+/**
+ * 密码登录参数
+ * @author Minnan on 2020/12/16
+ */
 @Data
 public class PasswordLoginDTO {
 

@@ -2,7 +2,7 @@ package site.minnan.rental.userinterface.response;
 
 /**
  * 返回状态码
- * created by Minnan on 2020/12/16
+ * @author Minnan on 2020/12/16
  */
 public enum  ResponseCode {
     SUCCESS("000", "操作成功"),
