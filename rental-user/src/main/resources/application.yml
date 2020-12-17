@@ -8,9 +8,8 @@ spring:
   redis:
     host: minnan.site
     port: 6379
-    database: 5
+    database: 1
     password: minnan
-
 server:
   port: 8107
 
@@ -21,3 +20,8 @@ jwt:
   header: Authorization
   expiration: 604800
   scret: min107
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true

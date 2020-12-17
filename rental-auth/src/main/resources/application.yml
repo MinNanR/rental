@@ -8,7 +8,7 @@ spring:
   redis:
     host: minnan.site
     port: 6379
-    database: 5
+    database: 1
     password: minnan
 
 server:
