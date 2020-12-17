@@ -2,6 +2,7 @@ package site.minnan.rental.userinterface.fascade;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import site.minnan.rental.application.service.AuthUserService;
@@ -23,12 +24,14 @@ public class UserController {
     @Autowired
     private AuthUserService authUserService;
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getUserList")
     public ResponseEntity<ListQueryVO<AuthUserVO>> getUserList(@RequestBody @Valid GetUserListDTO dto) {
         ListQueryVO<AuthUserVO> vo = authUserService.getUserList(dto);
         return ResponseEntity.success(vo);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("addUser/{type}")
     public ResponseEntity<?> addUser(@RequestBody @Valid AddUserDTO dto, @PathVariable("type") String type) {
         dto.setRole(type);
@@ -36,18 +39,21 @@ public class UserController {
         return ResponseEntity.success();
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("updateUser")
     public ResponseEntity<?> updateUser(@RequestBody @Validated UpdateUserDTO dto){
         authUserService.updateUser(dto);
         return ResponseEntity.success();
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("disableUser")
     public ResponseEntity<?> disableUser(@RequestBody @Valid UserEnabledDTO dto){
         authUserService.disableUser(dto);
         return ResponseEntity.success();
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("enableUser")
     public ResponseEntity<?> enableUser(@RequestBody @Valid UserEnabledDTO dto){
         authUserService.enableUser(dto);

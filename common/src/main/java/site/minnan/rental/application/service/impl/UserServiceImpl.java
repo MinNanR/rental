@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<AuthUser> userOptional = getAuthUser(username);
         AuthUser authUser = userOptional.orElseThrow(() -> new UsernameNotFoundException("用户名不存在"));
-        String roleName = authUser.getRoleName();
+        String roleName = authUser.getRole();
         List<GrantedAuthority> grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(roleName));
         return JwtUser.builder()
                 .id(authUser.getId())

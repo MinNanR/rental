@@ -1,4 +1,4 @@
-package site.minnan.infrastructure.security;
+package site.minnan.rental.infrastructure.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;

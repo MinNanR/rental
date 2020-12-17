@@ -3,25 +3,25 @@ package site.minnan.rental.infrastructure.exception;
 import cn.hutool.core.map.MapBuilder;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
-import org.springframework.core.MethodParameter;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
 import site.minnan.rental.userinterface.response.ResponseCode;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * 全局统一异常处理器（仅处理在controller内的异常）
+ *
  * @author Minnan on 2020/12/17
  */
 @ControllerAdvice
@@ -89,6 +89,14 @@ public class ControllerExceptionHandler {
     public ResponseEntity<?> handleEntityNotExistException(EntityNotExistException ex, HandlerMethod method) {
         log.error("", ex);
         return ResponseEntity.fail(ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex, HandlerMethod method) {
+        String uri = method.getMethod().getAnnotation(PostMapping.class).value()[0];
+        log.error("无权限访问:" + uri, ex);
+        return ResponseEntity.fail(ResponseCode.INVALID_USER, "非法用户");
     }
 
     @ExceptionHandler(Exception.class)

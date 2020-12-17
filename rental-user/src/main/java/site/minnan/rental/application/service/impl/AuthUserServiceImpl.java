@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -101,7 +102,7 @@ public class AuthUserServiceImpl implements AuthUserService {
      * @param dto 更新用户信息参数
      */
     @Override
-    public void updateUser(UpdateUserDTO dto) {
+    public String updateUser(UpdateUserDTO dto) {
         AuthUser authUser = userMapper.selectById(dto.getId());
         if (authUser == null) {
             throw new EntityNotExistException("用户不存在");
@@ -115,8 +116,8 @@ public class AuthUserServiceImpl implements AuthUserService {
         wrapper.set("update_user_id", principal.getId())
                 .set("update_user_name", principal.getRealName())
                 .set("update_time", new Timestamp(System.currentTimeMillis()));
-        redisUtil.delete("authUser::" + authUser.getUsername());
         userMapper.update(null, wrapper);
+        return authUser.getUsername();
     }
 
     /**
@@ -125,7 +126,8 @@ public class AuthUserServiceImpl implements AuthUserService {
      * @param dto 参数
      */
     @Override
-    public void disableUser(UserEnabledDTO dto) {
+    @CacheEvict(value = "authUser", key = "#result")
+    public String disableUser(UserEnabledDTO dto) {
         AuthUser authUser = userMapper.selectById(dto.getId());
         if(authUser == null){
             throw new EntityNotExistException("用户不存在");
@@ -133,8 +135,8 @@ public class AuthUserServiceImpl implements AuthUserService {
         UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", dto.getId());
         wrapper.set("enabled", AuthUser.DISABLE);
-        redisUtil.delete("authUser::" + authUser.getUsername());
         userMapper.update(null, wrapper);
+        return authUser.getUsername();
     }
 
     /**
@@ -143,7 +145,8 @@ public class AuthUserServiceImpl implements AuthUserService {
      * @param dto 参数
      */
     @Override
-    public void enableUser(UserEnabledDTO dto) {
+    @CacheEvict(value = "authUser", key = "#result")
+    public String enableUser(UserEnabledDTO dto) {
         AuthUser authUser = userMapper.selectById(dto.getId());
         if(authUser == null){
             throw new EntityNotExistException("用户不存在");
@@ -151,7 +154,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", dto.getId());
         wrapper.set("enabled", AuthUser.ENABLE);
-        redisUtil.delete("authUser::" + authUser.getUsername());
         userMapper.update(null, wrapper);
+        return authUser.getUsername();
     }
 }

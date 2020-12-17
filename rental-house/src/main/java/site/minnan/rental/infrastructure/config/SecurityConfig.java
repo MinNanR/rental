@@ -1,4 +1,4 @@
-package site.minnan.infrastructure.config;
+package site.minnan.rental.infrastructure.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
-import site.minnan.infrastructure.security.JwtRequestFilter;
+import site.minnan.rental.infrastructure.security.JwtRequestFilter;
 
 import javax.servlet.http.HttpServletResponse;
 

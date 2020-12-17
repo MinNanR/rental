@@ -6,21 +6,24 @@ Content-Type: application/json
   "password": "c663b11dff4be0badcf652212a2c1102"
 }
 
-> {% client.global.set("auth_token", response.body.data.token); %}
+
+> {% client.global.set("admin_token", response.body.data.token); %}
 
 ###
 POST {{authUrl}}/rental/auth/login/password
 Content-Type: application/json
 
 {
-  "username": "admin",
+  "username": "18925503712",
   "password": "e10adc3949ba59abbe56e057f20f883e"
 }
+
+> {% client.global.set("landlord_token", response.body.data.token); %}
 
 ###
 POST {{userUrl}}/rental/user/getUserList
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
 
 {
   "pageIndex": 1,
@@ -28,20 +31,20 @@ Authorization: Bearer {{auth_token}}
 }
 
 ###
-POST {{userUrl}}/rental/user/addUser/admin
+POST {{userUrl}}/rental/user/addUser/landlord
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
 
 {
-  "username": "",
+  "username": "18925503712",
   "password": "e10adc3949ba59abbe56e057f20f883e",
-  "realName": "管理员"
+  "realName": "强"
 }
 
 ###
 POST {{userUrl}}/rental/user/updateUser
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
 
 {
   "id": 12,
@@ -52,17 +55,38 @@ Authorization: Bearer {{auth_token}}
 ###
 POST {{userUrl}}/rental/user/disableUser
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 6
+}
+
+###
+POST {{userUrl}}/rental/user/enableUser
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
 
 {
   "id": 5
 }
 
 ###
-POST {{userUrl}}/rental/user/enableUser
+POST {{houseUrl}}/rental/house/addHouse
 Content-Type: application/json
-Authorization: Bearer {{auth_token}}
+Authorization: Bearer {{admin_token}}
 
 {
-  "id": 5
+  "address": "永和街1号",
+  "directorName": "李四",
+  "directorPhone": "17238390012"
+}
+
+###
+POST {{houseUrl}}/rental/house/getHouseList
+Content-Type: application/json
+Authorization: Bearer {{landlord_token}}
+
+{
+  "pageSize": 10,
+  "pageIndex": 1
 }

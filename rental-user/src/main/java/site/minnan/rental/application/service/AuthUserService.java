@@ -23,7 +23,6 @@ public interface AuthUserService {
     ListQueryVO<AuthUserVO> getUserList(GetUserListDTO dto);
 
 
-
     /**
      * 添加用户
      *
@@ -36,19 +35,19 @@ public interface AuthUserService {
      *
      * @param dto 更新用户信息参数
      */
-    void updateUser(UpdateUserDTO dto);
+    String updateUser(UpdateUserDTO dto);
 
     /**
      * 禁用用户
      *
      * @param dto 参数
      */
-    void disableUser(UserEnabledDTO dto);
+    String disableUser(UserEnabledDTO dto);
 
     /**
      * 启用用户
      *
      * @param dto 参数
      */
-    void enableUser(UserEnabledDTO dto);
+    String enableUser(UserEnabledDTO dto);
 }
