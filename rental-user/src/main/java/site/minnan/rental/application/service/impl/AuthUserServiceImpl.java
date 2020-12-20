@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,9 @@ import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.AddUserDTO;
-import site.minnan.rental.userinterface.dto.UserEnabledDTO;
 import site.minnan.rental.userinterface.dto.GetUserListDTO;
 import site.minnan.rental.userinterface.dto.UpdateUserDTO;
+import site.minnan.rental.userinterface.dto.UserEnabledDTO;
 
 import java.sql.Timestamp;
 import java.util.List;
