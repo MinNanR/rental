@@ -96,7 +96,7 @@ public class ControllerExceptionHandler {
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex, HandlerMethod method) {
         String uri = method.getMethod().getAnnotation(PostMapping.class).value()[0];
         log.error("无权限访问:" + uri, ex);
-        return ResponseEntity.fail(ResponseCode.INVALID_USER, "非法用户");
+        return ResponseEntity.invalid("无权限访问");
     }
 
     @ExceptionHandler(Exception.class)

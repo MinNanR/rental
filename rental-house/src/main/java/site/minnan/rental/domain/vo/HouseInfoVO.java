@@ -1,19 +1,21 @@
 package site.minnan.rental.domain.vo;
 
 import cn.hutool.core.date.DateUtil;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import site.minnan.rental.domain.aggretes.House;
 
-import java.io.Serializable;
-
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+/**
+ * 房屋详情
+ * @author Minnan on 2020/12/21
+ */
 @Data
-public class HouseVO implements Serializable {
+@AllArgsConstructor
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class HouseInfoVO {
 
     private Integer id;
 
@@ -21,15 +23,24 @@ public class HouseVO implements Serializable {
 
     private String directorName;
 
+    private String directorPhone;
+
+    private String longitude;
+
+    private String latitude;
+
     private String updateUserName;
 
     private String updateTime;
 
-    public static HouseVO assemble(House house){
-        return HouseVO.builder()
+    public static HouseInfoVO assemble(House house){
+        return HouseInfoVO.builder()
                 .id(house.getId())
                 .address(house.getAddress())
                 .directorName(house.getDirectorName())
+                .directorPhone(house.getDirectorPhone())
+                .longitude(house.getLongitude())
+                .latitude(house.getLatitude())
                 .updateUserName(house.getUpdateUserName())
                 .updateTime(DateUtil.format(house.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();

@@ -21,6 +21,17 @@ Content-Type: application/json
 > {% client.global.set("landlord_token", response.body.data.token); %}
 
 ###
+POST {{authUrl}}/rental/auth/login/password
+Content-Type: application/json
+
+{
+  "username": "13813812138",
+  "password": "e10adc3949ba59abbe56e057f20f883e"
+}
+
+> {% client.global.set("tenant_token", response.body.data.token) %}
+
+###
 POST {{userUrl}}/rental/user/getUserList
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
@@ -31,14 +42,14 @@ Authorization: Bearer {{admin_token}}
 }
 
 ###
-POST {{userUrl}}/rental/user/addUser/landlord
+POST {{userUrl}}/rental/user/addUser/tenant
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "username": "18925503712",
+  "username": "13813812138",
   "password": "e10adc3949ba59abbe56e057f20f883e",
-  "realName": "强"
+  "realName": "英"
 }
 
 ###
@@ -67,7 +78,7 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "id": 5
+  "id": 6
 }
 
 ###
@@ -109,3 +120,23 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {}
+
+###
+POST {{houseUrl}}/rental/house/getHouseInfo
+Content-Type: application/json
+Authorization: Bearer {{landlord_token}}
+
+{
+  "id": 6
+}
+
+###
+POST {{houseUrl}}/rental/house/updateHouse
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 6,
+  "directorName": "路人甲",
+  "directorPhone": "13813812133"
+}

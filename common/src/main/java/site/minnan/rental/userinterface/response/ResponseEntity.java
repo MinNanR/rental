@@ -98,6 +98,12 @@ public class ResponseEntity<T> {
         return responseEntity;
     }
 
+    public static <T> ResponseEntity<T> invalid(String message){
+        ResponseEntity<T> responseEntity = new ResponseEntity<T>(ResponseCode.INVALID_USER);
+        responseEntity.setMessage(message);
+        return responseEntity;
+    }
+
     /**
      * 失败并返回定制消息
      *

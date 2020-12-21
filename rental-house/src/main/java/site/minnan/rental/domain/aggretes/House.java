@@ -44,6 +44,16 @@ public class House {
     private String directorPhone;
 
     /**
+     * 经度
+     */
+    private String longitude;
+
+    /**
+     * 纬度
+     */
+    private String latitude;
+
+    /**
      * 创建人id
      */
     private Integer createUserId;
