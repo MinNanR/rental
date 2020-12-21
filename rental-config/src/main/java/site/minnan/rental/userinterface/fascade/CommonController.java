@@ -2,12 +2,15 @@ package site.minnan.rental.userinterface.fascade;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.minnan.rental.application.ConfigService;
 import site.minnan.rental.domain.aggretes.Menu;
+import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.vo.UserInformation;
 import site.minnan.rental.userinterface.dto.AddMenuDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
@@ -31,10 +34,21 @@ public class CommonController {
         return ResponseEntity.success();
     }
 
-//    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("getMenu")
     public ResponseEntity<List<Menu>> getMenu(){
         List<Menu> menuList = configService.getMenu();
         return ResponseEntity.success(menuList);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLOR', 'TENANT')")
+    @PostMapping("getUserInformation")
+    public ResponseEntity<UserInformation> getUserInformation(){
+        JwtUser user = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserInformation userInformation = UserInformation.builder()
+                .role(user.getAuthorities().toString())
+                .realName(user.getRealName())
+                .build();
+        return ResponseEntity.success(userInformation);
     }
 }

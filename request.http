@@ -93,9 +93,9 @@ Authorization: Bearer {{admin_token}}
 }
 
 ###
-POST {{houseUrl}}/rental/house/getHouseList
+POST http://localhost:2000/rental/house/getHouseList
 Content-Type: application/json
-Authorization: Bearer {{landlord_token}}
+Authorization: Bearer {{admin_token}}
 
 {
   "pageSize": 10,
@@ -122,7 +122,7 @@ Authorization: Bearer {{admin_token}}
 {}
 
 ###
-POST {{houseUrl}}/rental/house/getHouseInfo
+POST http://localhost:2000/rental/house/getHouseInfo
 Content-Type: application/json
 Authorization: Bearer {{landlord_token}}
 
@@ -140,3 +140,10 @@ Authorization: Bearer {{admin_token}}
   "directorName": "路人甲",
   "directorPhone": "13813812133"
 }
+
+###
+POST {{configUrl}}/rental/common/getUserInformation
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{}
