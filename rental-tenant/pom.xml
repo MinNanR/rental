@@ -11,5 +11,11 @@
 
     <artifactId>rental-tenant</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>site.minnan</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 </project>
