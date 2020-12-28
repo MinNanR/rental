@@ -27,7 +27,7 @@ public class ControllerLog {
     }
 
     @Around("controllerLog()")
-    public Object logAroundController(ProceedingJoinPoint proceedingJoinPoint) {
+    public Object logAroundController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long time = System.currentTimeMillis();
         Object[] args = proceedingJoinPoint.getArgs();
         JSONArray jsonArray =
@@ -35,12 +35,7 @@ public class ControllerLog {
         String methodFullName = proceedingJoinPoint.getTarget().getClass().getName()
                 + "." + proceedingJoinPoint.getSignature().getName();
         log.info("controller调用{}，参数：{}", methodFullName, jsonArray.toJSONString(0));
-        Object retValue = null;
-        try {
-            retValue = proceedingJoinPoint.proceed();
-        } catch (Throwable throwable) {
-            log.error("调用接口异常", throwable);
-        }
+        Object retValue = proceedingJoinPoint.proceed();
         time = System.currentTimeMillis() - time;
         String responseString = new JSONObject(retValue).toJSONString(0);
         log.info("controller调用{}完成，返回数据:{}，用时{}ms", methodFullName, responseString, time);

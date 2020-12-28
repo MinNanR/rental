@@ -18,3 +18,15 @@ jwt:
   header: Authorization
   expiration: 604800
   scret: min107
+
+mybatis-plus:
+  configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+dubbo:
+  application:
+    name: rental-tenant
+  registry:
+    address: zookeeper://127.0.0.1:2181

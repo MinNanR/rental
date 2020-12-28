@@ -91,6 +91,13 @@ public class ControllerExceptionHandler {
         return ResponseEntity.fail(ex.getMessage());
     }
 
+    /**
+     * 处理无权限访问接口异常
+     *
+     * @param ex 异常
+     * @param method
+     * @return
+     */
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseBody
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex, HandlerMethod method) {

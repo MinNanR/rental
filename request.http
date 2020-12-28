@@ -147,3 +147,28 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {}
+
+###
+POST {{tenantUrl}}/rental/tenant/addTenant
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "name": "李四",
+  "gender": "男",
+  "phone": "13813812138",
+  "identificationNumber": "441900199312052414",
+  "birthday": "1998-03-05",
+  "hometownProvince": "广东",
+  "hometownCity": "东莞"
+}
+
+###
+POST {{tenantUrl}}/rental/tenant/getTenantList
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "pageIndex": 1,
+  "pageSize": 10
+}
