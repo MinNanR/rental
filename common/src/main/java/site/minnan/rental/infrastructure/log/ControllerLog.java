@@ -1,5 +1,8 @@
 package site.minnan.rental.infrastructure.log;
 
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -23,17 +26,15 @@ public class ControllerLog {
     private void controllerLog() {
     }
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Around("controllerLog()")
-    public Object logAroundController(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+    public Object logAroundController(ProceedingJoinPoint proceedingJoinPoint) {
         long time = System.currentTimeMillis();
         Object[] args = proceedingJoinPoint.getArgs();
-        List<String> argStringList = Arrays.stream(args).map(Object::toString).collect(Collectors.toList());
-        String argsString = objectMapper.writeValueAsString(argStringList);
+        JSONArray jsonArray =
+                Arrays.stream(args).collect(JSONArray::new, JSONArray::add, JSONArray::addAll);
         String methodFullName = proceedingJoinPoint.getTarget().getClass().getName()
                 + "." + proceedingJoinPoint.getSignature().getName();
-        log.info("controller调用{}，参数：{}", methodFullName, argsString);
+        log.info("controller调用{}，参数：{}", methodFullName, jsonArray.toJSONString(0));
         Object retValue = null;
         try {
             retValue = proceedingJoinPoint.proceed();
@@ -41,7 +42,7 @@ public class ControllerLog {
             log.error("调用接口异常", throwable);
         }
         time = System.currentTimeMillis() - time;
-        String responseString = objectMapper.writeValueAsString(retValue);
+        String responseString = new JSONObject(retValue).toJSONString(0);
         log.info("controller调用{}完成，返回数据:{}，用时{}ms", methodFullName, responseString, time);
         return retValue;
     }
