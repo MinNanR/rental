@@ -1,4 +1,4 @@
-package site.minnan.rental.domain.aggretes;
+package site.minnan.rental.domain.aggregate;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
