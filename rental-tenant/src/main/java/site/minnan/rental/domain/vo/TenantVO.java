@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.minnan.rental.domain.aggretes.Tenant;
+import site.minnan.rental.domain.aggregate.Tenant;
 
 import java.util.Optional;
 

@@ -1,7 +1,6 @@
 package site.minnan.rental.infrastructure.enumerate;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.baomidou.mybatisplus.core.enums.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
@@ -11,15 +10,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum Gender {
 
-    MALE(1, "男"), FEMALE(2, "女");
+    MALE("MALE", "男"),
+    FEMALE("FEMALE", "女");
 
     @EnumValue
-    private final Integer value;
+    private final String value;
 
     @JsonValue
     private final String gender;
 
-    Gender(Integer value, String gender) {
+    Gender(String  value, String gender) {
         this.value = value;
         this.gender = gender;
     }
@@ -28,10 +28,7 @@ public enum Gender {
         return gender;
     }
 
-    /**
-     * 枚举数据库存储值
-     */
-    public Integer getValue() {
+    public String getValue() {
         return value;
     }
 }

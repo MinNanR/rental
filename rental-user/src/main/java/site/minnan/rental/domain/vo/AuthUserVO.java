@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import site.minnan.rental.domain.aggretes.AuthUser;
+import site.minnan.rental.domain.aggregate.AuthUser;
 
 /**
  * 用户信息值对象
@@ -56,7 +56,7 @@ public class AuthUserVO {
                 .username(user.getUsername())
                 .phone(user.getPhone())
                 .realName(user.getRealName())
-                .roleName(user.getRoleName())
+                .roleName(user.getRole().getRoleName())
                 .updateTime(DateUtil.format(user.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();
     }

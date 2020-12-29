@@ -3,7 +3,7 @@ package site.minnan.rental.application.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import site.minnan.rental.application.ConfigService;
-import site.minnan.rental.domain.aggretes.Menu;
+import site.minnan.rental.domain.aggregate.Menu;
 import site.minnan.rental.domain.mapper.MenuMapper;
 import site.minnan.rental.userinterface.dto.AddMenuDTO;
 

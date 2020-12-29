@@ -1,6 +1,6 @@
 package site.minnan.rental.application;
 
-import site.minnan.rental.domain.aggretes.Menu;
+import site.minnan.rental.domain.aggregate.Menu;
 import site.minnan.rental.userinterface.dto.AddMenuDTO;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package site.minnan.rental.domain.aggretes;
+package site.minnan.rental.domain.aggregate;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.Role;
 
 import java.sql.Timestamp;
@@ -41,19 +41,9 @@ public class AuthUser {
     private String password;
 
     /**
-     * 角色id
-     */
-    private Integer roleId;
-
-    /**
      * 角色
      */
-    private String roleName;
-
-    /**
-     * 角色（英文）
-     */
-    private String role;
+    private Role role;
 
     /**
      * 是否启用（0-禁用，1-启用）
@@ -115,17 +105,24 @@ public class AuthUser {
      */
     public final static Integer DISABLE = 0;
 
-    public void setRole(Role role) {
-        this.roleName = role.roleName();
-        this.roleId = role.roleId();
-        this.role = role.name();
-    }
-
     public void setCreateUser(JwtUser user) {
+        Timestamp current = new Timestamp(System.currentTimeMillis());
         this.createUserId = user.getId();
         this.createUserName = user.getRealName();
+        this.createTime = current;
         this.updateUserId = user.getId();
         this.updateUserName = user.getRealName();
+        this.updateTime = current;
+    }
+
+    public void setCreateUser(Integer userId, String userName){
+        Timestamp current = new Timestamp(System.currentTimeMillis());
+        this.createUserId = userId;
+        this.createUserName = userName;
+        this.createTime = current;
+        this.updateUserId = userId;
+        this.updateUserName = userName;
+        this.updateTime = current;
     }
 
     public void setUpdateUser(JwtUser user) {

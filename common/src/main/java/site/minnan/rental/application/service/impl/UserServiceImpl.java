@@ -1,10 +1,8 @@
 package site.minnan.rental.application.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,8 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import site.minnan.rental.application.service.UserService;
-import site.minnan.rental.domain.aggretes.AuthUser;
-import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.aggregate.AuthUser;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.UserMapper;
 import site.minnan.rental.domain.vo.LoginVO;
 import site.minnan.rental.infrastructure.utils.JwtUtil;
@@ -57,7 +55,7 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<AuthUser> userOptional = getAuthUser(username);
         AuthUser authUser = userOptional.orElseThrow(() -> new UsernameNotFoundException("用户名不存在"));
-        String roleName = authUser.getRole();
+        String roleName = authUser.getRole().getValue();
         List<GrantedAuthority> grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority(roleName));
         return JwtUser.builder()
                 .id(authUser.getId())

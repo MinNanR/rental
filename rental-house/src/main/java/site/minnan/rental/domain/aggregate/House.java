@@ -1,4 +1,4 @@
-package site.minnan.rental.domain.aggretes;
+package site.minnan.rental.domain.aggregate;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.entity.JwtUser;
 
 import java.sql.Timestamp;
 

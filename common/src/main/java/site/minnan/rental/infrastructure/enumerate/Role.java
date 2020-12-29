@@ -1,29 +1,34 @@
 package site.minnan.rental.infrastructure.enumerate;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * 用户类型枚举
  * created by Minnan on 2020/12/17
  */
 public enum Role {
 
-    ADMIN("管理员", 1),
-    LANDLORD("房东", 2),
-    TENANT("房客 ", 3);
+    ADMIN("ADMIN", "管理员"),
+    LANDLORD("LANDLORD", "房东"),
+    TENANT("TENANT", "房客");
 
+    @EnumValue
+    private final String value;
+
+    @JsonValue
     private final String roleName;
 
-    private final Integer roleId;
-
-    Role(String roleName, Integer roleId){
+    Role(String value, String roleName) {
+        this.value = value;
         this.roleName = roleName;
-        this.roleId = roleId;
     }
 
-    public String roleName(){
+    public String getValue(){
+        return value;
+    }
+
+    public String getRoleName(){
         return roleName;
-    }
-
-    public Integer roleId() {
-        return roleId;
     }
 }

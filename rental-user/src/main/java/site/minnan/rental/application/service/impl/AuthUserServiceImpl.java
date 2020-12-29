@@ -11,8 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import site.minnan.rental.application.service.AuthUserService;
-import site.minnan.rental.domain.aggretes.AuthUser;
-import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.aggregate.AuthUser;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.UserMapper;
 import site.minnan.rental.domain.vo.AuthUserVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
@@ -80,7 +80,6 @@ public class AuthUserServiceImpl implements AuthUserService {
             throw new EntityAlreadyExistException("用户名已被使用");
         }
         JwtUser user = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Timestamp current = new Timestamp(System.currentTimeMillis());
         String rawPassword = dto.getPassword();
         String encodedPassword = passwordEncoder.encode(rawPassword);
         AuthUser newUser = AuthUser.builder()
@@ -88,8 +87,9 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .password(encodedPassword)
                 .realName(dto.getRealName())
                 .phone(dto.getPhone())
-                .createTime(current)
-                .updateTime(current).build();
+                .role(Role.valueOf(dto.getRole().toUpperCase()))
+                .build();
+
         newUser.setCreateUser(user);
         newUser.setRole(Role.valueOf(dto.getRole().toUpperCase()));
         userMapper.insert(newUser);

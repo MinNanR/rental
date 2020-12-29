@@ -1,10 +1,10 @@
-package site.minnan.rental.domain.aggretes;
+package site.minnan.rental.domain.aggregate;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.Gender;
 
 import java.sql.Timestamp;

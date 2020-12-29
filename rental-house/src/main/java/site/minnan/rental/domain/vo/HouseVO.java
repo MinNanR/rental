@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import site.minnan.rental.domain.aggretes.House;
+import site.minnan.rental.domain.aggregate.House;
 
 import java.io.Serializable;
 

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 响应实体类
  * @author Minnan on 2020/12/16
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseEntity<T> {
+public class ResponseEntity<T> implements Serializable {
 
     /**
      * 响应状态码

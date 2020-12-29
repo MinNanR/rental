@@ -7,17 +7,20 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import site.minnan.rental.application.provider.UserProviderService;
 import site.minnan.rental.application.service.TenantService;
-import site.minnan.rental.domain.aggretes.Tenant;
-import site.minnan.rental.domain.enitty.JwtUser;
+import site.minnan.rental.domain.aggregate.Tenant;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.TenantMapper;
 import site.minnan.rental.domain.vo.ListQueryVO;
 import site.minnan.rental.domain.vo.TenantInfoVO;
 import site.minnan.rental.domain.vo.TenantVO;
+import site.minnan.rental.infrastructure.enumerate.Gender;
 import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.userinterface.dto.AddTenantDTO;
+import site.minnan.rental.userinterface.dto.AddTenantUserDTO;
 import site.minnan.rental.userinterface.dto.DetailsQueryDTO;
 import site.minnan.rental.userinterface.dto.GetTenantListDTO;
 
@@ -34,15 +37,13 @@ public class TenantServiceImpl implements TenantService {
     @Reference
     private UserProviderService userProviderService;
 
-//    @Reference
-//    private ProviderService providerService;
-
     /**
      * 添加房客
      *
      * @param dto
      */
     @Override
+    @Transactional
     public void addTenant(AddTenantDTO dto) {
         JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer check = tenantMapper.checkTenantExistByIdentificationNumber(dto.getIdentificationNumber());
@@ -51,6 +52,7 @@ public class TenantServiceImpl implements TenantService {
         }
         Tenant tenant = Tenant.builder()
                 .name(dto.getName())
+                .gender(Gender.valueOf(dto.getGender()))
                 .birthday(dto.getBirthday())
                 .phone(dto.getPhone())
                 .identificationNumber(dto.getIdentificationNumber())
@@ -59,7 +61,13 @@ public class TenantServiceImpl implements TenantService {
                 .build();
         tenant.setCreateUser(jwtUser);
         tenantMapper.insert(tenant);
-        userProviderService.createTenantUser(dto.getPhone(), dto.getName(), jwtUser);
+        AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
+                .phone(dto.getPhone())
+                .realName(dto.getName())
+                .userId(jwtUser.getId())
+                .userName(jwtUser.getRealName())
+                .build();
+        userProviderService.createTenantUser(tenantUserDTO);
     }
 
     /**
