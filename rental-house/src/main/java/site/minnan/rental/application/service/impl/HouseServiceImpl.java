@@ -12,6 +12,7 @@ import site.minnan.rental.application.service.HouseService;
 import site.minnan.rental.domain.aggregate.House;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.HouseMapper;
+import site.minnan.rental.domain.vo.HouseDropDown;
 import site.minnan.rental.domain.vo.HouseInfoVO;
 import site.minnan.rental.domain.vo.HouseVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
@@ -58,6 +59,7 @@ public class HouseServiceImpl implements HouseService {
     @Override
     public void addHouse(AddHouseDTO dto) {
         House newHouse = House.builder()
+                .houseName(dto.getHouseName())
                 .address(dto.getAddress())
                 .directorName(dto.getDirectorName())
                 .directorPhone(dto.getDirectorPhone())
@@ -107,5 +109,11 @@ public class HouseServiceImpl implements HouseService {
         wrapper.set("update_user_id", jwtUser.getId());
         wrapper.set("update_user_name", jwtUser.getRealName());
         int i = houseMapper.update(null, wrapper);
+    }
+
+    @Override
+    public List<HouseDropDown> getHouseDropDown() {
+        List<House> houseList = houseMapper.getHouseDropDown();
+        return houseList.stream().map(e -> new HouseDropDown(e.getId(), e.getHouseName())).collect(Collectors.toList());
     }
 }

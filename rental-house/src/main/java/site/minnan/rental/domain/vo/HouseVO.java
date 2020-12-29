@@ -17,6 +17,8 @@ public class HouseVO implements Serializable {
 
     private Integer id;
 
+    private String houseName;
+
     private String address;
 
     private String directorName;
@@ -28,6 +30,7 @@ public class HouseVO implements Serializable {
     public static HouseVO assemble(House house){
         return HouseVO.builder()
                 .id(house.getId())
+                .houseName(house.getHouseName())
                 .address(house.getAddress())
                 .directorName(house.getDirectorName())
                 .updateUserName(house.getUpdateUserName())

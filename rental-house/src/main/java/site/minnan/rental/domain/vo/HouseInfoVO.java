@@ -19,6 +19,8 @@ public class HouseInfoVO {
 
     private Integer id;
 
+    private String houseName;
+
     private String address;
 
     private String directorName;
@@ -36,6 +38,7 @@ public class HouseInfoVO {
     public static HouseInfoVO assemble(House house){
         return HouseInfoVO.builder()
                 .id(house.getId())
+                .houseName(house.getHouseName())
                 .address(house.getAddress())
                 .directorName(house.getDirectorName())
                 .directorPhone(house.getDirectorPhone())

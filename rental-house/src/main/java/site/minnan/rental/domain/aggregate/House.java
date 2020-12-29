@@ -29,6 +29,11 @@ public class House {
     private Integer id;
 
     /**
+     * 房屋简称
+     */
+    private String houseName;
+
+    /**
      * 房子地址
      */
     private String address;

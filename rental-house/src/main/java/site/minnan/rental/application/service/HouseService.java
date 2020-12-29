@@ -1,5 +1,6 @@
 package site.minnan.rental.application.service;
 
+import site.minnan.rental.domain.vo.HouseDropDown;
 import site.minnan.rental.domain.vo.HouseInfoVO;
 import site.minnan.rental.domain.vo.HouseVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
@@ -7,6 +8,8 @@ import site.minnan.rental.userinterface.dto.AddHouseDTO;
 import site.minnan.rental.userinterface.dto.DetailsQueryDTO;
 import site.minnan.rental.userinterface.dto.GetHouseListDTO;
 import site.minnan.rental.userinterface.dto.UpdateHouseDTO;
+
+import java.util.List;
 
 /**
  * 房屋service
@@ -44,4 +47,6 @@ public interface HouseService {
      * @param dto 更新参数
      */
     void updateHouse(UpdateHouseDTO dto);
+
+    List<HouseDropDown> getHouseDropDown();
 }

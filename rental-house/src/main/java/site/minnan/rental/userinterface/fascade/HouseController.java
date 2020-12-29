@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.minnan.rental.application.service.HouseService;
+import site.minnan.rental.domain.vo.HouseDropDown;
 import site.minnan.rental.domain.vo.HouseInfoVO;
 import site.minnan.rental.domain.vo.HouseVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
@@ -17,6 +18,7 @@ import site.minnan.rental.userinterface.dto.UpdateHouseDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("rental/house")
@@ -51,5 +53,12 @@ public class HouseController {
     public ResponseEntity<?> updateHouse(@RequestBody @Valid UpdateHouseDTO dto){
         houseService.updateHouse(dto);
         return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getHouseDropDown")
+    public ResponseEntity<?> getHouseDropDown(){
+        List<HouseDropDown> vo = houseService.getHouseDropDown();
+        return ResponseEntity.success(vo);
     }
 }
