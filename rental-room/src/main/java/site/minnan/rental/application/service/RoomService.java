@@ -2,11 +2,8 @@ package site.minnan.rental.application.service;
 
 import site.minnan.rental.domain.vo.ListQueryVO;
 import site.minnan.rental.domain.vo.RoomVO;
-import site.minnan.rental.userinterface.dto.AddRoomDTO;
-import site.minnan.rental.userinterface.dto.DetailsQueryDTO;
-import site.minnan.rental.userinterface.dto.GetRoomListDTO;
+import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.domain.vo.RoomInfoVO;
-import site.minnan.rental.userinterface.dto.UpdateRoomDTO;
 
 /**
  * 房间相关操作
@@ -44,4 +41,11 @@ public interface RoomService {
      * @param dto
      */
     void updateRoom(UpdateRoomDTO dto);
+
+    /**
+     * 检查房间号码是否已被使用
+     *
+     * @param dto
+     */
+    Boolean checkRoomNumberUsed(CheckRoomNumberDTO dto);
 }

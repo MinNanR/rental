@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.Gender;
+import site.minnan.rental.infrastructure.enumerate.TenantStatus;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -59,6 +60,21 @@ public class Tenant {
      * 身份证号码
      */
     private String identificationNumber;
+
+    /**
+     * 所住房间id
+     */
+    private Integer roomId;
+
+    /**
+     * 房间编号
+     */
+    private String roomNumber;
+
+    /**
+     * 房客状态
+     */
+    private TenantStatus status;
 
     /**
      * 创建人id

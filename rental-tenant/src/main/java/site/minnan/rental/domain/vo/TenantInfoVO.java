@@ -30,6 +30,14 @@ public class TenantInfoVO {
 
     private String identificationNumber;
 
+    private Integer roomId;
+
+    private String roomNumber;
+
+    private String status;
+
+    private String statusCode;
+
     public static TenantInfoVO assemble(Tenant tenant) {
         return TenantInfoVO.builder()
                 .id(tenant.getId())
@@ -40,6 +48,10 @@ public class TenantInfoVO {
                 .hometownProvince(tenant.getHometownProvince())
                 .hometownCity(tenant.getHometownCity())
                 .identificationNumber(tenant.getIdentificationNumber())
+                .roomId(tenant.getRoomId())
+                .roomNumber(tenant.getRoomNumber())
+                .status(tenant.getStatus().getStatus())
+                .statusCode(tenant.getStatus().getValue())
                 .build();
     }
 }

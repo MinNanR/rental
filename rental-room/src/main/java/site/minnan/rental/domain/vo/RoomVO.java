@@ -19,6 +19,8 @@ public class RoomVO {
 
     private Integer price;
 
+    private String status;
+
     private String updateUserName;
 
     private String updateTime;
@@ -28,6 +30,7 @@ public class RoomVO {
                 .id(room.getId())
                 .roomNumber(room.getRoomNumber())
                 .price(room.getPrice())
+                .status(room.getStatus().getStatus())
                 .updateUserName(room.getUpdateUserName())
                 .updateTime(DateUtil.format(room.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();

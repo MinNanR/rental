@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import site.minnan.rental.application.provider.RoomProviderService;
 import site.minnan.rental.application.provider.UserProviderService;
 import site.minnan.rental.application.service.TenantService;
 import site.minnan.rental.domain.aggregate.Tenant;
@@ -17,12 +18,11 @@ import site.minnan.rental.domain.vo.ListQueryVO;
 import site.minnan.rental.domain.vo.TenantInfoVO;
 import site.minnan.rental.domain.vo.TenantVO;
 import site.minnan.rental.infrastructure.enumerate.Gender;
+import site.minnan.rental.infrastructure.enumerate.RoomStatus;
+import site.minnan.rental.infrastructure.enumerate.TenantStatus;
 import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
-import site.minnan.rental.userinterface.dto.AddTenantDTO;
-import site.minnan.rental.userinterface.dto.AddTenantUserDTO;
-import site.minnan.rental.userinterface.dto.DetailsQueryDTO;
-import site.minnan.rental.userinterface.dto.GetTenantListDTO;
+import site.minnan.rental.userinterface.dto.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +36,9 @@ public class TenantServiceImpl implements TenantService {
 
     @Reference
     private UserProviderService userProviderService;
+
+    @Reference
+    private RoomProviderService roomProviderService;
 
     /**
      * 添加房客
@@ -58,16 +61,24 @@ public class TenantServiceImpl implements TenantService {
                 .identificationNumber(dto.getIdentificationNumber())
                 .hometownProvince(dto.getHometownProvince())
                 .hometownCity(dto.getHometownCity())
+                .roomId(dto.getRoomId())
+                .roomNumber(dto.getRoomNumber())
+                .status(TenantStatus.LIVING)
                 .build();
         tenant.setCreateUser(jwtUser);
         tenantMapper.insert(tenant);
+        UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
+                .id(dto.getRoomId())
+                .status(RoomStatus.ON_RENT.getValue())
+                .build();
+        roomProviderService.updateRoomStatus(updateRoomStatusDTO);
         AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
                 .phone(dto.getPhone())
                 .realName(dto.getName())
                 .userId(jwtUser.getId())
                 .userName(jwtUser.getRealName())
                 .build();
-        userProviderService.createTenantUser(tenantUserDTO);
+//        userProviderService.createTenantUser(tenantUserDTO);
     }
 
     /**
@@ -83,6 +94,7 @@ public class TenantServiceImpl implements TenantService {
         Optional.ofNullable(dto.getPhone()).ifPresent(s -> wrapper.like("phone", s));
         Optional.ofNullable(dto.getHometownProvince()).ifPresent(s -> wrapper.eq("hometown_province", s));
         Optional.ofNullable(dto.getHometownCity()).ifPresent(s -> wrapper.eq("hometown_city", s));
+        wrapper.ne("status", TenantStatus.DELETED.getValue());
         Page<Tenant> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
         IPage<Tenant> page = tenantMapper.selectPage(queryPage, wrapper);
         List<TenantVO> voList = page.getRecords().stream().map(TenantVO::assemble).collect(Collectors.toList());

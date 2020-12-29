@@ -154,13 +154,15 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "name": "翠花",
-  "gender": "FEMALE",
+  "name": "李四",
+  "gender": "MALE",
   "phone": "18938389900",
-  "identificationNumber": "4419331772020211",
-  "birthday": "1998-03-05",
+  "identificationNumber": "441933198202021124",
+  "birthday": "1982-02-02",
   "hometownProvince": "广东",
-  "hometownCity": "东莞"
+  "hometownCity": "东莞",
+  "roomId": 2,
+  "roomNumber": "103"
 }
 
 ###
@@ -219,6 +221,17 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "id": 5,
-  "price": 100
+  "id": 2,
+  "roomNumber": "101"
+}
+
+###
+POST {{roomUrl}}/rental/room/checkRoomNumberUsed
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 2,
+  "roomNumber": "111",
+  "houseId": 1
 }

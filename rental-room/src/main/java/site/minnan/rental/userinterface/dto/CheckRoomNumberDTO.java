@@ -5,16 +5,18 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 
 /**
- * 房间列表查询参数
+ * 检查房间号码是否已使用参数
  * @author Minnan on 2020/12/29
  */
 @Data
-public class GetRoomListDTO extends ListQueryDTO{
+public class CheckRoomNumberDTO {
+
+    @NotNull(message = "未提供房间id")
+    private Integer id;
 
     @NotNull(message = "未指定房屋")
     private Integer houseId;
 
-    private Integer floor;
-
-    private String status;
+    @NotNull(message = "房间编号不能为空")
+    private String roomNumber;
 }

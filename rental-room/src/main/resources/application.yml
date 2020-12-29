@@ -22,3 +22,14 @@ jwt:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+dubbo:
+  application:
+    name: rental-room
+  # 指定注册协议和注册地址  dubbo推荐使用zookeeper作为注册中心，并且在start依赖中引入了zookeeper的java客户端Curator
+  registry:
+    protocol: zookeeper
+    address: 127.0.0.1:2181
+  protocol:
+    name: dubbo
+    port: 20882

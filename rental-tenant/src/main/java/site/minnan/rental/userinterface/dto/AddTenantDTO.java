@@ -38,4 +38,9 @@ public class AddTenantDTO {
     private String hometownProvince;
 
     private String hometownCity;
+
+    @NotNull(message = "未指定房间")
+    private Integer roomId;
+
+    private String roomNumber;
 }

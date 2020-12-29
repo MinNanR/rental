@@ -46,10 +46,17 @@ public class RoomController {
         return ResponseEntity.success(vo);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("updateRoom")
     public ResponseEntity<?> updateRoom(@RequestBody @Valid UpdateRoomDTO dto){
         roomService.updateRoom(dto);
         return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("checkRoomNumberUsed")
+    public ResponseEntity<Boolean> checkRoomNumberUsed(@RequestBody @Valid CheckRoomNumberDTO dto){
+        Boolean check = roomService.checkRoomNumberUsed(dto);
+        return ResponseEntity.success(check);
     }
 }
