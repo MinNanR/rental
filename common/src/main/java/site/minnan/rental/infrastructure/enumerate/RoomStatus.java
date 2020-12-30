@@ -30,5 +30,4 @@ public enum RoomStatus {
     public String getStatus(){
         return status;
     }
-
 }

@@ -115,6 +115,10 @@ public class RooServiceImpl implements RoomService {
     @Override
     public Boolean checkRoomNumberUsed(CheckRoomNumberDTO dto) {
         Integer check = roomMapper.checkRoomNumberUsed(dto.getHouseId(), dto.getRoomNumber());
-        return check != null && !check.equals(dto.getId());
+        if(dto.getId() == null){
+            return check != null;
+        }else{
+            return check != null && !check.equals(dto.getId());
+        }
     }
 }

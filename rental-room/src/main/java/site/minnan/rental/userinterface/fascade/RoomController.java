@@ -9,11 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import site.minnan.rental.application.service.RoomService;
 import site.minnan.rental.domain.vo.ListQueryVO;
 import site.minnan.rental.domain.vo.RoomInfoVO;
+import site.minnan.rental.domain.vo.RoomStatusDropDown;
 import site.minnan.rental.domain.vo.RoomVO;
+import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Minnan on 2020/12/29
@@ -27,36 +32,46 @@ public class RoomController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("addRoom")
-    public ResponseEntity<?> addRoom(@RequestBody @Valid AddRoomDTO dto){
+    public ResponseEntity<?> addRoom(@RequestBody @Valid AddRoomDTO dto) {
         roomService.addRoom(dto);
         return ResponseEntity.success();
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getRoomList")
-    public ResponseEntity<ListQueryVO<RoomVO>> getRoomList(@RequestBody @Valid GetRoomListDTO dto){
+    public ResponseEntity<ListQueryVO<RoomVO>> getRoomList(@RequestBody @Valid GetRoomListDTO dto) {
         ListQueryVO<RoomVO> vo = roomService.getRoomList(dto);
         return ResponseEntity.success(vo);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getRoomInfo")
-    public ResponseEntity<RoomInfoVO> getRoomInfo(@RequestBody @Valid DetailsQueryDTO dto){
+    public ResponseEntity<RoomInfoVO> getRoomInfo(@RequestBody @Valid DetailsQueryDTO dto) {
         RoomInfoVO vo = roomService.getRoomInfo(dto);
         return ResponseEntity.success(vo);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("updateRoom")
-    public ResponseEntity<?> updateRoom(@RequestBody @Valid UpdateRoomDTO dto){
+    public ResponseEntity<?> updateRoom(@RequestBody @Valid UpdateRoomDTO dto) {
         roomService.updateRoom(dto);
         return ResponseEntity.success();
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("checkRoomNumberUsed")
-    public ResponseEntity<Boolean> checkRoomNumberUsed(@RequestBody @Valid CheckRoomNumberDTO dto){
+    public ResponseEntity<Boolean> checkRoomNumberUsed(@RequestBody @Valid CheckRoomNumberDTO dto) {
         Boolean check = roomService.checkRoomNumberUsed(dto);
         return ResponseEntity.success(check);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getRoomStatusDropDown")
+    public ResponseEntity<List<RoomStatusDropDown>> getRoomStatus() {
+        List<RoomStatusDropDown> dropDownList = Arrays.stream(RoomStatus.values())
+                .filter(e -> !RoomStatus.DELETED.equals(e))
+                .map(e -> new RoomStatusDropDown(e.getStatus(), e.getValue()))
+                .collect(Collectors.toList());
+        return ResponseEntity.success(dropDownList);
     }
 }

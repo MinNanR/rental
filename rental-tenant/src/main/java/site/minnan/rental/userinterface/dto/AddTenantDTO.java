@@ -20,6 +20,15 @@ public class AddTenantDTO {
     @NotEmpty(message = "房客姓名不能为空")
     private String name;
 
+    @NotNull(message = "未指定房间")
+    private Integer roomId;
+
+    @NotEmpty(message = "未指定房间")
+    private String roomNumber;
+
+    @NotEmpty(message = "未指定房屋")
+    private String houseName;
+
     @NotEmpty(message = "性别未填写")
     private String gender;
 
@@ -38,9 +47,4 @@ public class AddTenantDTO {
     private String hometownProvince;
 
     private String hometownCity;
-
-    @NotNull(message = "未指定房间")
-    private Integer roomId;
-
-    private String roomNumber;
 }

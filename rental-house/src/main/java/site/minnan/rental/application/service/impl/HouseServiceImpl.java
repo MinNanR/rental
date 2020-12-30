@@ -100,6 +100,7 @@ public class HouseServiceImpl implements HouseService {
         UpdateWrapper<House> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", dto.getId());
         Optional.ofNullable(dto.getAddress()).ifPresent(s -> wrapper.set("address", s));
+        Optional.ofNullable(dto.getHouseName()).ifPresent(s -> wrapper.set("house_name", s));
         Optional.ofNullable(dto.getDirectorName()).ifPresent(s -> wrapper.set("director_name", s));
         Optional.ofNullable(dto.getDirectorPhone()).ifPresent(s -> wrapper.set("director_phone", s));
         Optional.ofNullable(dto.getLatitude()).ifPresent(s -> wrapper.set("latitude", s));

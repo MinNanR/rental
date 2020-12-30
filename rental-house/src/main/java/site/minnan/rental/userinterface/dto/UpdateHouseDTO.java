@@ -16,6 +16,8 @@ public class UpdateHouseDTO {
     @NotNull(message = "未指定更新的对象")
     private Integer id;
 
+    private String houseName;
+
     private String address;
 
     private String directorName;

@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CheckRoomNumberDTO {
 
-    @NotNull(message = "未提供房间id")
     private Integer id;
 
     @NotNull(message = "未指定房屋")

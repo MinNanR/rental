@@ -235,3 +235,17 @@ Authorization: Bearer {{admin_token}}
   "roomNumber": "111",
   "houseId": 1
 }
+
+###
+POST {{houseUrl}}/rental/house/getHouseDropDown
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{}
+
+###
+POST {{roomUrl}}/rental/room/getRoomStatusDropDown
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{}
