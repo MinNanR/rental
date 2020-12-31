@@ -15,6 +15,8 @@ public class GetTenantListDTO extends ListQueryDTO{
 
     private String hometownCity;
 
-    private String phone;
+    private Integer houseId;
+
+    private String roomNumber;
 
 }

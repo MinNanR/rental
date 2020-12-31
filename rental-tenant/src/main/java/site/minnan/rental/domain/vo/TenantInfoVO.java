@@ -30,6 +30,8 @@ public class TenantInfoVO {
 
     private String identificationNumber;
 
+    private String houseId;
+
     private Integer roomId;
 
     private String roomNumber;

@@ -61,6 +61,8 @@ public class TenantServiceImpl implements TenantService {
                 .identificationNumber(dto.getIdentificationNumber())
                 .hometownProvince(dto.getHometownProvince())
                 .hometownCity(dto.getHometownCity())
+                .houseId(dto.getHouseId())
+                .houseName(dto.getHouseName())
                 .roomId(dto.getRoomId())
                 .roomNumber(dto.getRoomNumber())
                 .status(TenantStatus.LIVING)
@@ -78,7 +80,7 @@ public class TenantServiceImpl implements TenantService {
                 .userId(jwtUser.getId())
                 .userName(jwtUser.getRealName())
                 .build();
-//        userProviderService.createTenantUser(tenantUserDTO);
+        userProviderService.createTenantUser(tenantUserDTO);
     }
 
     /**
@@ -91,7 +93,8 @@ public class TenantServiceImpl implements TenantService {
     public ListQueryVO<TenantVO> getTenantList(GetTenantListDTO dto) {
         QueryWrapper<Tenant> wrapper = new QueryWrapper<>();
         Optional.ofNullable(dto.getName()).ifPresent(s -> wrapper.like("name", s));
-        Optional.ofNullable(dto.getPhone()).ifPresent(s -> wrapper.like("phone", s));
+        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
+        Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.like("room_number", s));
         Optional.ofNullable(dto.getHometownProvince()).ifPresent(s -> wrapper.eq("hometown_province", s));
         Optional.ofNullable(dto.getHometownCity()).ifPresent(s -> wrapper.eq("hometown_city", s));
         wrapper.ne("status", TenantStatus.DELETED.getValue());

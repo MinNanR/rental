@@ -249,3 +249,13 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {}
+
+
+###
+POST {{roomUrl}}/rental/room/getRoomDropDown
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "houseId": 1
+}

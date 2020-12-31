@@ -1,5 +1,7 @@
 package site.minnan.rental.domain.vo;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +24,8 @@ public class TenantVO {
 
     private String hometown;
 
+    private String identificationNumber;
+
     private String updateUserName;
 
     private String updateTime;
@@ -35,8 +39,9 @@ public class TenantVO {
                 .name(tenant.getName())
                 .phone(tenant.getPhone())
                 .hometown(hometown.toString())
+                .identificationNumber(StrUtil.replace(tenant.getIdentificationNumber(), 6, 15, '*'))
                 .updateUserName(tenant.getUpdateUserName())
-                .updateTime(tenant.getUpdateUserName())
+                .updateTime(DateUtil.format(tenant.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();
     }
 }

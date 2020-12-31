@@ -12,6 +12,7 @@ import site.minnan.rental.domain.aggregate.Room;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.RoomMapper;
 import site.minnan.rental.domain.vo.ListQueryVO;
+import site.minnan.rental.domain.vo.RoomDropDown;
 import site.minnan.rental.domain.vo.RoomInfoVO;
 import site.minnan.rental.domain.vo.RoomVO;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
@@ -115,10 +116,20 @@ public class RooServiceImpl implements RoomService {
     @Override
     public Boolean checkRoomNumberUsed(CheckRoomNumberDTO dto) {
         Integer check = roomMapper.checkRoomNumberUsed(dto.getHouseId(), dto.getRoomNumber());
-        if(dto.getId() == null){
+        if (dto.getId() == null) {
             return check != null;
-        }else{
+        } else {
             return check != null && !check.equals(dto.getId());
         }
+    }
+
+    /**
+     * 获取房间下拉框
+     *
+     * @param dto
+     */
+    @Override
+    public List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto) {
+        return roomMapper.getRoomDropDown(dto.getHouseId());
     }
 }

@@ -1,9 +1,12 @@
 package site.minnan.rental.application.service;
 
 import site.minnan.rental.domain.vo.ListQueryVO;
+import site.minnan.rental.domain.vo.RoomDropDown;
 import site.minnan.rental.domain.vo.RoomVO;
 import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.domain.vo.RoomInfoVO;
+
+import java.util.List;
 
 /**
  * 房间相关操作
@@ -48,4 +51,11 @@ public interface RoomService {
      * @param dto
      */
     Boolean checkRoomNumberUsed(CheckRoomNumberDTO dto);
+
+    /**
+     * 获取房间下拉框
+     *
+     * @param dto
+     */
+    List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto);
 }

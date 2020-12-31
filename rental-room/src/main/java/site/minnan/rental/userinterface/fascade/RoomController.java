@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.minnan.rental.application.service.RoomService;
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.RoomInfoVO;
-import site.minnan.rental.domain.vo.RoomStatusDropDown;
-import site.minnan.rental.domain.vo.RoomVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseEntity;
@@ -73,5 +70,12 @@ public class RoomController {
                 .map(e -> new RoomStatusDropDown(e.getStatus(), e.getValue()))
                 .collect(Collectors.toList());
         return ResponseEntity.success(dropDownList);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getRoomDropDown")
+    public ResponseEntity<List<RoomDropDown>> getRoomDropDown(@RequestBody @Valid GetRoomDropDownDTO dto) {
+        List<RoomDropDown> roomDropDown = roomService.getRoomDropDown(dto);
+        return ResponseEntity.success(roomDropDown);
     }
 }

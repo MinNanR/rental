@@ -61,6 +61,17 @@ public class Tenant {
      */
     private String identificationNumber;
 
+
+    /**
+     * 所住房屋id
+     */
+    private Integer houseId;
+
+    /**
+     * 所住房屋简称
+     */
+    private String houseName;
+
     /**
      * 所住房间id
      */
@@ -116,7 +127,7 @@ public class Tenant {
         this.updateTime = currentTime;
     }
 
-    public void setUpdateUser(JwtUser user){
+    public void setUpdateUser(JwtUser user) {
         this.updateUserId = user.getId();
         this.updateUserName = user.getRealName();
         this.updateTime = new Timestamp(System.currentTimeMillis());
