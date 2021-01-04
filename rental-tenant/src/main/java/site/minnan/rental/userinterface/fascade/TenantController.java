@@ -56,8 +56,15 @@ public class TenantController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("tenantMove")
-    public ResponseEntity<?> tenantMove(@RequestBody @Valid TenantMoveDTO dto){
+    public ResponseEntity<?> tenantMove(@RequestBody @Valid TenantMoveDTO dto) {
         tenantService.tenantMove(dto);
+        return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("updateTenant")
+    public ResponseEntity<?> updateTenant(@RequestBody @Valid UpdateTenantDTO dto) {
+        tenantService.updateTenant(dto);
         return ResponseEntity.success();
     }
 }

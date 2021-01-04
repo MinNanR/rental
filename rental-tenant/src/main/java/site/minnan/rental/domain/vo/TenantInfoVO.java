@@ -30,7 +30,9 @@ public class TenantInfoVO {
 
     private String identificationNumber;
 
-    private String houseId;
+    private Integer houseId;
+
+    private String houseName;
 
     private Integer roomId;
 
@@ -50,6 +52,8 @@ public class TenantInfoVO {
                 .hometownProvince(tenant.getHometownProvince())
                 .hometownCity(tenant.getHometownCity())
                 .identificationNumber(tenant.getIdentificationNumber())
+                .houseId(tenant.getHouseId())
+                .houseName(tenant.getHouseName())
                 .roomId(tenant.getRoomId())
                 .roomNumber(tenant.getRoomNumber())
                 .status(tenant.getStatus().getStatus())

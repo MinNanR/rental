@@ -282,3 +282,25 @@ Authorization: Bearer {{admin_token}}
   "roomNumber": "102",
   "tenantIdList": [20]
 }
+
+###
+POST  {{tenantUrl}}/rental/tenant/updateTenant
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 20,
+  "hometownProvince": "广东省",
+  "hometownCity": "东莞市",
+  "birthday": "1998-03-05",
+  "gender": "FEMALE"
+}
+
+###
+POST {{tenantUrl}}/rental/tenant/getTenantInfo
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 20
+}

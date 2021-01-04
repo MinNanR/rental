@@ -52,4 +52,11 @@ public interface TenantService {
      * @param dto
      */
     void tenantMove(TenantMoveDTO dto);
+
+    /**
+     * 修改房客信息
+     *
+     * @param dto
+     */
+    void updateTenant(UpdateTenantDTO dto);
 }

@@ -187,4 +187,35 @@ public class TenantServiceImpl implements TenantService {
                         .build();
         roomProviderService.updateRoomStatus(roomStatusDTO);
     }
+
+    /**
+     * 修改房客信息
+     *
+     * @param dto
+     */
+    @Override
+    public void updateTenant(UpdateTenantDTO dto) {
+        Tenant tenant = tenantMapper.selectById(dto.getId());
+        if (tenant == null) {
+            throw new EntityNotExistException("房客不存在");
+        }
+        JwtUser user = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UpdateWrapper<Tenant> wrapper = new UpdateWrapper<>();
+        Optional.ofNullable(dto.getName()).ifPresent(s -> wrapper.set("name", s));
+        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.set("house_id", s));
+        Optional.ofNullable(dto.getHouseName()).ifPresent(s -> wrapper.set("house_name", s));
+        Optional.ofNullable(dto.getRoomId()).ifPresent(s -> wrapper.set("room_id", s));
+        Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.set("room_number", s));
+        Optional.ofNullable(dto.getGender()).ifPresent(s -> wrapper.set("gender", s));
+        Optional.ofNullable(dto.getPhone()).ifPresent(s -> wrapper.set("phone", s));
+        Optional.ofNullable(dto.getIdentificationNumber()).ifPresent(s -> wrapper.set("identification_number", s));
+        Optional.ofNullable(dto.getBirthday()).ifPresent(s -> wrapper.set("birthday", s));
+        Optional.ofNullable(dto.getHometownProvince()).ifPresent(s -> wrapper.set("hometown_province", s));
+        Optional.ofNullable(dto.getHometownCity()).ifPresent(s -> wrapper.set("hometown_city", s));
+        wrapper.set("update_user_id", user.getId());
+        wrapper.set("update_user_name", user.getRealName());
+        wrapper.set("update_time", new Timestamp(System.currentTimeMillis()));
+        wrapper.eq("id", dto.getId());
+        tenantMapper.update(null, wrapper);
+    }
 }
