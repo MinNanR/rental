@@ -15,6 +15,9 @@ public class AddRoomDTO {
     @NotNull(message = "未指定所属房屋")
     private Integer houseId;
 
+    @NotNull(message = "未指定所属房屋")
+    private String houseName;
+
     @NotEmpty(message = "房间编号不能为空")
     private String roomNumber;
 

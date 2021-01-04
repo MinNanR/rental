@@ -19,4 +19,6 @@ public class GetTenantListDTO extends ListQueryDTO{
 
     private String roomNumber;
 
+    private Integer roomId;
+
 }

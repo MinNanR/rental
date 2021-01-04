@@ -10,9 +10,11 @@ import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.userinterface.dto.UpdateRoomStatusDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
+import java.sql.Timestamp;
+
 @Service(timeout = 5000, interfaceClass = RoomProviderService.class)
 @Slf4j
-public class RoomProviderServiceImpl implements RoomProviderService{
+public class RoomProviderServiceImpl implements RoomProviderService {
 
     @Autowired
     private RoomMapper roomMapper;
@@ -28,8 +30,11 @@ public class RoomProviderServiceImpl implements RoomProviderService{
         try {
             RoomStatus status = RoomStatus.valueOf(dto.getStatus());
             UpdateWrapper<Room> wrapper = new UpdateWrapper<>();
-            wrapper.eq("id", dto.getId());
-            wrapper.set("status", status.getValue());
+            wrapper.eq("id", dto.getId())
+                    .set("status", status.getValue())
+                    .set("update_user_id", dto.getUserId())
+                    .set("update_user_name", dto.getUserName())
+                    .set("update_time", new Timestamp(System.currentTimeMillis()));
             roomMapper.update(null, wrapper);
             return ResponseEntity.success();
         } catch (IllegalArgumentException e) {

@@ -40,6 +40,7 @@ public class RooServiceImpl implements RoomService {
     public void addRoom(AddRoomDTO dto) {
         Room room = Room.builder()
                 .houseId(dto.getHouseId())
+                .houseName(dto.getHouseName())
                 .roomNumber(dto.getRoomNumber())
                 .floor(dto.getFloor())
                 .price(dto.getPrice())

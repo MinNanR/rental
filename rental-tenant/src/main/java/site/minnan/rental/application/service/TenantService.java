@@ -1,11 +1,12 @@
 package site.minnan.rental.application.service;
 
 import site.minnan.rental.domain.vo.ListQueryVO;
+import site.minnan.rental.domain.vo.TenantDropDownVO;
 import site.minnan.rental.domain.vo.TenantInfoVO;
 import site.minnan.rental.domain.vo.TenantVO;
-import site.minnan.rental.userinterface.dto.AddTenantDTO;
-import site.minnan.rental.userinterface.dto.DetailsQueryDTO;
-import site.minnan.rental.userinterface.dto.GetTenantListDTO;
+import site.minnan.rental.userinterface.dto.*;
+
+import java.util.List;
 
 /**
  * 房客相关服务
@@ -36,4 +37,19 @@ public interface TenantService {
      * @return
      */
     TenantInfoVO getTenantInfo(DetailsQueryDTO dto);
+
+    /**
+     * 获取房客下拉框
+     *
+     * @param dto
+     * @return
+     */
+    List<TenantDropDownVO> getTenantDropDown(GetTenantDropDownDTO dto);
+
+    /**
+     * 房客迁移房间
+     *
+     * @param dto
+     */
+    void tenantMove(TenantMoveDTO dto);
 }

@@ -18,4 +18,8 @@ public class UpdateRoomStatusDTO implements Serializable {
     private Integer id;
 
     private String status;
+
+    private Integer userId;
+
+    private String userName;
 }

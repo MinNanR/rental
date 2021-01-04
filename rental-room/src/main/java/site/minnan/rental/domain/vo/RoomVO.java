@@ -1,6 +1,7 @@
 package site.minnan.rental.domain.vo;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +29,7 @@ public class RoomVO {
     public static RoomVO assemble(Room room){
         return RoomVO.builder()
                 .id(room.getId())
-                .roomNumber(room.getRoomNumber())
+                .roomNumber(StrUtil.format("{}-{}", room.getHouseName(), room.getRoomNumber()))
                 .price(room.getPrice())
                 .status(room.getStatus().getStatus())
                 .updateUserName(room.getUpdateUserName())

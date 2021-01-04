@@ -36,6 +36,11 @@ public class Room {
     private Integer houseId;
 
     /**
+     * 房屋简称
+     */
+    private String houseName;
+
+    /**
      * 房间号
      */
     private String roomNumber;

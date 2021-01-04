@@ -19,6 +19,8 @@ public class RoomInfoVO {
 
     private Integer houseId;
 
+    private String houseName;
+
     private String roomNumber;
 
     private Integer floor;
@@ -33,6 +35,7 @@ public class RoomInfoVO {
         return RoomInfoVO.builder()
                 .id(room.getId())
                 .houseId(room.getHouseId())
+                .houseName(room.getHouseName())
                 .roomNumber(room.getRoomNumber())
                 .floor(room.getFloor())
                 .price(room.getPrice())

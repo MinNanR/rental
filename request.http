@@ -259,3 +259,26 @@ Authorization: Bearer {{admin_token}}
 {
   "houseId": 1
 }
+
+###
+POST {{tenantUrl}}/rental/tenant/getTenantDropDown
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "roomId": 6,
+  "name": "张"
+}
+
+###
+POST {{tenantUrl}}/rental/tenant/tenantMove
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "roomId": 6,
+  "houseId": 1,
+  "houseName": "永泰街",
+  "roomNumber": "102",
+  "tenantIdList": [20]
+}
