@@ -21,14 +21,6 @@ public class UpdateTenantDTO {
 
     private String name;
 
-    private Integer houseId;
-
-    private String houseName;
-
-    private Integer roomId;
-
-    private Integer roomNumber;
-
     private String gender;
 
     @Pattern(regexp = "^1([3456789])\\d{9}$", message = "手机号码格式不正确")

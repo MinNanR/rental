@@ -276,11 +276,11 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {
-  "roomId": 6,
+  "roomId": 7,
   "houseId": 1,
   "houseName": "永泰街",
-  "roomNumber": "102",
-  "tenantIdList": [20]
+  "roomNumber": "103",
+  "tenantIdList": [21, 20]
 }
 
 ###
@@ -298,6 +298,15 @@ Authorization: Bearer {{admin_token}}
 
 ###
 POST {{tenantUrl}}/rental/tenant/getTenantInfo
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 20
+}
+
+###
+POST {{tenantUrl}}/rental/tenant/surrender
 Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 

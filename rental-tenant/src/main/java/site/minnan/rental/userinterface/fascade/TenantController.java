@@ -35,9 +35,16 @@ public class TenantController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getTenantList")
-    public ResponseEntity<?> getTenantList(@RequestBody @Valid GetTenantListDTO dto) {
+    public ResponseEntity<ListQueryVO<TenantVO>> getTenantList(@RequestBody @Valid GetTenantListDTO dto) {
         ListQueryVO<TenantVO> vo = tenantService.getTenantList(dto);
         return ResponseEntity.success(vo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getTenantByRoom")
+    public ResponseEntity<List<TenantVO>> getTenantByRoom(@RequestBody @Valid GetTenantByRoomDTO dto){
+        List<TenantVO> tenantList = tenantService.getTenantByRoom(dto);
+        return ResponseEntity.success(tenantList);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
@@ -65,6 +72,13 @@ public class TenantController {
     @PostMapping("updateTenant")
     public ResponseEntity<?> updateTenant(@RequestBody @Valid UpdateTenantDTO dto) {
         tenantService.updateTenant(dto);
+        return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
+    @PostMapping("surrender")
+    public ResponseEntity<?> surrender(@RequestBody @Valid SurrenderDTO dto) {
+        tenantService.surrender(dto);
         return ResponseEntity.success();
     }
 }

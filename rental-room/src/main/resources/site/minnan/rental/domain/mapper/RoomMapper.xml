@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="site.minnan.rental.domain.mapper.RoomMapper">
+
+    <update id="updateRoomStatusBatch">
+        <foreach collection="roomList" item="room" separator=";">
+            update rental_room set status = #{room.status}, update_user_id = #{room.updateUserId},
+            update_user_name = #{room.updateUserName} ,update_time = #{room.updateTime}
+            where id = #{room.id}
+        </foreach>
+    </update>
+</mapper>

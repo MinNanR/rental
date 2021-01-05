@@ -26,6 +26,8 @@ public class TenantVO {
 
     private String identificationNumber;
 
+    private String status;
+
     private String updateUserName;
 
     private String updateTime;
@@ -40,6 +42,7 @@ public class TenantVO {
                 .phone(tenant.getPhone())
                 .hometown(hometown.toString())
                 .identificationNumber(StrUtil.replace(tenant.getIdentificationNumber(), 6, 15, '*'))
+                .status(tenant.getStatus().getStatus())
                 .updateUserName(tenant.getUpdateUserName())
                 .updateTime(DateUtil.format(tenant.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();

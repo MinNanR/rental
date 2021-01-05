@@ -3,6 +3,8 @@ package site.minnan.rental.application.provider;
 import site.minnan.rental.userinterface.dto.UpdateRoomStatusDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
+import java.util.List;
+
 /**
  * 房间服务
  *
@@ -17,4 +19,6 @@ public interface RoomProviderService {
      * @return
      */
     ResponseEntity<?> updateRoomStatus(UpdateRoomStatusDTO dto);
+
+    ResponseEntity<?> updateRoomStatusBatch(List<UpdateRoomStatusDTO> dtoList);
 }

@@ -28,6 +28,7 @@ import site.minnan.rental.userinterface.dto.*;
 
 import javax.validation.constraints.NotEmpty;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -112,6 +113,21 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
+     * 查询该房间所住的房客
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<TenantVO> getTenantByRoom(GetTenantByRoomDTO dto) {
+        QueryWrapper<Tenant> wrapper = new QueryWrapper<>();
+        wrapper.eq("room_id", dto.getRoomId())
+                .eq("status", TenantStatus.LIVING);
+        List<Tenant> tenantList = tenantMapper.selectList(wrapper);
+        return tenantList.stream().map(TenantVO::assemble).collect(Collectors.toList());
+    }
+
+    /**
      * 查询房客详情
      *
      * @param dto
@@ -137,6 +153,7 @@ public class TenantServiceImpl implements TenantService {
         QueryWrapper<Tenant> wrapper = new QueryWrapper<>();
         wrapper.like("name", dto.getName());
         wrapper.ne("room_id", dto.getRoomId());
+        wrapper.or().eq("status", TenantStatus.LEFT);
         List<Tenant> tenantList = tenantMapper.selectList(wrapper);
         return tenantList.stream().map(TenantDropDownVO::assemble).collect(Collectors.toList());
     }
@@ -160,11 +177,13 @@ public class TenantServiceImpl implements TenantService {
                 .set("house_name", dto.getHouseName())
                 .set("room_id", dto.getRoomId())
                 .set("room_number", dto.getRoomNumber())
+                .set("status", TenantStatus.LIVING)
                 .set("update_user_id", jwtUser.getId())
                 .set("update_user_name", jwtUser.getRealName())
                 .set("update_time", new Timestamp(System.currentTimeMillis()))
                 .in("id", tenantIdList);
         tenantMapper.update(null, updateWrapper);
+        List<UpdateRoomStatusDTO> updateRoomStatusDTOList = new ArrayList<>();
         for (Integer id : roomIdList) {
             Integer check = tenantMapper.checkRoomOnRentByRoomId(id);
             if (check == null) {
@@ -175,7 +194,7 @@ public class TenantServiceImpl implements TenantService {
                                 .userId(jwtUser.getId())
                                 .userName(jwtUser.getRealName())
                                 .build();
-                roomProviderService.updateRoomStatus(roomStatusDTO);
+                updateRoomStatusDTOList.add(roomStatusDTO);
             }
         }
         UpdateRoomStatusDTO roomStatusDTO =
@@ -185,7 +204,8 @@ public class TenantServiceImpl implements TenantService {
                         .userId(jwtUser.getId())
                         .userName(jwtUser.getRealName())
                         .build();
-        roomProviderService.updateRoomStatus(roomStatusDTO);
+        updateRoomStatusDTOList.add(roomStatusDTO);
+        roomProviderService.updateRoomStatusBatch(updateRoomStatusDTOList);
     }
 
     /**
@@ -202,10 +222,6 @@ public class TenantServiceImpl implements TenantService {
         JwtUser user = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UpdateWrapper<Tenant> wrapper = new UpdateWrapper<>();
         Optional.ofNullable(dto.getName()).ifPresent(s -> wrapper.set("name", s));
-        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.set("house_id", s));
-        Optional.ofNullable(dto.getHouseName()).ifPresent(s -> wrapper.set("house_name", s));
-        Optional.ofNullable(dto.getRoomId()).ifPresent(s -> wrapper.set("room_id", s));
-        Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.set("room_number", s));
         Optional.ofNullable(dto.getGender()).ifPresent(s -> wrapper.set("gender", s));
         Optional.ofNullable(dto.getPhone()).ifPresent(s -> wrapper.set("phone", s));
         Optional.ofNullable(dto.getIdentificationNumber()).ifPresent(s -> wrapper.set("identification_number", s));
@@ -217,5 +233,36 @@ public class TenantServiceImpl implements TenantService {
         wrapper.set("update_time", new Timestamp(System.currentTimeMillis()));
         wrapper.eq("id", dto.getId());
         tenantMapper.update(null, wrapper);
+    }
+
+    /**
+     * 房客退租
+     *
+     * @param dto
+     */
+    @Override
+    public void surrender(SurrenderDTO dto) {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Tenant tenant = tenantMapper.selectById(dto.getId());
+        if (tenant == null) {
+            throw new EntityNotExistException("房客不存在");
+        }
+        UpdateWrapper<Tenant> wrapper = new UpdateWrapper<>();
+        wrapper.set("status", TenantStatus.LEFT)
+                .set("update_user_id", jwtUser.getId())
+                .set("update_user_name", jwtUser.getRealName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .eq("id", dto.getId());
+        tenantMapper.update(null ,wrapper);
+        Integer check = tenantMapper.checkRoomOnRentByRoomId(tenant.getRoomId());
+        if (check == null) {
+            UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
+                    .id(tenant.getId())
+                    .status(RoomStatus.VACANT.getValue())
+                    .userId(jwtUser.getId())
+                    .userName(jwtUser.getRealName())
+                    .build();
+            roomProviderService.updateRoomStatus(updateRoomStatusDTO);
+        }
     }
 }

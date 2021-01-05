@@ -25,4 +25,6 @@ public interface RoomMapper extends BaseMapper<Room> {
 
     @Select("select id id, room_number roomNumber from rental_room where house_id = #{houseId}")
     List<RoomDropDown> getRoomDropDown(@Param("houseId") Integer houseId);
+
+    Integer updateRoomStatusBatch(@Param("roomList")List<Room> roomList);
 }

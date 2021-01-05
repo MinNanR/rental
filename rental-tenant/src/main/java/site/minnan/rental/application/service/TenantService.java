@@ -31,6 +31,13 @@ public interface TenantService {
     ListQueryVO<TenantVO> getTenantList(GetTenantListDTO dto);
 
     /**
+     * 查询该房间所住的房客
+     * @param dto
+     * @return
+     */
+    List<TenantVO> getTenantByRoom(GetTenantByRoomDTO dto);
+
+    /**
      * 查询房客详情
      *
      * @param dto
@@ -59,4 +66,11 @@ public interface TenantService {
      * @param dto
      */
     void updateTenant(UpdateTenantDTO dto);
+
+    /**
+     * 房客退租
+     *
+     * @param dto
+     */
+    void surrender(SurrenderDTO dto);
 }
