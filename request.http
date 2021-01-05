@@ -313,3 +313,10 @@ Authorization: Bearer {{admin_token}}
 {
   "id": 20
 }
+
+###
+POST {{configUrl}}/rental/common/getRoleDropDown
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{}

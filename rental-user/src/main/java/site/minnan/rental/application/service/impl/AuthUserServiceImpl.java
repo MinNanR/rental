@@ -56,9 +56,11 @@ public class AuthUserServiceImpl implements AuthUserService {
      */
     @Override
     public ListQueryVO<AuthUserVO> getUserList(GetUserListDTO dto) {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         QueryWrapper<AuthUser> wrapper = new QueryWrapper<>();
-        Optional.ofNullable(dto.getRealName()).ifPresent(e -> wrapper.eq("realName", e));
-        Optional.ofNullable(dto.getPhoneNumber()).ifPresent(e -> wrapper.eq("phone", e));
+        Optional.ofNullable(dto.getRealName()).ifPresent(e -> wrapper.like("real_name", e));
+        Optional.ofNullable(dto.getPhoneNumber()).ifPresent(e -> wrapper.like("phone", e));
+        wrapper.ne("id", jwtUser.getId());
         Page<AuthUser> page = new Page<>(dto.getPageIndex(), dto.getPageSize());
         IPage<AuthUser> authUserPage = userMapper.selectPage(page, wrapper);
         List<AuthUserVO> voList =

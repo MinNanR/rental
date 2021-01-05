@@ -1,5 +1,7 @@
 package site.minnan.rental.application.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -25,6 +27,8 @@ import site.minnan.rental.infrastructure.enumerate.TenantStatus;
 import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.userinterface.dto.*;
+import site.minnan.rental.userinterface.response.ResponseCode;
+import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.constraints.NotEmpty;
 import java.sql.Timestamp;
@@ -59,6 +63,17 @@ public class TenantServiceImpl implements TenantService {
         if (check != null) {
             throw new EntityAlreadyExistException("房客已存在");
         }
+        AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
+                .phone(dto.getPhone())
+                .realName(dto.getName())
+                .userId(jwtUser.getId())
+                .userName(jwtUser.getRealName())
+                .build();
+        ResponseEntity<Integer> newUser = userProviderService.createTenantUser(tenantUserDTO);
+        if(!ResponseCode.SUCCESS.code().equals(newUser.getCode())){
+            throw new EntityAlreadyExistException(newUser.getMessage());
+        }
+        Integer userId = newUser.getData();
         Tenant tenant = Tenant.builder()
                 .name(dto.getName())
                 .gender(Gender.valueOf(dto.getGender()))
@@ -71,6 +86,7 @@ public class TenantServiceImpl implements TenantService {
                 .houseName(dto.getHouseName())
                 .roomId(dto.getRoomId())
                 .roomNumber(dto.getRoomNumber())
+                .userId(userId)
                 .status(TenantStatus.LIVING)
                 .build();
         tenant.setCreateUser(jwtUser);
@@ -80,13 +96,7 @@ public class TenantServiceImpl implements TenantService {
                 .status(RoomStatus.ON_RENT.getValue())
                 .build();
         roomProviderService.updateRoomStatus(updateRoomStatusDTO);
-        AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
-                .phone(dto.getPhone())
-                .realName(dto.getName())
-                .userId(jwtUser.getId())
-                .userName(jwtUser.getRealName())
-                .build();
-        userProviderService.createTenantUser(tenantUserDTO);
+
     }
 
     /**
@@ -169,8 +179,9 @@ public class TenantServiceImpl implements TenantService {
         List<Integer> tenantIdList = dto.getTenantIdList();
         QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("id", tenantIdList);
+        List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
         Set<Integer> roomIdList =
-                tenantMapper.selectList(queryWrapper).stream().map(Tenant::getRoomId).collect(Collectors.toSet());
+                tenantList.stream().map(Tenant::getRoomId).collect(Collectors.toSet());
         UpdateWrapper<Tenant> updateWrapper = new UpdateWrapper<>();
 
         updateWrapper.set("house_id", dto.getHouseId())
@@ -206,6 +217,18 @@ public class TenantServiceImpl implements TenantService {
                         .build();
         updateRoomStatusDTOList.add(roomStatusDTO);
         roomProviderService.updateRoomStatusBatch(updateRoomStatusDTOList);
+        List<Integer> leftUserList = tenantList.stream()
+                .filter(e -> TenantStatus.LEFT.equals(e.getStatus()))
+                .map(Tenant::getUserId)
+                .collect(Collectors.toList());
+        if(CollectionUtil.isNotEmpty(leftUserList)){
+            EnableTenantUserBatchDTO enableTenantUserBatchDTO = EnableTenantUserBatchDTO.builder()
+                    .userIdList(leftUserList)
+                    .userId(jwtUser.getId())
+                    .userName(jwtUser.getRealName())
+                    .build();
+            userProviderService.enableTenantUserBatch(enableTenantUserBatchDTO);
+        }
     }
 
     /**
@@ -264,5 +287,11 @@ public class TenantServiceImpl implements TenantService {
                     .build();
             roomProviderService.updateRoomStatus(updateRoomStatusDTO);
         }
+        DisableTenantUserDTO disableTenantUserDTO = DisableTenantUserDTO.builder()
+                .userId(tenant.getUserId())
+                .updateUserId(jwtUser.getId())
+                .updateUserName(jwtUser.getRealName())
+                .build();
+        userProviderService.disableTenantUser(disableTenantUserDTO);
     }
 }

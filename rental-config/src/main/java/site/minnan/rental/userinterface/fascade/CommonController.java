@@ -10,11 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 import site.minnan.rental.application.ConfigService;
 import site.minnan.rental.domain.aggregate.Menu;
 import site.minnan.rental.domain.entity.JwtUser;
+import site.minnan.rental.domain.vo.RoleDropDown;
 import site.minnan.rental.domain.vo.UserInformation;
+import site.minnan.rental.infrastructure.enumerate.Role;
 import site.minnan.rental.userinterface.dto.AddMenuDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 基础配置controller（下拉框，菜单等）
@@ -39,6 +44,15 @@ public class CommonController {
     public ResponseEntity<List<Menu>> getMenu(){
         List<Menu> menuList = configService.getMenu();
         return ResponseEntity.success(menuList);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("getRoleDropDown")
+    public ResponseEntity<List<RoleDropDown>> getRoleDropDown(){
+        List<RoleDropDown> dropDownList = Arrays.stream(Role.values())
+                .map(e -> new RoleDropDown(e.getValue(), e.getRoleName()))
+                .collect(Collectors.toList());
+        return ResponseEntity.success(dropDownList);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLOR', 'TENANT')")

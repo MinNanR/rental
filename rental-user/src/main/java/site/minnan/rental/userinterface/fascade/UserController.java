@@ -24,7 +24,7 @@ public class UserController {
     @Autowired
     private AuthUserService authUserService;
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("getUserList")
     public ResponseEntity<ListQueryVO<AuthUserVO>> getUserList(@RequestBody @Valid GetUserListDTO dto) {
         ListQueryVO<AuthUserVO> vo = authUserService.getUserList(dto);

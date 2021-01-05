@@ -88,6 +88,11 @@ public class Tenant {
     private TenantStatus status;
 
     /**
+     * 用户账号id
+     */
+    private Integer userId;
+
+    /**
      * 创建人id
      */
     private Integer createUserId;

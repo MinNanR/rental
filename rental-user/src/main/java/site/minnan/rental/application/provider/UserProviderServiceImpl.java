@@ -2,6 +2,7 @@ package site.minnan.rental.application.provider;
 
 import cn.hutool.crypto.digest.MD5;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,11 +11,15 @@ import site.minnan.rental.domain.aggregate.AuthUser;
 import site.minnan.rental.domain.mapper.UserMapper;
 import site.minnan.rental.infrastructure.enumerate.Role;
 import site.minnan.rental.userinterface.dto.AddTenantUserDTO;
+import site.minnan.rental.userinterface.dto.DisableTenantUserDTO;
+import site.minnan.rental.userinterface.dto.EnableTenantUserBatchDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
+
+import java.sql.Timestamp;
 
 @Service(timeout = 5000, interfaceClass = UserProviderService.class)
 @Slf4j
-public class UserProviderServiceImpl implements UserProviderService{
+public class UserProviderServiceImpl implements UserProviderService {
 
     @Autowired
     private UserMapper userMapper;
@@ -26,11 +31,16 @@ public class UserProviderServiceImpl implements UserProviderService{
      * 创建租客用户
      *
      * @param dto 参数
+     * @return 新用户id
      */
     @Override
     @Transactional
-    public ResponseEntity<?> createTenantUser(AddTenantUserDTO dto) {
+    public ResponseEntity<Integer> createTenantUser(AddTenantUserDTO dto) {
         try {
+            Integer check = userMapper.checkUsernameUsed(dto.getPhone());
+            if (check != null) {
+                return ResponseEntity.fail("手机号码已存在");
+            }
             String passwordMd5 = MD5.create().digestHex(dto.getPhone().substring(dto.getPhone().length() - 6));
             String encodedPassword = passwordEncoder.encode(passwordMd5);
             AuthUser authUser = AuthUser.builder()
@@ -43,10 +53,46 @@ public class UserProviderServiceImpl implements UserProviderService{
                     .build();
             authUser.setCreateUser(dto.getUserId(), dto.getUserName());
             userMapper.insert(authUser);
-            return ResponseEntity.success();
+            return ResponseEntity.success(authUser.getId());
         } catch (Exception e) {
             log.error("添加租客用户异常", e);
             return ResponseEntity.fail(e.getMessage());
         }
+    }
+
+    /**
+     * 房客退租后禁用用户
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public ResponseEntity<?> disableTenantUser(DisableTenantUserDTO dto) {
+        UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
+        wrapper.set("enabled", 0)
+                .set("update_user_id", dto.getUpdateUserId())
+                .set("update_user_name", dto.getUpdateUserName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .eq("id", dto.getUserId());
+        userMapper.update(null, wrapper);
+        return ResponseEntity.success();
+    }
+
+    /**
+     * 启用用户（租客退租后重新入住）
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public ResponseEntity<?> enableTenantUserBatch(EnableTenantUserBatchDTO dto) {
+        UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
+        wrapper.set("enabled", 1)
+                .set("update_user_id", dto.getUserId())
+                .set("update_user_name", dto.getUserName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .in("id", dto.getUserIdList());
+        userMapper.update(null, wrapper);
+        return ResponseEntity.success();
     }
 }
