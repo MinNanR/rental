@@ -14,5 +14,4 @@ public class RoomDropDown {
 
     private String roomNumber;
 
-
 }

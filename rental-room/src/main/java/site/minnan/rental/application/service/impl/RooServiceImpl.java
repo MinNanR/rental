@@ -1,5 +1,6 @@
 package site.minnan.rental.application.service.impl;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import site.minnan.rental.application.provider.UtilityProviderService;
 import site.minnan.rental.application.service.RoomService;
 import site.minnan.rental.domain.aggregate.Room;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -16,7 +18,6 @@ import site.minnan.rental.domain.vo.RoomDropDown;
 import site.minnan.rental.domain.vo.RoomInfoVO;
 import site.minnan.rental.domain.vo.RoomVO;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
-import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.userinterface.dto.*;
 
@@ -30,6 +31,9 @@ public class RooServiceImpl implements RoomService {
 
     @Autowired
     private RoomMapper roomMapper;
+
+    @Reference
+    private UtilityProviderService utilityProviderService;
 
     /**
      * 创建房间参数
@@ -132,5 +136,31 @@ public class RooServiceImpl implements RoomService {
     @Override
     public List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto) {
         return roomMapper.getRoomDropDown(dto.getHouseId());
+    }
+
+    /**
+     * 获取需要登记水电的房间
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<RoomDropDown> getRoomToRecordUtility(GetRoomToRecordUtilityDTO dto) {
+        QueryWrapper<Room> wrapper = new QueryWrapper<Room>();
+        wrapper.eq("house_id", dto.getHouseId())
+                .eq("floor", dto.getFloor())
+                .eq("status", RoomStatus.ON_RENT);
+        List<Room> roomList = roomMapper.selectList(wrapper);
+        GetRecordedRoomDTO getRecordedRoomDTO = GetRecordedRoomDTO.builder()
+                .houseId(dto.getHouseId())
+                .year(dto.getYear())
+                .month(dto.getMonth())
+                .floor(dto.getFloor())
+                .build();
+        List<Integer> recordedRoom = utilityProviderService.getRecordedRoom(getRecordedRoomDTO);
+        return roomList.stream()
+                .filter(e -> !recordedRoom.contains(e.getId()))
+                .map(e -> new RoomDropDown(e.getId(), e.getRoomNumber()))
+                .collect(Collectors.toList());
     }
 }

@@ -58,4 +58,12 @@ public interface RoomService {
      * @param dto
      */
     List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto);
+
+    /**
+     * 获取需要登记水电的房间
+     *
+     * @param dto
+     * @return
+     */
+    List<RoomDropDown> getRoomToRecordUtility(GetRoomToRecordUtilityDTO dto);
 }

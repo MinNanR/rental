@@ -9,7 +9,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rental-utilities</artifactId>
+    <artifactId>rental-bill</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>site.minnan</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 </project>

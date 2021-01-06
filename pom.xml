@@ -21,7 +21,7 @@
         <module>rental-room</module>
         <module>rental-house</module>
         <module>rental-payment</module>
-        <module>rental-utilities</module>
+        <module>rental-bill</module>
         <module>common</module>
         <module>rental-user</module>
         <module>rental-config</module>

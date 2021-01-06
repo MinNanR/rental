@@ -7,7 +7,7 @@ Content-Type: application/json
 }
 
 
-> {% client.global.set("admin_token", response.body.data.token); %}
+> {% client.global.set("admin_token", "Bearer " + response.body.data.token); %}
 
 ###
 POST {{authUrl}}/rental/auth/login/password
@@ -18,7 +18,7 @@ Content-Type: application/json
   "password": "e10adc3949ba59abbe56e057f20f883e"
 }
 
-> {% client.global.set("landlord_token", response.body.data.token); %}
+> {% client.global.set("landlord_token", `Bearer ${response.body.data.token}`); %}
 
 ###
 POST {{authUrl}}/rental/auth/login/password
@@ -29,12 +29,12 @@ Content-Type: application/json
   "password": "e10adc3949ba59abbe56e057f20f883e"
 }
 
-> {% client.global.set("tenant_token", response.body.data.token) %}
+> {% client.global.set("tenant_token", `Bearer ${response.body.data.token}`) %}
 
 ###
 POST {{userUrl}}/rental/user/getUserList
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "pageIndex": 1,
@@ -44,7 +44,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{userUrl}}/rental/user/addUser/tenant
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "username": "13813812138",
@@ -55,7 +55,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{userUrl}}/rental/user/updateUser
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 12,
@@ -66,7 +66,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{userUrl}}/rental/user/disableUser
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 6
@@ -75,7 +75,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{userUrl}}/rental/user/enableUser
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 6
@@ -84,7 +84,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{houseUrl}}/rental/house/addHouse
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "address": "永和街1号",
@@ -95,7 +95,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST http://localhost:2000/rental/house/getHouseList
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "pageSize": 10,
@@ -105,7 +105,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{configUrl}}/rental/common/addMenu
 Content-Type:application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "name": "日志",
@@ -117,14 +117,14 @@ Authorization: Bearer {{admin_token}}
 ###
 POST http://localhost:2000/rental/common/getMenu
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {}
 
 ###
 POST http://localhost:2000/rental/house/getHouseInfo
 Content-Type: application/json
-Authorization: Bearer {{landlord_token}}
+Authorization: {{landlord_token}}
 
 {
   "id": 6
@@ -133,7 +133,7 @@ Authorization: Bearer {{landlord_token}}
 ###
 POST {{houseUrl}}/rental/house/updateHouse
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 6,
@@ -144,14 +144,14 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{configUrl}}/rental/common/getUserInformation
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {}
 
 ###
 POST {{tenantUrl}}/rental/tenant/addTenant
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "name": "李四",
@@ -168,7 +168,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{tenantUrl}}/rental/tenant/getTenantList
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "pageIndex": 1,
@@ -178,7 +178,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{tenantUrl}}/rental/tenant/getTenantInfo
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 12
@@ -187,7 +187,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{roomUrl}}/rental/room/addRoom
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "houseId": 1,
@@ -198,7 +198,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{roomUrl}}/rental/room/getRoomList
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "pageSize": 10,
@@ -209,7 +209,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{roomUrl}}/rental/room/getRoomInfo
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 2
@@ -218,7 +218,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{roomUrl}}/rental/room/updateRoom
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 2,
@@ -228,7 +228,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{roomUrl}}/rental/room/checkRoomNumberUsed
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 2,
@@ -239,14 +239,14 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{houseUrl}}/rental/house/getHouseDropDown
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {}
 
 ###
 POST {{roomUrl}}/rental/room/getRoomStatusDropDown
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {}
 
@@ -254,7 +254,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{roomUrl}}/rental/room/getRoomDropDown
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "houseId": 1
@@ -263,7 +263,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{tenantUrl}}/rental/tenant/getTenantDropDown
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "roomId": 6,
@@ -273,20 +273,23 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{tenantUrl}}/rental/tenant/tenantMove
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "roomId": 7,
   "houseId": 1,
   "houseName": "永泰街",
   "roomNumber": "103",
-  "tenantIdList": [21, 20]
+  "tenantIdList": [
+    21,
+    20
+  ]
 }
 
 ###
 POST  {{tenantUrl}}/rental/tenant/updateTenant
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 20,
@@ -299,7 +302,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{tenantUrl}}/rental/tenant/getTenantInfo
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 20
@@ -308,7 +311,7 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{tenantUrl}}/rental/tenant/surrender
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 20
@@ -317,15 +320,76 @@ Authorization: Bearer {{admin_token}}
 ###
 POST {{configUrl}}/rental/common/getRoleDropDown
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {}
 
 ###
 POST {{userUrl}}/rental/user/getUserInfo
 Content-Type: application/json
-Authorization: Bearer {{admin_token}}
+Authorization: {{admin_token}}
 
 {
   "id": 10
+}
+
+###
+POST {{billUrl}}/rental/utility/addUtilityBatch
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "year": 2020,
+  "month": 12,
+  "houseId": 1,
+  "houseName": "永泰街",
+  "floor": 1,
+  "utilityList": [
+    {
+      "roomId": 5,
+      "roomNumber": 101,
+      "water": 20,
+      "electricity": 2.71
+    },
+    {
+      "roomId": 6,
+      "roomNumber": 102,
+      "water": 18,
+      "electricity": 7.31
+    }
+  ]
+}
+
+###
+POST {{billUrl}}/rental/utility/getUtilityList
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "pageIndex": 1,
+  "pageSize": 10,
+  "houseId": 1,
+  "year": 2020
+}
+
+###
+POST {{billUrl}}/rental/utility/updateUtility
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "id": 1,
+  "water": 20
+}
+
+###
+POST {{roomUrl}}/rental/room/getRoomToRecordUtility
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "houseId": 1,
+  "year": 2020,
+  "month": 10,
+  "floor": 1
 }

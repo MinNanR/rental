@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:mysql://minnan.site:3306/rental_test?serverTimezone=Asia/Shanghai
+    username: Minnan
+    password: minnan
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  redis:
+    host: minnan.site
+    port: 6379
+    database: 1
+    password: minnan
+
+server:
+  port: 8105
+
+jwt:
+  header: Authorization
+  expiration: 604800
+  scret: min107
+
+logging:
+  file:
+    name: ./logs/rental-bill.log
+
+dubbo:
+  application:
+    name: rental-bill
+  # 指定注册协议和注册地址  dubbo推荐使用zookeeper作为注册中心，并且在start依赖中引入了zookeeper的java客户端Curator
+  registry:
+    protocol: zookeeper
+    address: 127.0.0.1:2181
+
+mybatis-plus:
+  mapper-locations: /site/minnan/rental/domain/mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
