@@ -40,6 +40,8 @@ public class AuthUserVO {
      */
     private String roleName;
 
+    private Integer enabled;
+
     /**
      * 更新时间
      */
@@ -57,6 +59,7 @@ public class AuthUserVO {
                 .phone(user.getPhone())
                 .realName(user.getRealName())
                 .roleName(user.getRole().getRoleName())
+                .enabled(user.getEnabled())
                 .updateUserName(user.getUpdateUserName())
                 .updateTime(DateUtil.format(user.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();

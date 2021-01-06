@@ -23,3 +23,7 @@ jwt:
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #    map-underscore-to-camel-case: true
+
+logging:
+  file:
+    name: ./logs/rental-house.log

@@ -320,3 +320,12 @@ Content-Type: application/json
 Authorization: Bearer {{admin_token}}
 
 {}
+
+###
+POST {{userUrl}}/rental/user/getUserInfo
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+
+{
+  "id": 10
+}

@@ -2,10 +2,8 @@ package site.minnan.rental.application.service;
 
 import site.minnan.rental.domain.vo.AuthUserVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.userinterface.dto.AddUserDTO;
-import site.minnan.rental.userinterface.dto.UserEnabledDTO;
-import site.minnan.rental.userinterface.dto.GetUserListDTO;
-import site.minnan.rental.userinterface.dto.UpdateUserDTO;
+import site.minnan.rental.domain.vo.UserInfoVO;
+import site.minnan.rental.userinterface.dto.*;
 
 /**
  * 用户管理service
@@ -50,4 +48,12 @@ public interface AuthUserService {
      * @param dto 参数
      */
     String enableUser(UserEnabledDTO dto);
+
+    /**
+     * 查询用户详情
+     *
+     * @param dto
+     * @return
+     */
+    UserInfoVO getUserInfo(DetailsQueryDTO dto);
 }

@@ -16,14 +16,12 @@ import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.UserMapper;
 import site.minnan.rental.domain.vo.AuthUserVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
+import site.minnan.rental.domain.vo.UserInfoVO;
 import site.minnan.rental.infrastructure.enumerate.Role;
 import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
-import site.minnan.rental.userinterface.dto.AddUserDTO;
-import site.minnan.rental.userinterface.dto.GetUserListDTO;
-import site.minnan.rental.userinterface.dto.UpdateUserDTO;
-import site.minnan.rental.userinterface.dto.UserEnabledDTO;
+import site.minnan.rental.userinterface.dto.*;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -32,6 +30,7 @@ import java.util.stream.Collectors;
 
 /**
  * 用户管理service
+ *
  * @author Minnan on 2020/12/16
  */
 @Service
@@ -60,7 +59,8 @@ public class AuthUserServiceImpl implements AuthUserService {
         QueryWrapper<AuthUser> wrapper = new QueryWrapper<>();
         Optional.ofNullable(dto.getRealName()).ifPresent(e -> wrapper.like("real_name", e));
         Optional.ofNullable(dto.getPhoneNumber()).ifPresent(e -> wrapper.like("phone", e));
-        wrapper.ne("id", jwtUser.getId());
+        wrapper.ne("id", jwtUser.getId())
+                .orderByDesc("update_time");
         Page<AuthUser> page = new Page<>(dto.getPageIndex(), dto.getPageSize());
         IPage<AuthUser> authUserPage = userMapper.selectPage(page, wrapper);
         List<AuthUserVO> voList =
@@ -89,6 +89,7 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .password(encodedPassword)
                 .realName(dto.getRealName())
                 .phone(dto.getPhone())
+                .enabled(AuthUser.ENABLE)
                 .role(Role.valueOf(dto.getRole().toUpperCase()))
                 .build();
 
@@ -129,13 +130,17 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     @CacheEvict(value = "authUser", key = "#result")
     public String disableUser(UserEnabledDTO dto) {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AuthUser authUser = userMapper.selectById(dto.getId());
-        if(authUser == null){
+        if (authUser == null) {
             throw new EntityNotExistException("用户不存在");
         }
         UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
-        wrapper.eq("id", dto.getId());
-        wrapper.set("enabled", AuthUser.DISABLE);
+        wrapper.set("enabled", AuthUser.DISABLE)
+                .set("update_user_id", jwtUser.getId())
+                .set("update_user_name", jwtUser.getRealName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .eq("id", dto.getId());
         userMapper.update(null, wrapper);
         return authUser.getUsername();
     }
@@ -148,14 +153,33 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     @CacheEvict(value = "authUser", key = "#result")
     public String enableUser(UserEnabledDTO dto) {
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         AuthUser authUser = userMapper.selectById(dto.getId());
-        if(authUser == null){
+        if (authUser == null) {
             throw new EntityNotExistException("用户不存在");
         }
         UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
-        wrapper.eq("id", dto.getId());
-        wrapper.set("enabled", AuthUser.ENABLE);
+        wrapper.set("enabled", AuthUser.ENABLE)
+                .set("update_user_id", jwtUser.getId())
+                .set("update_user_name", jwtUser.getRealName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .eq("id", dto.getId());
         userMapper.update(null, wrapper);
         return authUser.getUsername();
+    }
+
+    /**
+     * 查询用户详情
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public UserInfoVO getUserInfo(DetailsQueryDTO dto) {
+        AuthUser authUser = userMapper.selectById(dto.getId());
+        if (authUser == null) {
+            throw new EntityNotExistException("用户不存在");
+        }
+        return UserInfoVO.assemble(authUser);
     }
 }

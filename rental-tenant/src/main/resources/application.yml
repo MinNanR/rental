@@ -29,3 +29,7 @@ dubbo:
     name: rental-tenant
   registry:
     address: zookeeper://127.0.0.1:2181
+
+  logging:
+    file:
+      name: ./logs/rental-tenant.log

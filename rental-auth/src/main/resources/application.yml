@@ -21,3 +21,7 @@ jwt:
   header: Authorization
   expiration: 604800
   scret: min107
+
+logging:
+  file:
+    name: ./logs/rental-auth.log

@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import site.minnan.rental.application.service.AuthUserService;
 import site.minnan.rental.domain.vo.AuthUserVO;
 import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.userinterface.dto.AddUserDTO;
-import site.minnan.rental.userinterface.dto.UserEnabledDTO;
-import site.minnan.rental.userinterface.dto.GetUserListDTO;
-import site.minnan.rental.userinterface.dto.UpdateUserDTO;
+import site.minnan.rental.domain.vo.UserInfoVO;
+import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
@@ -41,22 +39,29 @@ public class UserController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("updateUser")
-    public ResponseEntity<?> updateUser(@RequestBody @Validated UpdateUserDTO dto){
+    public ResponseEntity<?> updateUser(@RequestBody @Validated UpdateUserDTO dto) {
         authUserService.updateUser(dto);
         return ResponseEntity.success();
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("disableUser")
-    public ResponseEntity<?> disableUser(@RequestBody @Valid UserEnabledDTO dto){
+    public ResponseEntity<?> disableUser(@RequestBody @Valid UserEnabledDTO dto) {
         authUserService.disableUser(dto);
         return ResponseEntity.success();
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("enableUser")
-    public ResponseEntity<?> enableUser(@RequestBody @Valid UserEnabledDTO dto){
+    public ResponseEntity<?> enableUser(@RequestBody @Valid UserEnabledDTO dto) {
         authUserService.enableUser(dto);
         return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("getUserInfo")
+    public ResponseEntity<UserInfoVO> getUserInfo(@RequestBody @Valid DetailsQueryDTO dto) {
+        UserInfoVO userInfo = authUserService.getUserInfo(dto);
+        return ResponseEntity.success(userInfo);
     }
 }
