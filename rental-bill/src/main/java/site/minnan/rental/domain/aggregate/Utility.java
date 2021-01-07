@@ -75,6 +75,11 @@ public class Utility {
     private BigDecimal electricity;
 
     /**
+     * 账单id
+     */
+    private Integer billId;
+
+    /**
      * 状态
      */
     private UtilityStatus status;
@@ -134,5 +139,14 @@ public class Utility {
         updateUserId = user.getId();
         updateUserName = user.getRealName();
         updateTime = current;
+    }
+
+    public void setCreateUser(Integer userId, String userName, Timestamp time){
+        this.createUserId = userId;
+        this.createUserName = userName;
+        this.createTime = time;
+        this.updateUserId = userId;
+        this.updateUserName = userName;
+        this.updateTime = time;
     }
 }

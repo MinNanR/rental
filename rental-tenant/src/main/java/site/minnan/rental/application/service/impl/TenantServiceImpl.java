@@ -1,17 +1,22 @@
 package site.minnan.rental.application.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.minnan.rental.application.provider.RoomProviderService;
 import site.minnan.rental.application.provider.UserProviderService;
+import site.minnan.rental.application.provider.BillProviderService;
 import site.minnan.rental.application.service.TenantService;
 import site.minnan.rental.domain.aggregate.Tenant;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -30,13 +35,11 @@ import site.minnan.rental.userinterface.response.ResponseCode;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TenantServiceImpl implements TenantService {
 
     @Autowired
@@ -47,6 +50,9 @@ public class TenantServiceImpl implements TenantService {
 
     @Reference
     private RoomProviderService roomProviderService;
+
+    @Reference
+    private BillProviderService billProviderService;
 
     /**
      * 添加房客
@@ -68,7 +74,7 @@ public class TenantServiceImpl implements TenantService {
                 .userName(jwtUser.getRealName())
                 .build();
         ResponseEntity<Integer> newUser = userProviderService.createTenantUser(tenantUserDTO);
-        if(!ResponseCode.SUCCESS.code().equals(newUser.getCode())){
+        if (!ResponseCode.SUCCESS.code().equals(newUser.getCode())) {
             throw new EntityAlreadyExistException(newUser.getMessage());
         }
         Integer userId = newUser.getData();
@@ -93,7 +99,18 @@ public class TenantServiceImpl implements TenantService {
                 .id(dto.getRoomId())
                 .status(RoomStatus.ON_RENT.getValue())
                 .build();
-        roomProviderService.updateRoomStatus(updateRoomStatusDTO);
+        ResponseEntity<JSONObject> response = roomProviderService.updateRoomStatus(updateRoomStatusDTO);
+        JSONObject room = response.getData();
+        if (RoomStatus.VACANT.getValue().equals(room.getStr("status"))) {
+            ResponseEntity<JSONObject> roomInfo = roomProviderService.getRoomInfo(dto.getRoomId());
+            CreateBillDTO createBillDTO = CreateBillDTO.builder()
+                    .roomId(dto.getRoomId())
+                    .userId(jwtUser.getId())
+                    .userName(jwtUser.getRealName())
+                    .roomInfo(room)
+                    .build();
+            billProviderService.createBill(createBillDTO);
+        }
 
     }
 
@@ -174,6 +191,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public void tenantMove(TenantMoveDTO dto) {
         JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer checkRoomOnRent = tenantMapper.checkRoomOnRentByRoomId(dto.getRoomId());
         List<Integer> tenantIdList = dto.getTenantIdList();
         QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
         queryWrapper.in("id", tenantIdList);
@@ -192,6 +210,8 @@ public class TenantServiceImpl implements TenantService {
                 .set("update_time", new Timestamp(System.currentTimeMillis()))
                 .in("id", tenantIdList);
         tenantMapper.update(null, updateWrapper);
+
+        //检查房客原房间是否仍有人居住，无人居住则将房间状态改为空闲
         List<UpdateRoomStatusDTO> updateRoomStatusDTOList = new ArrayList<>();
         for (Integer id : roomIdList) {
             Integer check = tenantMapper.checkRoomOnRentByRoomId(id);
@@ -206,6 +226,7 @@ public class TenantServiceImpl implements TenantService {
                 updateRoomStatusDTOList.add(roomStatusDTO);
             }
         }
+        //当前房间修改为在租
         UpdateRoomStatusDTO roomStatusDTO =
                 UpdateRoomStatusDTO.builder()
                         .id(dto.getRoomId())
@@ -215,17 +236,29 @@ public class TenantServiceImpl implements TenantService {
                         .build();
         updateRoomStatusDTOList.add(roomStatusDTO);
         roomProviderService.updateRoomStatusBatch(updateRoomStatusDTOList);
+
+        //检查迁移的房客是否有离开再租的房客
         List<Integer> leftUserList = tenantList.stream()
                 .filter(e -> TenantStatus.LEFT.equals(e.getStatus()))
                 .map(Tenant::getUserId)
                 .collect(Collectors.toList());
-        if(CollectionUtil.isNotEmpty(leftUserList)){
+        if (CollectionUtil.isNotEmpty(leftUserList)) {
             EnableTenantUserBatchDTO enableTenantUserBatchDTO = EnableTenantUserBatchDTO.builder()
                     .userIdList(leftUserList)
                     .userId(jwtUser.getId())
                     .userName(jwtUser.getRealName())
                     .build();
             userProviderService.enableTenantUserBatch(enableTenantUserBatchDTO);
+        }
+
+        //房间原本为空闲状态则创建账单
+        if (checkRoomOnRent == null) {
+            CreateBillDTO createBillDTO = CreateBillDTO.builder()
+                    .roomId(dto.getRoomId())
+                    .userId(jwtUser.getId())
+                    .userName(jwtUser.getRealName())
+                    .build();
+            billProviderService.createBill(createBillDTO);
         }
     }
 
@@ -274,7 +307,7 @@ public class TenantServiceImpl implements TenantService {
                 .set("update_user_name", jwtUser.getRealName())
                 .set("update_time", new Timestamp(System.currentTimeMillis()))
                 .eq("id", dto.getId());
-        tenantMapper.update(null ,wrapper);
+        tenantMapper.update(null, wrapper);
         Integer check = tenantMapper.checkRoomOnRentByRoomId(tenant.getRoomId());
         if (check == null) {
             UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()

@@ -60,10 +60,9 @@ public interface RoomService {
     List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto);
 
     /**
-     * 获取需要登记水电的房间
-     *
+     * 获取楼层下拉框
      * @param dto
      * @return
      */
-    List<RoomDropDown> getRoomToRecordUtility(GetRoomToRecordUtilityDTO dto);
+    List<Integer> getFloorDropDown(GetFloorDropDownDTO dto);
 }

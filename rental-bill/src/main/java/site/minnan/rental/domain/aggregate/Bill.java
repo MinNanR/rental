@@ -79,9 +79,9 @@ public class Bill {
     private Integer rent;
 
     /**
-     * 缴费期限
+     * 结束日期
      */
-    private Date paymentDeadline;
+    private Date completedDate;
 
     /**
      * 水电单id
@@ -122,4 +122,13 @@ public class Bill {
      * 更新时间
      */
     private Timestamp updateTime;
+
+    public void setCreateUser(Integer userId, String userName, Timestamp time){
+        this.createUserId = userId;
+        this.createUserName = userName;
+        this.createTime = time;
+        this.updateUserId = userId;
+        this.updateUserName = userName;
+        this.updateTime = time;
+    }
 }

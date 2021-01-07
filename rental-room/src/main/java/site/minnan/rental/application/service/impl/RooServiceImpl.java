@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import site.minnan.rental.application.provider.UtilityProviderService;
+import site.minnan.rental.application.provider.BillProviderService;
 import site.minnan.rental.application.service.RoomService;
 import site.minnan.rental.domain.aggregate.Room;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -31,9 +31,6 @@ public class RooServiceImpl implements RoomService {
 
     @Autowired
     private RoomMapper roomMapper;
-
-    @Reference
-    private UtilityProviderService utilityProviderService;
 
     /**
      * 创建房间参数
@@ -139,28 +136,13 @@ public class RooServiceImpl implements RoomService {
     }
 
     /**
-     * 获取需要登记水电的房间
+     * 获取楼层下拉框
      *
      * @param dto
      * @return
      */
     @Override
-    public List<RoomDropDown> getRoomToRecordUtility(GetRoomToRecordUtilityDTO dto) {
-        QueryWrapper<Room> wrapper = new QueryWrapper<Room>();
-        wrapper.eq("house_id", dto.getHouseId())
-                .eq("floor", dto.getFloor())
-                .eq("status", RoomStatus.ON_RENT);
-        List<Room> roomList = roomMapper.selectList(wrapper);
-        GetRecordedRoomDTO getRecordedRoomDTO = GetRecordedRoomDTO.builder()
-                .houseId(dto.getHouseId())
-                .year(dto.getYear())
-                .month(dto.getMonth())
-                .floor(dto.getFloor())
-                .build();
-        List<Integer> recordedRoom = utilityProviderService.getRecordedRoom(getRecordedRoomDTO);
-        return roomList.stream()
-                .filter(e -> !recordedRoom.contains(e.getId()))
-                .map(e -> new RoomDropDown(e.getId(), e.getRoomNumber()))
-                .collect(Collectors.toList());
+    public List<Integer> getFloorDropDown(GetFloorDropDownDTO dto) {
+        return roomMapper.getFloorDropDown(dto.getHouseId());
     }
 }

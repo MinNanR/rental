@@ -12,10 +12,13 @@ import site.minnan.rental.domain.aggregate.Utility;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.UtilityMapper;
 import site.minnan.rental.domain.vo.ListQueryVO;
+import site.minnan.rental.domain.vo.UtilityRecordVO;
 import site.minnan.rental.domain.vo.UtilityVO;
+import site.minnan.rental.infrastructure.enumerate.UtilityStatus;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.userinterface.dto.AddUtilityBatchDTO;
 import site.minnan.rental.userinterface.dto.GetUtilityListDTO;
+import site.minnan.rental.userinterface.dto.GetUtilityToBeRecordedDTO;
 import site.minnan.rental.userinterface.dto.UpdateUtilityDTO;
 
 import java.util.List;
@@ -57,6 +60,8 @@ public class UtilityServiceImpl implements UtilityService {
         Optional.ofNullable(dto.getYear()).ifPresent(s -> wrapper.eq("year", s));
         Optional.ofNullable(dto.getMonth()).ifPresent(s -> wrapper.eq("month", s));
         Optional.ofNullable(dto.getStatus()).ifPresent(s -> wrapper.eq("status", s));
+        wrapper.ne("status", UtilityStatus.USING)
+                .ne("status", UtilityStatus.TO_BE_RECORDED);
         wrapper.orderByDesc("update_time");
         Page<Utility> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
         IPage<Utility> page = utilityMapper.selectPage(queryPage, wrapper);
@@ -80,5 +85,23 @@ public class UtilityServiceImpl implements UtilityService {
         Optional.ofNullable(dto.getElectricity()).ifPresent(s -> wrapper.set("electricity", s));
         wrapper.eq("id", dto.getId());
         utilityMapper.update(null ,wrapper);
+    }
+
+    /**
+     * 获取需要登记水电的水电单
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<UtilityRecordVO> getUtilityRecord(GetUtilityToBeRecordedDTO dto) {
+        QueryWrapper<Utility> wrapper = new QueryWrapper<>();
+        wrapper.eq("house_id", dto.getHouseId())
+                .eq("floor", dto.getFloor())
+                .eq("year", dto.getYear())
+                .eq("month", dto.getMonth())
+                .eq("status", UtilityStatus.TO_BE_RECORDED);
+        List<Utility> utilities = utilityMapper.selectList(wrapper);
+        return utilities.stream().map(UtilityRecordVO::assemble).collect(Collectors.toList());
     }
 }

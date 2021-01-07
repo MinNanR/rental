@@ -1,0 +1,9 @@
+@startuml
+:创建账单，同时创建水电单（水电设置为null）BillStatus=UNCOMPLETED,UtilityStatus=USING;
+:账单到期，账单转为等待结算，水电单转为等待记录，BillStatus=TO_BE_SETTLED,UtilityStatus=TO_BE_RECORDED;
+:登记水电查询：查询UtilityStatus=TO_BE_RECORDED;
+:登记水电，水电单转为未结算,UtilityStatus=UNSETTLED;
+:管理员结算水电单，账单转为未支付，水电单转为已结算，BillStatus=UNPAID，BillStatus=SETTLED;
+:房客支付账单，账单转为已支付,BillStatus=PAID;
+:管理员打印收据，账单转为已出单,BillStatus=PRINTED;
+@enduml

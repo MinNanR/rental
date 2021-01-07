@@ -80,9 +80,9 @@ public class RoomController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("getRoomToRecordUtility")
-    public ResponseEntity<List<RoomDropDown>> getRoomToRecordUtility(@RequestBody @Valid GetRoomToRecordUtilityDTO dto){
-        List<RoomDropDown> roomList = roomService.getRoomToRecordUtility(dto);
-        return ResponseEntity.success(roomList);
+    @PostMapping("getFloorDropDown")
+    public ResponseEntity<List<Integer>> getFloorDropDown(@RequestBody @Valid GetFloorDropDownDTO dto){
+        List<Integer> floorDropDown = roomService.getFloorDropDown(dto);
+        return ResponseEntity.success(floorDropDown);
     }
 }

@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum UtilityStatus {
 
-    UNSETTLED("UNSETTLED", "未出单"),
-    SETTLED("SETTLED", "已出单");
+    USING("USING","正在使用"),
+    TO_BE_RECORDED("TO_BE_RECORDED", "待登记"),
+    UNSETTLED("UNSETTLED", "未结算"),
+    SETTLED("SETTLED", "已结算");
 
     @EnumValue
     private final String value;

@@ -154,15 +154,17 @@ Content-Type: application/json
 Authorization: {{admin_token}}
 
 {
-  "name": "李四",
+  "name": "赵六",
   "gender": "MALE",
-  "phone": "18938389900",
-  "identificationNumber": "441933198202021124",
+  "phone": "18933334444",
+  "identificationNumber": "441933198202021125",
   "birthday": "1982-02-02",
   "hometownProvince": "广东",
   "hometownCity": "东莞",
-  "roomId": 2,
-  "roomNumber": "103"
+  "houseId": "2",
+  "houseName": "三甲1号",
+  "roomId": 8,
+  "roomNumber": "101"
 }
 
 ###
@@ -392,4 +394,13 @@ Authorization: {{admin_token}}
   "year": 2020,
   "month": 10,
   "floor": 1
+}
+
+###
+POST {{roomUrl}}/rental/room/getFloorDropDown
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "houseId": 1
 }

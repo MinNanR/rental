@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum  BillStatus {
 
+    UNCOMPLETED("UNCOMPLETED","未完成"),
+    TO_BE_SETTLED("TO_BE_SETTLED", "等待结算"),
     UNPAID("UNPAID", "未支付"),
     PAID("PAID", "已支付"),
     PRINTED("PRINTED", "已出单");
