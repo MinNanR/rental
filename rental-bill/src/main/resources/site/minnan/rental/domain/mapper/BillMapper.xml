@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="site.minnan.rental.domain.mapper.BillMapper">
+
+    <update id="updateBatch">
+        <foreach collection="bills" item="bill" separator=";">
+            update rental_bill set water_usage = #{bill.waterUsage}, electricity_usage = #{bill.electricityUsage},
+            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name #{bill.updateUserName},
+            update_time = #{bill.updateTime}
+        </foreach>
+    </update>
+
+
+    <update id="settleBatch">
+        <foreach collection="bills" item="bill" separator=";">
+            update rental_bill set water_usage = #{bill.waterCharge}, electricity_usage = #{bill.electricityCharge},
+            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name #{bill.updateUserName},
+            update_time = #{bill.updateTime}
+        </foreach>
+    </update>
+</mapper>

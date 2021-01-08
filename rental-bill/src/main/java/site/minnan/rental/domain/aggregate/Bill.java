@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
+import site.minnan.rental.userinterface.dto.RecordUtilityDTO;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -64,9 +66,19 @@ public class Bill {
     private Integer floor;
 
     /**
+     * 用水量
+     */
+    private BigDecimal waterUsage;
+
+    /**
      * 水费
      */
     private BigDecimal waterCharge;
+
+    /**
+     * 用电量
+     */
+    private BigDecimal electricityUsage;
 
     /**
      * 电费
@@ -82,11 +94,6 @@ public class Bill {
      * 结束日期
      */
     private Date completedDate;
-
-    /**
-     * 水电单id
-     */
-    private Integer utilityId;
 
     /**
      * 账单状态
@@ -130,5 +137,25 @@ public class Bill {
         this.updateUserId = userId;
         this.updateUserName = userName;
         this.updateTime = time;
+    }
+
+    public static Bill assemble(RecordUtilityDTO dto){
+        return Bill.builder()
+                .id(dto.getId())
+                .waterUsage(dto.getWaterUsage())
+                .electricityUsage(dto.getElectricityUsage())
+                .build();
+    }
+
+    public void setUpdateUser(JwtUser jwtUser){
+        this.updateUserId = jwtUser.getId();
+        this.updateUserName = jwtUser.getUsername();
+        this.updateTime = new Timestamp(System.currentTimeMillis());
+    }
+
+    public void settle(BigDecimal waterPrice, BigDecimal electricityPrice){
+        this.waterCharge = this.waterUsage.multiply(waterPrice);
+        this.electricityCharge = this.electricityUsage.multiply(electricityPrice);
+        this.status = BillStatus.UNPAID;
     }
 }

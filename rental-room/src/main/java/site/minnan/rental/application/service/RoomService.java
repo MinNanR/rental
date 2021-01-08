@@ -59,10 +59,4 @@ public interface RoomService {
      */
     List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto);
 
-    /**
-     * 获取楼层下拉框
-     * @param dto
-     * @return
-     */
-    List<Integer> getFloorDropDown(GetFloorDropDownDTO dto);
 }

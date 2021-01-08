@@ -404,3 +404,33 @@ Authorization: {{admin_token}}
 {
   "houseId": 1
 }
+
+
+###
+POST {{billUrl}}/rental/bill/setUtilityPrice
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "waterPrice": 1.35,
+  "electricityPrice": 0.35
+}
+
+###
+POST {{billUrl}}/rental/bill/getUtilityPrice
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{}
+
+###
+POST {{billUrl}}/rental/bill/getUnrecordedBill
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "houseId": 1,
+  "floor": 1,
+  "year": 2021,
+  "month": 1
+}

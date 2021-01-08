@@ -98,6 +98,8 @@ public class TenantServiceImpl implements TenantService {
         UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
                 .id(dto.getRoomId())
                 .status(RoomStatus.ON_RENT.getValue())
+                .userId(jwtUser.getId())
+                .userName(jwtUser.getRealName())
                 .build();
         ResponseEntity<JSONObject> response = roomProviderService.updateRoomStatus(updateRoomStatusDTO);
         JSONObject room = response.getData();
@@ -216,13 +218,12 @@ public class TenantServiceImpl implements TenantService {
         for (Integer id : roomIdList) {
             Integer check = tenantMapper.checkRoomOnRentByRoomId(id);
             if (check == null) {
-                UpdateRoomStatusDTO roomStatusDTO =
-                        UpdateRoomStatusDTO.builder()
-                                .id(id)
-                                .status(RoomStatus.VACANT.getValue())
-                                .userId(jwtUser.getId())
-                                .userName(jwtUser.getRealName())
-                                .build();
+                UpdateRoomStatusDTO roomStatusDTO = UpdateRoomStatusDTO.builder()
+                        .id(id)
+                        .status(RoomStatus.VACANT.getValue())
+                        .userId(jwtUser.getId())
+                        .userName(jwtUser.getRealName())
+                        .build();
                 updateRoomStatusDTOList.add(roomStatusDTO);
             }
         }

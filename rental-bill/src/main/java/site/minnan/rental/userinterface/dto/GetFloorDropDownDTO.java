@@ -13,4 +13,8 @@ public class GetFloorDropDownDTO {
 
     @NotNull(message = "未指定房屋")
     private Integer houseId;
+
+    private Integer year;
+
+    private Integer month;
 }

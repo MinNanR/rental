@@ -106,6 +106,13 @@ public class ControllerExceptionHandler {
         return ResponseEntity.invalid("无权限访问");
     }
 
+    @ExceptionHandler(UnmodifiableException.class)
+    @ResponseBody
+    public ResponseEntity<?> handleUnmodifiableException(UnmodifiableException ex){
+        log.error("实体不可修改", ex);
+        return ResponseEntity.fail(ResponseCode.FAIL, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<?> handleUnknownException(Exception ex) {

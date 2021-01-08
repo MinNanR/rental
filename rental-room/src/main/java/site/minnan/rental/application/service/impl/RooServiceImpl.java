@@ -134,15 +134,4 @@ public class RooServiceImpl implements RoomService {
     public List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto) {
         return roomMapper.getRoomDropDown(dto.getHouseId());
     }
-
-    /**
-     * 获取楼层下拉框
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public List<Integer> getFloorDropDown(GetFloorDropDownDTO dto) {
-        return roomMapper.getFloorDropDown(dto.getHouseId());
-    }
 }
