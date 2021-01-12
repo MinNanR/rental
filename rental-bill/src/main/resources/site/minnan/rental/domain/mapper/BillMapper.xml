@@ -7,8 +7,8 @@
     <update id="updateBatch">
         <foreach collection="bills" item="bill" separator=";">
             update rental_bill set water_usage = #{bill.waterUsage}, electricity_usage = #{bill.electricityUsage},
-            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name #{bill.updateUserName},
-            update_time = #{bill.updateTime}
+            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName},
+            update_time = #{bill.updateTime} where id = #{bill.id}
         </foreach>
     </update>
 

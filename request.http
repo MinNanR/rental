@@ -336,33 +336,6 @@ Authorization: {{admin_token}}
 }
 
 ###
-POST {{billUrl}}/rental/utility/addUtilityBatch
-Content-Type: application/json
-Authorization: {{admin_token}}
-
-{
-  "year": 2020,
-  "month": 12,
-  "houseId": 1,
-  "houseName": "永泰街",
-  "floor": 1,
-  "utilityList": [
-    {
-      "roomId": 5,
-      "roomNumber": 101,
-      "water": 20,
-      "electricity": 2.71
-    },
-    {
-      "roomId": 6,
-      "roomNumber": 102,
-      "water": 18,
-      "electricity": 7.31
-    }
-  ]
-}
-
-###
 POST {{billUrl}}/rental/utility/getUtilityList
 Content-Type: application/json
 Authorization: {{admin_token}}
@@ -372,16 +345,6 @@ Authorization: {{admin_token}}
   "pageSize": 10,
   "houseId": 1,
   "year": 2020
-}
-
-###
-POST {{billUrl}}/rental/utility/updateUtility
-Content-Type: application/json
-Authorization: {{admin_token}}
-
-{
-  "id": 1,
-  "water": 20
 }
 
 ###
@@ -434,3 +397,17 @@ Authorization: {{admin_token}}
   "year": 2021,
   "month": 1
 }
+
+
+###
+POST {{billUrl}}/rental/bill/recordUtility
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+[
+  {
+    "id": 2,
+    "waterUsage": 12.8,
+    "electricityUsage": 11.1
+  }
+]

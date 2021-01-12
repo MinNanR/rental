@@ -6,15 +6,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.BillMapper;
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.UnrecordedBillVO;
-import site.minnan.rental.domain.vo.UtilityPrice;
-import site.minnan.rental.domain.vo.UtilityVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
@@ -84,9 +82,9 @@ public class BillServiceImpl implements BillService {
             throw new EntityNotExistException("账单不存在");
         }
         if (!BillStatus.UNRECORDED.equals(bill.getStatus()) && !BillStatus.UNSETTLED.equals(bill.getStatus())) {
-            if(BillStatus.INIT.equals(bill.getStatus())){
+            if (BillStatus.INIT.equals(bill.getStatus())) {
                 throw new UnmodifiableException("结算月未结束");
-            }else{
+            } else {
                 throw new UnmodifiableException("当前账单已结算");
             }
         }
@@ -97,7 +95,7 @@ public class BillServiceImpl implements BillService {
         wrapper.set("update_user_id", jwtUser.getId())
                 .set("update_user_name", jwtUser.getRealName())
                 .set("update_time", new Timestamp(System.currentTimeMillis()));
-        billMapper.update(null,wrapper);
+        billMapper.update(null, wrapper);
     }
 
     /**
@@ -154,6 +152,7 @@ public class BillServiceImpl implements BillService {
         Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.eq("room_number", s));
         Optional.ofNullable(dto.getYear()).ifPresent(s -> wrapper.eq("year", s));
         Optional.ofNullable(dto.getMonth()).ifPresent(s -> wrapper.eq("month", s));
+        Optional.ofNullable(dto.getStatus()).ifPresent(s -> wrapper.eq("status", s));
         wrapper.ne("status", BillStatus.INIT)
                 .ne("status", BillStatus.UNRECORDED);
         Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
@@ -171,11 +170,52 @@ public class BillServiceImpl implements BillService {
     @Override
     public Collection<Integer> getFloorDropDown(GetFloorDropDownDTO dto) {
         QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        wrapper.eq("house_id",dto.getHouseId())
+        wrapper.eq("house_id", dto.getHouseId())
                 .eq("year", dto.getYear())
                 .eq("month", dto.getMonth())
                 .eq("status", BillStatus.UNRECORDED);
         List<Bill> billList = billMapper.selectList(wrapper);
         return billList.stream().map(Bill::getFloor).distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * 获取账单列表
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public ListQueryVO<BillVO> getBillList(GetBillListDTO dto) {
+        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
+        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
+        Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.eq("room_number", s));
+        Optional.ofNullable(dto.getYear()).ifPresent(s -> wrapper.eq("year", s));
+        Optional.ofNullable(dto.getMonth()).ifPresent(s -> wrapper.eq("month", s));
+        Optional.ofNullable(dto.getStatus()).ifPresent(s -> wrapper.eq("status", s));
+        wrapper.ne("status", BillStatus.INIT)
+                .ne("status", BillStatus.UNRECORDED)
+                .ne("status", BillStatus.UNSETTLED);
+        wrapper.orderByDesc("update_time");
+        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
+        IPage<Bill> page = billMapper.selectPage(queryPage, wrapper);
+        List<BillVO> list = page.getRecords().stream().map(BillVO::assemble).collect(Collectors.toList());
+        long total = page.getTotal();
+        return new ListQueryVO<>(list, total);
+    }
+
+    /**
+     * 获取未结算的账单
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<UtilityVO> getUnsettledBill(GetUnsettledBillDTO dto) {
+        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
+        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
+        Optional.ofNullable(dto.getFloor()).ifPresent(s -> wrapper.eq("floor", s));
+        wrapper.eq("status", BillStatus.UNSETTLED);
+        List<Bill> billList = billMapper.selectList(wrapper);
+        return billList.stream().map(UtilityVO::assemble).collect(Collectors.toList());
     }
 }

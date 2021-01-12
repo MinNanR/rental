@@ -1,5 +1,6 @@
 package site.minnan.rental.userinterface.fascade;
 
+import cn.hutool.core.util.ArrayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,12 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.vo.*;
+import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 水电登记相关操作
@@ -79,5 +83,40 @@ public class BillController {
     public ResponseEntity<Collection<Integer>> getFloorDropDown(@RequestBody @Valid GetFloorDropDownDTO dto){
         Collection<Integer> floorDropDown = billService.getFloorDropDown(dto);
         return ResponseEntity.success(floorDropDown);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getUtilityStatusDropDown")
+    public ResponseEntity<List<BillStatusDropDown>> getUtilityStatusDropDown(){
+        List<BillStatusDropDown> dropDownList = Arrays.stream(ArrayUtil.sub(BillStatus.values(), 2,
+                3))
+                .map(e -> new BillStatusDropDown(e.getStatus(), e.getValue()))
+                .collect(Collectors.toList());
+        return ResponseEntity.success(dropDownList);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getBillStatusDropDown")
+    public ResponseEntity<List<BillStatusDropDown>> getBillStatusDropDown(){
+        List<BillStatusDropDown> dropDownList = Arrays.stream(ArrayUtil.sub(BillStatus.values(), 3,
+                BillStatus.values().length))
+                .map(e -> new BillStatusDropDown(e.getStatus(), e.getValue()))
+                .collect(Collectors.toList());
+        return ResponseEntity.success(dropDownList);
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getBillList")
+    public ResponseEntity<?> getBillList(@RequestBody @Valid GetBillListDTO dto){
+        ListQueryVO<BillVO> vo = billService.getBillList(dto);
+        return ResponseEntity.success(vo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getUnsettledBill")
+    public ResponseEntity<List<UtilityVO>> getUnsettledBillList(GetUnsettledBillDTO dto){
+        List<UtilityVO> vo = billService.getUnsettledBill(dto);
+        return ResponseEntity.success(vo);
     }
 }

@@ -14,6 +14,7 @@ import site.minnan.rental.userinterface.dto.RecordUtilityDTO;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * 账单
@@ -142,14 +143,15 @@ public class Bill {
     public static Bill assemble(RecordUtilityDTO dto){
         return Bill.builder()
                 .id(dto.getId())
-                .waterUsage(dto.getWaterUsage())
-                .electricityUsage(dto.getElectricityUsage())
+                .waterUsage(Optional.ofNullable(dto.getWaterUsage()).orElse(BigDecimal.ZERO))
+                .electricityUsage(Optional.ofNullable(dto.getElectricityUsage()).orElse(BigDecimal.ZERO))
+                .status(BillStatus.UNSETTLED)
                 .build();
     }
 
     public void setUpdateUser(JwtUser jwtUser){
         this.updateUserId = jwtUser.getId();
-        this.updateUserName = jwtUser.getUsername();
+        this.updateUserName = jwtUser.getRealName();
         this.updateTime = new Timestamp(System.currentTimeMillis());
     }
 

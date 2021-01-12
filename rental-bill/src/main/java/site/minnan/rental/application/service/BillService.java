@@ -1,9 +1,6 @@
 package site.minnan.rental.application.service;
 
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.UnrecordedBillVO;
-import site.minnan.rental.domain.vo.UtilityPrice;
-import site.minnan.rental.domain.vo.UtilityVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.userinterface.dto.*;
 
 import java.util.Collection;
@@ -74,4 +71,20 @@ public interface BillService {
      * @return
      */
     Collection<Integer> getFloorDropDown(GetFloorDropDownDTO dto);
+
+    /**
+     * 获取账单列表
+     *
+     * @param dto
+     * @return
+     */
+    ListQueryVO<BillVO> getBillList(GetBillListDTO dto);
+
+    /**
+     * 获取未结算的账单
+     *
+     * @param dto
+     * @return
+     */
+    List<UtilityVO> getUnsettledBill(GetUnsettledBillDTO dto);
 }
