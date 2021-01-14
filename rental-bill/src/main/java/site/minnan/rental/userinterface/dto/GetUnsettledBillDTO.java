@@ -10,6 +10,4 @@ import lombok.Data;
 public class GetUnsettledBillDTO {
 
     private Integer houseId;
-
-    private Integer floor;
 }

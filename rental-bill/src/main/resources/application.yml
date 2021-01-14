@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://minnan.site:3306/rental_test?serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://minnan.site:3306/rental_test?serverTimezone=Asia/Shanghai&allowMultiQueries=true
     username: Minnan
     password: minnan
     driver-class-name: com.mysql.cj.jdbc.Driver

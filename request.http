@@ -411,3 +411,12 @@ Authorization: {{admin_token}}
     "electricityUsage": 11.1
   }
 ]
+
+###
+POST {{billUrl}}/rental/bill/getUnsettledFloorDropDown
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "houseId": 1
+}

@@ -12,6 +12,7 @@ import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.userinterface.dto.RecordUtilityDTO;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Optional;
@@ -131,7 +132,7 @@ public class Bill {
      */
     private Timestamp updateTime;
 
-    public void setCreateUser(Integer userId, String userName, Timestamp time){
+    public void setCreateUser(Integer userId, String userName, Timestamp time) {
         this.createUserId = userId;
         this.createUserName = userName;
         this.createTime = time;
@@ -140,7 +141,7 @@ public class Bill {
         this.updateTime = time;
     }
 
-    public static Bill assemble(RecordUtilityDTO dto){
+    public static Bill assemble(RecordUtilityDTO dto) {
         return Bill.builder()
                 .id(dto.getId())
                 .waterUsage(Optional.ofNullable(dto.getWaterUsage()).orElse(BigDecimal.ZERO))
@@ -149,15 +150,15 @@ public class Bill {
                 .build();
     }
 
-    public void setUpdateUser(JwtUser jwtUser){
+    public void setUpdateUser(JwtUser jwtUser) {
         this.updateUserId = jwtUser.getId();
         this.updateUserName = jwtUser.getRealName();
         this.updateTime = new Timestamp(System.currentTimeMillis());
     }
 
-    public void settle(BigDecimal waterPrice, BigDecimal electricityPrice){
-        this.waterCharge = this.waterUsage.multiply(waterPrice);
-        this.electricityCharge = this.electricityUsage.multiply(electricityPrice);
+    public void settle(BigDecimal waterPrice, BigDecimal electricityPrice) {
+        this.waterCharge = this.waterUsage.multiply(waterPrice).setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.electricityCharge = this.electricityUsage.multiply(electricityPrice).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.status = BillStatus.UNPAID;
     }
 }

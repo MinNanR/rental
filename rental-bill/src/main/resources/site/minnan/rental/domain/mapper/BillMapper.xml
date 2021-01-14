@@ -15,8 +15,8 @@
 
     <update id="settleBatch">
         <foreach collection="bills" item="bill" separator=";">
-            update rental_bill set water_usage = #{bill.waterCharge}, electricity_usage = #{bill.electricityCharge},
-            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name #{bill.updateUserName},
+            update rental_bill set water_charge = #{bill.waterCharge}, electricity_charge = #{bill.electricityCharge},
+            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName},
             update_time = #{bill.updateTime}
         </foreach>
     </update>

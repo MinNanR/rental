@@ -86,5 +86,13 @@ public interface BillService {
      * @param dto
      * @return
      */
-    List<UtilityVO> getUnsettledBill(GetUnsettledBillDTO dto);
+    List<BillVO> getUnsettledBill(GetUnsettledBillDTO dto);
+
+    /**
+     * 获取未结算的楼层下拉框
+     *
+     * @param dto
+     * @return
+     */
+    Collection<Integer> getUnsettledFloorDropDown(GetFloorDropDownDTO dto);
 }

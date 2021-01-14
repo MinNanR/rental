@@ -191,10 +191,14 @@ public class BillServiceImpl implements BillService {
         Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.eq("room_number", s));
         Optional.ofNullable(dto.getYear()).ifPresent(s -> wrapper.eq("year", s));
         Optional.ofNullable(dto.getMonth()).ifPresent(s -> wrapper.eq("month", s));
-        Optional.ofNullable(dto.getStatus()).ifPresent(s -> wrapper.eq("status", s));
-        wrapper.ne("status", BillStatus.INIT)
-                .ne("status", BillStatus.UNRECORDED)
-                .ne("status", BillStatus.UNSETTLED);
+        Optional<String> status = Optional.ofNullable(dto.getStatus());
+        if (status.isPresent()) {
+            wrapper.eq("status", status.get());
+        } else {
+            wrapper.ne("status", BillStatus.INIT)
+                    .ne("status", BillStatus.UNRECORDED)
+                    .ne("status", BillStatus.UNSETTLED);
+        }
         wrapper.orderByDesc("update_time");
         Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
         IPage<Bill> page = billMapper.selectPage(queryPage, wrapper);
@@ -210,12 +214,31 @@ public class BillServiceImpl implements BillService {
      * @return
      */
     @Override
-    public List<UtilityVO> getUnsettledBill(GetUnsettledBillDTO dto) {
+    public List<BillVO> getUnsettledBill(GetUnsettledBillDTO dto) {
         QueryWrapper<Bill> wrapper = new QueryWrapper<>();
         Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
-        Optional.ofNullable(dto.getFloor()).ifPresent(s -> wrapper.eq("floor", s));
         wrapper.eq("status", BillStatus.UNSETTLED);
         List<Bill> billList = billMapper.selectList(wrapper);
-        return billList.stream().map(UtilityVO::assemble).collect(Collectors.toList());
+        UtilityPrice price = getUtilityPrice();
+        BigDecimal waterPrice = price.getWaterPrice();
+        BigDecimal electricityPrice = price.getElectricityPrice();
+        return billList.stream()
+                .peek(e -> e.settle(waterPrice, electricityPrice))
+                .map(BillVO::assemble)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取未结算的楼层下拉框
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public Collection<Integer> getUnsettledFloorDropDown(GetFloorDropDownDTO dto) {
+        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
+        wrapper.eq("house_id", dto.getHouseId())
+                .eq("status", BillStatus.UNSETTLED);
+        return billMapper.selectList(wrapper).stream().map(Bill::getFloor).collect(Collectors.toList());
     }
 }

@@ -27,11 +27,17 @@ public class BillVO {
 
     private BigDecimal electricityCharge;
 
+    private Integer rent;
+
+    private BigDecimal totalCharge;
+
+    private String time;
+
     private String updateUserName;
 
     private String updateTime;
 
-    public static BillVO assemble(Bill bill){
+    public static BillVO assemble(Bill bill) {
         return BillVO.builder()
                 .id(bill.getId())
                 .roomNumber(StrUtil.format("{}-{}", bill.getHouseName(), bill.getRoomNumber()))
@@ -39,8 +45,11 @@ public class BillVO {
                 .waterCharge(bill.getWaterCharge())
                 .electricityUsage(bill.getElectricityUsage())
                 .electricityCharge(bill.getElectricityCharge())
+                .rent(bill.getRent())
+                .totalCharge(BigDecimal.valueOf(bill.getRent()).add(bill.getWaterCharge()).add(bill.getElectricityCharge()))
+                .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
                 .updateUserName(bill.getUpdateUserName())
-                .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
+                .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"))
                 .build();
     }
 }
