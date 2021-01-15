@@ -32,4 +32,4 @@ dubbo:
 
   logging:
     file:
-      name: ./logs/rental-tenant.log
+      name: ./logs/rental-tenant/rental-tenant.log

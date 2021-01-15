@@ -20,6 +20,4 @@ public class CreateBillDTO implements Serializable {
     private Integer userId;
 
     private String userName;
-
-    private JSONObject roomInfo;
 }

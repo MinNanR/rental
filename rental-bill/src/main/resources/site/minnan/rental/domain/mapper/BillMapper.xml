@@ -3,16 +3,29 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="site.minnan.rental.domain.mapper.BillMapper">
+    <!--批量插入-->
+    <insert id="insertBatch">
+        insert into rental_bill (year, month, house_id, house_name, room_id, room_number, floor, rent,
+        completed_date, status, create_user_id, create_user_name, create_time, update_user_id, update_user_name,
+        update_time)
+        values
+        <foreach collection="bills" separator="," item="bill">
+            (#{bill.year}, #{bill.month}, #{bill.houseId}, #{bill.houseName}, #{bill.roomId}, #{bill.roomNumber},
+            #{bill.floor}, #{bill.rent},#{bill.completedDate}, #{bill.status}, #{bill.createUserId},
+            #{bill.createUserName}, #{bill.createTime}, #{bill.updateUserId}, #{bill.updateUserName},
+            #{bill.updateTime})
+        </foreach>
+    </insert>
 
-    <update id="updateBatch">
+    <!--批量更新水电用量-->
+    <update id="updateUtilityBatch">
         <foreach collection="bills" item="bill" separator=";">
             update rental_bill set water_usage = #{bill.waterUsage}, electricity_usage = #{bill.electricityUsage},
             status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName},
             update_time = #{bill.updateTime} where id = #{bill.id}
         </foreach>
     </update>
-
-
+    <!--批量结算-->
     <update id="settleBatch">
         <foreach collection="bills" item="bill" separator=";">
             update rental_bill set water_charge = #{bill.waterCharge}, electricity_charge = #{bill.electricityCharge},

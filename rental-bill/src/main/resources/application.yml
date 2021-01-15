@@ -21,19 +21,18 @@ jwt:
 
 logging:
   file:
-    name: ./logs/rental-bill.log
+    name: ./logs/rental_bill/rental_bill.log
 
 dubbo:
   application:
     name: rental-bill
-  # 指定注册协议和注册地址  dubbo推荐使用zookeeper作为注册中心，并且在start依赖中引入了zookeeper的java客户端Curator
   registry:
     address: zookeeper://127.0.0.1:2181
   protocol:
     name: dubbo
     port: 20884
 
-mybatis-plus:
-  mapper-locations: /site/minnan/rental/domain/mapper/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis-plus:
+#  mapper-locations: /site/minnan/rental/domain/mapper/*.xml
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

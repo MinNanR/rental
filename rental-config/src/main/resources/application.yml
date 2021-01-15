@@ -28,4 +28,4 @@ jwt:
 
 logging:
   file:
-    name: ./logs/rental-config.log
+    name: ./logs/rental-config/rental-config.log

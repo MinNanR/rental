@@ -24,4 +24,4 @@ jwt:
 
 logging:
   file:
-    name: ./logs/rental-auth.log
+    name: ./logs/rental-auth/rental-auth.log

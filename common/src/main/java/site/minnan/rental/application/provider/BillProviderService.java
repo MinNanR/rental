@@ -13,4 +13,11 @@ public interface BillProviderService {
      * @param dto
      */
     void createBill(CreateBillDTO dto);
+
+    /**
+     * 房客退租时账单状态修改
+     *
+     * @param roomId
+     */
+    void completeBillWithSurrender(Integer roomId);
 }

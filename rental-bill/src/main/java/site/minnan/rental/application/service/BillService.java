@@ -95,4 +95,9 @@ public interface BillService {
      * @return
      */
     Collection<Integer> getUnsettledFloorDropDown(GetFloorDropDownDTO dto);
+
+    /**
+     * 将到期账单设置为等待登记水电
+     */
+    void setBillUnrecorded();
 }

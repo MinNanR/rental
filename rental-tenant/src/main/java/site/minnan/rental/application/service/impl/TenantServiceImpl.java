@@ -101,15 +101,12 @@ public class TenantServiceImpl implements TenantService {
                 .userId(jwtUser.getId())
                 .userName(jwtUser.getRealName())
                 .build();
-        ResponseEntity<JSONObject> response = roomProviderService.updateRoomStatus(updateRoomStatusDTO);
-        JSONObject room = response.getData();
+        JSONObject room = roomProviderService.updateRoomStatus(updateRoomStatusDTO);
         if (RoomStatus.VACANT.getValue().equals(room.getStr("status"))) {
-            ResponseEntity<JSONObject> roomInfo = roomProviderService.getRoomInfo(dto.getRoomId());
             CreateBillDTO createBillDTO = CreateBillDTO.builder()
                     .roomId(dto.getRoomId())
                     .userId(jwtUser.getId())
                     .userName(jwtUser.getRealName())
-                    .roomInfo(room)
                     .build();
             billProviderService.createBill(createBillDTO);
         }
@@ -318,6 +315,7 @@ public class TenantServiceImpl implements TenantService {
                     .userName(jwtUser.getRealName())
                     .build();
             roomProviderService.updateRoomStatus(updateRoomStatusDTO);
+            billProviderService.completeBillWithSurrender(tenant.getRoomId());
         }
         DisableTenantUserDTO disableTenantUserDTO = DisableTenantUserDTO.builder()
                 .userId(tenant.getUserId())

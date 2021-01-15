@@ -18,7 +18,24 @@ import java.util.List;
 @Repository
 public interface BillMapper extends BaseMapper<Bill> {
 
-    void updateBatch(@Param("bills") Collection<Bill> bills);
+    /**
+     * 批量更新水电用量
+     *
+     * @param bills
+     */
+    void updateUtilityBatch(@Param("bills") Collection<Bill> bills);
 
+    /**
+     * 批量结算
+     *
+     * @param bills
+     */
     void settleBatch(@Param("bills") Collection<Bill> bills);
+
+    /**
+     * 批量插入
+     *
+     * @param bills
+     */
+    void insertBatch(@Param("bills") Collection<Bill> bills);
 }

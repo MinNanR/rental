@@ -26,4 +26,4 @@ jwt:
 
 logging:
   file:
-    name: ./logs/rental-house.log
+    name: ./logs/rental-house/rental-house.log

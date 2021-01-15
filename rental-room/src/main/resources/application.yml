@@ -36,4 +36,4 @@ dubbo:
 
 logging:
   file:
-    name: ./logs/rental-room.log
+    name: ./logs/rental-room/rental-room.log

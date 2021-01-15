@@ -15,6 +15,7 @@ import site.minnan.rental.userinterface.dto.UpdateRoomStatusDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,9 +30,10 @@ public class RoomProviderServiceImpl implements RoomProviderService {
      * 更新房间状态
      *
      * @param dto
+     * @return
      */
     @Override
-    public ResponseEntity<JSONObject> updateRoomStatus(UpdateRoomStatusDTO dto) {
+    public JSONObject updateRoomStatus(UpdateRoomStatusDTO dto) {
         try {
             Room roomOriginal = roomMapper.selectById(dto.getId());
             RoomStatus status = RoomStatus.valueOf(dto.getStatus());
@@ -42,7 +44,7 @@ public class RoomProviderServiceImpl implements RoomProviderService {
                     .set("update_user_name", dto.getUserName())
                     .set("update_time", new Timestamp(System.currentTimeMillis()));
             roomMapper.update(null, wrapper);
-            return ResponseEntity.success(new JSONObject(roomOriginal));
+            return new JSONObject(roomOriginal);
         } catch (IllegalArgumentException e) {
             log.error("非法参数", e);
             throw e;
@@ -51,7 +53,7 @@ public class RoomProviderServiceImpl implements RoomProviderService {
 
     @Override
     @Transactional
-    public ResponseEntity<JSONArray> updateRoomStatusBatch(List<UpdateRoomStatusDTO> dtoList) {
+    public void updateRoomStatusBatch(List<UpdateRoomStatusDTO> dtoList) {
         try {
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             List<Integer> roomIdList = dtoList.stream().map(UpdateRoomStatusDTO::getId).collect(Collectors.toList());
@@ -67,7 +69,7 @@ public class RoomProviderServiceImpl implements RoomProviderService {
                             .updateTime(currentTime).build())
                     .collect(Collectors.toList());
             roomMapper.updateRoomStatusBatch(roomList);
-            return ResponseEntity.success(new JSONArray(roomOriginal));
+            ResponseEntity.success(new JSONArray(roomOriginal));
         } catch (IllegalArgumentException e) {
             log.error("非法参数", e);
             throw e;
@@ -81,8 +83,20 @@ public class RoomProviderServiceImpl implements RoomProviderService {
      * @return
      */
     @Override
-    public ResponseEntity<JSONObject> getRoomInfo(Integer id) {
+    public JSONObject getRoomInfo(Integer id) {
         Room room = roomMapper.selectById(id);
-        return ResponseEntity.success(new JSONObject(room));
+        return new JSONObject(room);
+    }
+
+    /**
+     * 批量获取房间信息
+     *
+     * @param ids
+     * @return
+     */
+    @Override
+    public JSONArray getRoomInfoBatch(Collection<Integer> ids) {
+        List<Room> rooms = roomMapper.selectBatchIds(ids);
+        return new JSONArray(rooms);
     }
 }

@@ -1,13 +1,20 @@
 package site.minnan.rental.application.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import site.minnan.rental.application.provider.RoomProviderService;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -22,10 +29,7 @@ import site.minnan.rental.userinterface.dto.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +40,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Reference
+    private RoomProviderService roomProviderService;
 
     /**
      * 登记水电用量
@@ -49,7 +56,7 @@ public class BillServiceImpl implements BillService {
                 .map(Bill::assemble)
                 .peek(e -> e.setUpdateUser(jwtUser))
                 .collect(Collectors.toList());
-        billMapper.updateBatch(billList);
+        billMapper.updateUtilityBatch(billList);
     }
 
     /**
@@ -240,5 +247,57 @@ public class BillServiceImpl implements BillService {
         wrapper.eq("house_id", dto.getHouseId())
                 .eq("status", BillStatus.UNSETTLED);
         return billMapper.selectList(wrapper).stream().map(Bill::getFloor).collect(Collectors.toList());
+    }
+
+    /**
+     * 将到期账单设置为等待登记水电
+     */
+    @Override
+    public void setBillUnrecorded() {
+        //将到期账单状态设置为等待登记水电
+        DateTime now = DateTime.now();
+        Timestamp currentTime = new Timestamp(now.getTime());
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status", BillStatus.INIT);
+        List<Bill> initBillList = billMapper.selectList(queryWrapper);
+        List<Bill> initializedBillList = initBillList.stream()
+                .filter(e -> DateUtil.isSameDay(e.getCompletedDate(), now))
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(initializedBillList)) {
+            List<Integer> initializedBillIdList = initBillList.stream().map(Bill::getId).collect(Collectors.toList());
+            UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.set("status", BillStatus.UNRECORDED)
+                    .set("update_user_id", 0)
+                    .set("update_user_name", "系统")
+                    .set("update_time", currentTime)
+                    .in("id", initializedBillIdList);
+            billMapper.update(null, updateWrapper);
+
+            //生成新的账单
+            List<Integer> roomIdList = initializedBillList.stream().map(Bill::getRoomId).collect(Collectors.toList());
+            JSONArray roomInfoList = roomProviderService.getRoomInfoBatch(roomIdList);
+            DateTime oneMonthLater = now.offsetNew(DateField.MONTH, 1);
+            List<Bill> newBillList = new ArrayList<>();
+            for (int i = 0; i < roomInfoList.size(); i++) {
+                JSONObject roomInfo = roomInfoList.getJSONObject(i);
+                if (Objects.equals(roomInfo.getStr("status"), RoomStatus.ON_RENT.getValue())) {
+                    Bill newBill = Bill.builder()
+                            .year(now.year())
+                            .month(now.month())
+                            .houseId(roomInfo.getInt("houseId"))
+                            .houseName(roomInfo.getStr("houseName"))
+                            .roomId(roomInfo.getInt("id"))
+                            .roomNumber(roomInfo.getStr("roomNumber"))
+                            .floor(roomInfo.getInt("floor"))
+                            .rent(roomInfo.getInt("price"))
+                            .completedDate(oneMonthLater)
+                            .status(BillStatus.INIT)
+                            .build();
+                    newBill.setCreateUser(0, "系统", currentTime);
+                    newBillList.add(newBill);
+                }
+            }
+            billMapper.insertBatch(newBillList);
+        }
     }
 }

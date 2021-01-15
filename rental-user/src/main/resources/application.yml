@@ -38,4 +38,4 @@ dubbo:
 
 logging:
   file:
-    name: ./logs/rental-user.log
+    name: ./logs/rental-user/rental-user.log
