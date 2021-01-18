@@ -100,4 +100,11 @@ public interface BillService {
      * 将到期账单设置为等待登记水电
      */
     void setBillUnrecorded();
+
+    /**
+     * 获取未支付的账单
+     * @param dto
+     * @return
+     */
+    List<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto);
 }

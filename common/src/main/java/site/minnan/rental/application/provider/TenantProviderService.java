@@ -1,6 +1,7 @@
 package site.minnan.rental.application.provider;
 
 import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,5 +28,5 @@ public interface TenantProviderService {
      * @param ids
      * @return
      */
-    Map<Integer, List<String>> getTenantNameByRoomIds(Collection<Integer> ids);
+    Map<Integer, List<JSONObject>> getTenantNameByRoomIds(Collection<Integer> ids);
 }

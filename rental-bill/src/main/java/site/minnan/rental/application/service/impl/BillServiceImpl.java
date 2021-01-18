@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import site.minnan.rental.application.provider.RoomProviderService;
+import site.minnan.rental.application.provider.TenantProviderService;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -43,6 +44,9 @@ public class BillServiceImpl implements BillService {
 
     @Reference
     private RoomProviderService roomProviderService;
+
+    @Reference
+    private TenantProviderService tenantProviderService;
 
     /**
      * 登记水电用量
@@ -299,5 +303,16 @@ public class BillServiceImpl implements BillService {
             }
             billMapper.insertBatch(newBillList);
         }
+    }
+
+    /**
+     * 获取未支付的账单
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public List<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto) {
+        return null;
     }
 }

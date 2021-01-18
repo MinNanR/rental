@@ -27,4 +27,5 @@ public class TenantMoveDTO {
 
     @NotEmpty(message = "未指定要迁移的房客")
     private List<Integer> tenantIdList;
+
 }
