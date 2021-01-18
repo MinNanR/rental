@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import site.minnan.rental.domain.aggregate.Tenant;
 import site.minnan.rental.domain.vo.TenantDropDownVO;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -19,4 +20,14 @@ public interface TenantMapper extends BaseMapper<Tenant> {
 
     @Select("select id from rental_tenant where room_id = #{roomId} limit 1")
     Integer checkRoomOnRentByRoomId(@Param("roomId") Integer roomId);
+
+    @Select("select name from rental_tenant where room_id = #{roomId}")
+    List<String> getTenantNameByRoomId(@Param("roomId")Integer id);
+
+    /**
+     * 批量根据房间id获取房客名称
+     * @param ids
+     * @return
+     */
+    List<Tenant> getTenantByRoomIds(@Param("ids")Collection<Integer> ids);
 }
