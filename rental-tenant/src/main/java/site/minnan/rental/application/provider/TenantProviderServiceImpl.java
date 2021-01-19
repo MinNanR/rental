@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import site.minnan.rental.domain.aggregate.Tenant;
 import site.minnan.rental.domain.mapper.TenantMapper;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -42,10 +39,14 @@ public class TenantProviderServiceImpl implements TenantProviderService {
      * @return
      */
     @Override
-    public Map<Integer, List<JSONObject>> getTenantNameByRoomIds(Collection<Integer> ids) {
+    public Map<Integer, JSONObject> getTenantInfoByRoomIds(Collection<Integer> ids) {
         List<Tenant> tenantList = tenantMapper.getTenantByRoomIds(ids);
-//        return tenantList.stream().collect(Collectors.groupingBy(Tenant::getRoomId,
-//                Collectors.mapping(JSONObject::new, (JSONArray::new, (array, e), JSONArray::addAll)));
-        return tenantList.stream().map(JSONObject::new).collect(Collectors.groupingBy(e -> e.getInt("roomId")));
+        return tenantList.stream().collect(Collectors.groupingBy(Tenant::getRoomId,
+                Collectors.collectingAndThen(Collectors.toList(), e -> {
+                    String nameStr = e.stream().map(Tenant::getName).collect(Collectors.joining("、"));
+                    String phone = e.stream().findFirst().map(Tenant::getPhone).orElse("");
+                    JSONObject jsonObject = new JSONObject();
+                    return jsonObject.putOpt("name", nameStr).putOpt("phone", phone);
+                })));
     }
 }

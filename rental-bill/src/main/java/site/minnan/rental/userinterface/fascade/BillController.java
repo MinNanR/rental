@@ -38,7 +38,7 @@ public class BillController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("getUnrecordedBill")
+    @PostMapping("getBillList/unrecorded")
     public ResponseEntity<List<UnrecordedBillVO>> getUnrecordedBill(@RequestBody @Valid GetUnrecordedBillDTO dto) {
         List<UnrecordedBillVO> billList = billService.getUnrecordedBill(dto);
         return ResponseEntity.success(billList);
@@ -115,7 +115,7 @@ public class BillController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("getUnsettledBill")
+    @PostMapping("getBill/unsettled")
     public ResponseEntity<List<BillVO>> getUnsettledBillList(@RequestBody @Valid GetUnsettledBillDTO dto) {
         List<BillVO> vo = billService.getUnsettledBill(dto);
         return ResponseEntity.success(vo);
@@ -126,5 +126,11 @@ public class BillController {
     public ResponseEntity<Collection<Integer>> getUnsettledFloorDropDown(@RequestBody @Valid GetFloorDropDownDTO dto) {
         Collection<Integer> floorDropDown = billService.getUnsettledFloorDropDown(dto);
         return ResponseEntity.success(floorDropDown);
+    }
+
+    @PostMapping("getBillList/unpaid")
+    public ResponseEntity<ListQueryVO<UnpaidBillVO>> getUnpaidBillList(@RequestBody @Valid ListQueryDTO dto){
+        ListQueryVO<UnpaidBillVO> vo = billService.getUnpaidBillList(dto);
+        return ResponseEntity.success(vo);
     }
 }

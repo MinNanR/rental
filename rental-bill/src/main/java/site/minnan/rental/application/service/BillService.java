@@ -106,5 +106,5 @@ public interface BillService {
      * @param dto
      * @return
      */
-    List<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto);
+    ListQueryVO<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto);
 }

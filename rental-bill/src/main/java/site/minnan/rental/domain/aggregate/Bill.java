@@ -97,6 +97,8 @@ public class Bill {
      */
     private Date completedDate;
 
+    private Timestamp pay_time;
+
     /**
      * 账单状态
      */

@@ -312,7 +312,25 @@ public class BillServiceImpl implements BillService {
      * @return
      */
     @Override
-    public List<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto) {
-        return null;
+    public ListQueryVO<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto) {
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status", BillStatus.UNPAID);
+        queryWrapper.orderByDesc("update_time");
+        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
+        IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
+        List<Bill> records = page.getRecords();
+        Optional<List<UnpaidBillVO>> opt = Optional.empty();
+        if(CollectionUtil.isNotEmpty(records)){
+            List<UnpaidBillVO> list = records.stream().map(UnpaidBillVO::assemble).collect(Collectors.toList());
+            Set<Integer> ids = records.stream().map(Bill::getRoomId).collect(Collectors.toSet());
+            Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByRoomIds(ids);
+            list.forEach(e -> {
+                JSONObject info = tenantInfo.get(e.getRoomId());
+                e.setLivingPeople(info.getStr("name"));
+                e.setPhone(info.getStr("phone"));
+            });
+            opt = Optional.of(list);
+        }
+        return new ListQueryVO<>(opt.orElseGet(ArrayList::new), page.getTotal());
     }
 }

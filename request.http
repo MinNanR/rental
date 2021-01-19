@@ -431,3 +431,13 @@ Authorization: {{admin_token}}
   "pageIndex": 1,
   "status": "UNPAID"
 }
+
+###
+POST {{billUrl}}/rental/bill/getBillList/unpaid
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "pageSize": 10,
+  "pageIndex": 1
+}

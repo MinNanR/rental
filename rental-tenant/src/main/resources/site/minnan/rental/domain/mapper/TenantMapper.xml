@@ -5,7 +5,7 @@
 <mapper namespace="site.minnan.rental.domain.mapper.TenantMapper">
 
     <select id="getTenantByRoomIds" resultType="site.minnan.rental.domain.aggregate.Tenant">
-        select id id, name name, room_id roomId from rental_tenant where room_id in
+        select id id, name name, room_id roomId, phone phone from rental_tenant where room_id in
         <foreach collection="ids" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
