@@ -32,7 +32,7 @@ dubbo:
     name: dubbo
     port: 20884
 
-#mybatis-plus:
-#  mapper-locations: /site/minnan/rental/domain/mapper/*.xml
+mybatis-plus:
+  mapper-locations: /site/minnan/rental/domain/mapper/*.xml
 #  configuration:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

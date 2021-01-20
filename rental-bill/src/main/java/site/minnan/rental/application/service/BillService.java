@@ -3,6 +3,7 @@ package site.minnan.rental.application.service;
 import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.userinterface.dto.*;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -103,8 +104,32 @@ public interface BillService {
 
     /**
      * 获取未支付的账单
+     *
      * @param dto
      * @return
      */
     ListQueryVO<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto);
+
+    /**
+     * 获取本月总额
+     *
+     * @return
+     */
+    BigDecimal getMonthTotal();
+
+    /**
+     * 获取已支付且未打印的账单
+     *
+     * @param dto
+     * @return
+     */
+    ListQueryVO<PaidBillVO> getPaidBillList(ListQueryDTO dto);
+
+    /**
+     * 获取账单详情
+     *
+     * @param dto
+     * @return
+     */
+    BillInfoVO getBillInfo(DetailsQueryDTO dto);
 }

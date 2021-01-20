@@ -33,4 +33,9 @@
             update_time = #{bill.updateTime}
         </foreach>
     </update>
+
+    <!--获取本月支付的账单-->
+    <select id="getPaidBillInThisMonth" resultType="site.minnan.rental.domain.aggregate.Bill">
+        select id,
+    </select>
 </mapper>

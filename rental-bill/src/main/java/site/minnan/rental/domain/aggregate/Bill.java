@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
+import site.minnan.rental.infrastructure.enumerate.PaymentMethod;
 import site.minnan.rental.userinterface.dto.RecordUtilityDTO;
 
 import java.math.BigDecimal;
@@ -97,7 +98,15 @@ public class Bill {
      */
     private Date completedDate;
 
-    private Timestamp pay_time;
+    /**
+     * 支付时间
+     */
+    private Timestamp payTime;
+
+    /**
+     * 支付方式
+     */
+    private PaymentMethod paymentMethod;
 
     /**
      * 账单状态
@@ -162,5 +171,9 @@ public class Bill {
         this.waterCharge = this.waterUsage.multiply(waterPrice).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.electricityCharge = this.electricityUsage.multiply(electricityPrice).setScale(2, BigDecimal.ROUND_HALF_UP);
         this.status = BillStatus.UNPAID;
+    }
+
+    public BigDecimal totalCharge(){
+        return waterCharge.add(electricityCharge).add(BigDecimal.valueOf(rent));
     }
 }

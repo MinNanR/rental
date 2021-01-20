@@ -15,15 +15,17 @@ import java.util.Map;
 public interface TenantProviderService {
 
     /**
-     * 根据房间id获取房客名称
+     * 根据房间id获取房客信息
+     * 房客名称及其联系电话
      *
      * @param id
      * @return
      */
-    List<String> getTenantNameByRoomId(Integer id);
+    JSONArray getTenantInfoByRoomId(Integer id);
 
     /**
-     * 批量根据房间id获取房客名称
+     * 批量根据房间id获取房客信息
+     * 所有的房客名称，第一个房客的电话号码
      *
      * @param ids
      * @return

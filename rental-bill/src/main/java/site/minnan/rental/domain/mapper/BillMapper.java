@@ -38,4 +38,11 @@ public interface BillMapper extends BaseMapper<Bill> {
      * @param bills
      */
     void insertBatch(@Param("bills") Collection<Bill> bills);
+
+    /**
+     * 获取本月支付的账单
+     *
+     * @return
+     */
+    List<Bill> getPaidBillInThisMonth();
 }

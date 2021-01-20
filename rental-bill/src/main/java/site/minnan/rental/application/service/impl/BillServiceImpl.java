@@ -320,7 +320,7 @@ public class BillServiceImpl implements BillService {
         IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
         List<Bill> records = page.getRecords();
         Optional<List<UnpaidBillVO>> opt = Optional.empty();
-        if(CollectionUtil.isNotEmpty(records)){
+        if (CollectionUtil.isNotEmpty(records)) {
             List<UnpaidBillVO> list = records.stream().map(UnpaidBillVO::assemble).collect(Collectors.toList());
             Set<Integer> ids = records.stream().map(Bill::getRoomId).collect(Collectors.toSet());
             Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByRoomIds(ids);
@@ -332,5 +332,73 @@ public class BillServiceImpl implements BillService {
             opt = Optional.of(list);
         }
         return new ListQueryVO<>(opt.orElseGet(ArrayList::new), page.getTotal());
+    }
+
+    /**
+     * 获取本月总额
+     *
+     * @return
+     */
+    @Override
+    public BigDecimal getMonthTotal() {
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("month(pay_time)", DateUtil.month(DateTime.now()) + 1)
+                .and(w -> w.eq("status", BillStatus.PAID).or().eq("status", BillStatus.PRINTED));
+        List<Bill> bills = billMapper.selectList(queryWrapper);
+        Optional<BigDecimal> total = Optional.empty();
+        if (CollectionUtil.isNotEmpty(bills)) {
+            BigDecimal totalValue = bills.stream()
+                    .map(e -> e.getWaterCharge().add(e.getElectricityCharge()).add(BigDecimal.valueOf(e.getRent())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            total = Optional.of(totalValue);
+        }
+        return total.orElse(BigDecimal.ZERO);
+    }
+
+    /**
+     * 获取已支付且未打印的账单
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public ListQueryVO<PaidBillVO> getPaidBillList(ListQueryDTO dto) {
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("status", BillStatus.PAID);
+        queryWrapper.orderByAsc("pay_time");
+        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
+        IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
+        List<Bill> records = page.getRecords();
+        Optional<List<PaidBillVO>> opt = Optional.empty();
+        if (CollectionUtil.isNotEmpty(records)) {
+            List<PaidBillVO> list = records.stream().map(PaidBillVO::assemble).collect(Collectors.toList());
+            Set<Integer> ids = records.stream().map(Bill::getRoomId).collect(Collectors.toSet());
+            Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByRoomIds(ids);
+            list.forEach(e -> {
+                JSONObject info = tenantInfo.get(e.getRoomId());
+                e.setLivingPeople(info.getStr("name"));
+            });
+            opt = Optional.of(list);
+        }
+        return new ListQueryVO<>(opt.orElseGet(ArrayList::new), page.getTotal());
+    }
+
+    /**
+     * 获取账单详情
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public BillInfoVO getBillInfo(DetailsQueryDTO dto) {
+        Bill bill = billMapper.selectById(dto.getId());
+        BillInfoVO vo = BillInfoVO.assemble(bill);
+        JSONArray tenantInfo = tenantProviderService.getTenantInfoByRoomId(bill.getRoomId());
+        for (int i = 0; i < tenantInfo.size(); i++) {
+            JSONObject info = tenantInfo.getJSONObject(i);
+            TenantInfoVO t = new TenantInfoVO(info.getStr("name"), info.getStr("phone"));
+            vo.addTenant(t);
+        }
+        return vo;
     }
 }

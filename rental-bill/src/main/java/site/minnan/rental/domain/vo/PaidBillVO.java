@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class UnpaidBillVO {
+public class PaidBillVO {
 
     private Integer id;
 
@@ -30,12 +30,12 @@ public class UnpaidBillVO {
 
     private String livingPeople;
 
-    private String phone;
+    private String payTime;
 
-    private String updateTime;
+    private String paymentMethod;
 
-    public static UnpaidBillVO assemble(Bill bill){
-        return UnpaidBillVO.builder()
+    public static PaidBillVO assemble(Bill bill){
+        return PaidBillVO.builder()
                 .id(bill.getId())
                 .roomId(bill.getRoomId())
                 .roomNumber(StrUtil.format("{}-{}", bill.getHouseName(), bill.getRoomNumber()))
@@ -44,8 +44,8 @@ public class UnpaidBillVO {
                 .rent(bill.getRent())
                 .totalCharge(bill.totalCharge())
                 .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
-                .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
+                .payTime(DateUtil.format(bill.getPayTime(), "yyyy-MM-dd"))
+                .paymentMethod(bill.getPaymentMethod().getMethod())
                 .build();
     }
-
 }

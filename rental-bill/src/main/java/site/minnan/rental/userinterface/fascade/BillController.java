@@ -1,6 +1,8 @@
 package site.minnan.rental.userinterface.fascade;
 
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +17,7 @@ import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -128,9 +131,32 @@ public class BillController {
         return ResponseEntity.success(floorDropDown);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getBillList/unpaid")
     public ResponseEntity<ListQueryVO<UnpaidBillVO>> getUnpaidBillList(@RequestBody @Valid ListQueryDTO dto){
         ListQueryVO<UnpaidBillVO> vo = billService.getUnpaidBillList(dto);
+        return ResponseEntity.success(vo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getMonthTotal")
+    public ResponseEntity<String> getMonthTotal(){
+        BigDecimal total = billService.getMonthTotal();
+        String totalStr = NumberUtil.decimalFormat(",###", total);
+        return ResponseEntity.success(totalStr);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getBillList/paid")
+    public ResponseEntity<ListQueryVO<PaidBillVO>> getPaidBillList(@RequestBody @Valid ListQueryDTO dto){
+        ListQueryVO<PaidBillVO> vo = billService.getPaidBillList(dto);
+        return ResponseEntity.success(vo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getBillInfo")
+    public ResponseEntity<BillInfoVO> getBillInfo(@RequestBody @Valid DetailsQueryDTO dto){
+        BillInfoVO vo = billService.getBillInfo(dto);
         return ResponseEntity.success(vo);
     }
 }

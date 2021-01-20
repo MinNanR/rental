@@ -46,7 +46,7 @@ public class BillVO {
                 .electricityUsage(bill.getElectricityUsage())
                 .electricityCharge(bill.getElectricityCharge())
                 .rent(bill.getRent())
-                .totalCharge(BigDecimal.valueOf(bill.getRent()).add(bill.getWaterCharge()).add(bill.getElectricityCharge()))
+                .totalCharge(bill.totalCharge())
                 .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
                 .updateUserName(bill.getUpdateUserName())
                 .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"))

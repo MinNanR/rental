@@ -21,8 +21,8 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     @Select("select id from rental_tenant where room_id = #{roomId} limit 1")
     Integer checkRoomOnRentByRoomId(@Param("roomId") Integer roomId);
 
-    @Select("select name from rental_tenant where room_id = #{roomId}")
-    List<String> getTenantNameByRoomId(@Param("roomId")Integer id);
+    @Select("select name, phone from rental_tenant where room_id = #{roomId}")
+    List<Tenant> getTenantInfoByRoomId(@Param("roomId")Integer id);
 
     /**
      * 批量根据房间id获取房客名称

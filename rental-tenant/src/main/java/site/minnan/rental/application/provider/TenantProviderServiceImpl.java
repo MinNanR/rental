@@ -4,6 +4,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,8 +29,12 @@ public class TenantProviderServiceImpl implements TenantProviderService {
      * @return
      */
     @Override
-    public List<String> getTenantNameByRoomId(Integer id) {
-        return tenantMapper.getTenantNameByRoomId(id);
+    public JSONArray getTenantInfoByRoomId(Integer id) {
+        QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "name", "phone")
+                .eq("room_id", id);
+        List<Tenant> tenants = tenantMapper.selectList(queryWrapper);
+        return tenants.stream().map(JSONObject::new).collect(JSONArray::new, JSONArray::add, JSONArray::addAll);
     }
 
     /**
