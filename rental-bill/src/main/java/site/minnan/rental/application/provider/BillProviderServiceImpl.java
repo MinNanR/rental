@@ -23,7 +23,7 @@ public class BillProviderServiceImpl implements BillProviderService {
     @Autowired
     private BillMapper billMapper;
 
-    @Reference
+    @Reference(check = false)
     private RoomProviderService roomProviderService;
 
     /**

@@ -45,13 +45,13 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private TenantMapper tenantMapper;
 
-    @Reference
+    @Reference(check = false)
     private UserProviderService userProviderService;
 
-    @Reference
+    @Reference(check = false)
     private RoomProviderService roomProviderService;
 
-    @Reference
+    @Reference(check = false)
     private BillProviderService billProviderService;
 
     /**

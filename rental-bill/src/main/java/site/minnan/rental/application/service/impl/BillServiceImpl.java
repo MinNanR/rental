@@ -42,10 +42,10 @@ public class BillServiceImpl implements BillService {
     @Autowired
     private RedisUtil redisUtil;
 
-    @Reference
+    @Reference(check = false)
     private RoomProviderService roomProviderService;
 
-    @Reference
+    @Reference(check = false)
     private TenantProviderService tenantProviderService;
 
     /**

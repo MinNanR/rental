@@ -1,19 +1,16 @@
 package site.minnan.rental.application.provider;
 
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.annotation.JsonAlias;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import site.minnan.rental.domain.aggregate.Tenant;
 import site.minnan.rental.domain.mapper.TenantMapper;
 
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service(timeout = 5000, interfaceClass = TenantProviderService.class)
