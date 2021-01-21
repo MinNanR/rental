@@ -193,8 +193,9 @@ Authorization: {{admin_token}}
 
 {
   "houseId": 1,
-  "roomNumber": "101",
-  "floor": "1"
+  "houseName": "永泰街",
+  "roomNumber": "405",
+  "floor": 4
 }
 
 ###
@@ -459,4 +460,13 @@ Authorization: {{admin_token}}
 
 {
   "id": 7
+}
+
+###
+POST {{roomUrl}}/rental/room/getAllRoom
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "id": 1
 }

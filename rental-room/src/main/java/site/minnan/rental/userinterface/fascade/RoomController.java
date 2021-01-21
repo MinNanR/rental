@@ -14,7 +14,9 @@ import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -77,5 +79,12 @@ public class RoomController {
     public ResponseEntity<List<RoomDropDown>> getRoomDropDown(@RequestBody @Valid GetRoomDropDownDTO dto) {
         List<RoomDropDown> roomDropDown = roomService.getRoomDropDown(dto);
         return ResponseEntity.success(roomDropDown);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getAllRoom")
+    public ResponseEntity<Collection<FloorVO>> getAllRoom(@RequestBody @Valid GetFloorDTO dto){
+        Collection<FloorVO> vo = roomService.getAllRoom(dto);
+        return ResponseEntity.success(vo);
     }
 }

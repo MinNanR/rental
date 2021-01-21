@@ -48,7 +48,11 @@ public class BillInfoVO {
 
     private String paymentMethod;
 
+    private String paymentMethodCode;
+
     private String status;
+
+    private String statusCode;
 
     public static BillInfoVO assemble(Bill bill) {
         return BillInfoVO.builder()
@@ -65,7 +69,9 @@ public class BillInfoVO {
                 .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
                 .payTime(DateUtil.format(bill.getPayTime(), "yyyy-MM-dd"))
                 .paymentMethod(Optional.ofNullable(bill.getPaymentMethod()).map(PaymentMethod::getMethod).orElse(""))
+                .paymentMethodCode(Optional.ofNullable(bill.getPaymentMethod()).map(PaymentMethod::getValue).orElse(""))
                 .status(bill.getStatus().getStatus())
+                .statusCode(bill.getStatus().getValue())
                 .tenantList(new ArrayList<>())
                 .build();
     }

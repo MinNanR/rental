@@ -1,5 +1,7 @@
 package site.minnan.rental.application.service.impl;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -13,16 +15,15 @@ import site.minnan.rental.application.service.RoomService;
 import site.minnan.rental.domain.aggregate.Room;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.RoomMapper;
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.RoomDropDown;
-import site.minnan.rental.domain.vo.RoomInfoVO;
-import site.minnan.rental.domain.vo.RoomVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.userinterface.dto.*;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -133,5 +134,30 @@ public class RooServiceImpl implements RoomService {
     @Override
     public List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto) {
         return roomMapper.getRoomDropDown(dto.getHouseId());
+    }
+
+    /**
+     * 获取所有房间列表
+     *
+     * @param dto
+     * @return 房间列表，按楼层归并
+     */
+    @Override
+    public Collection<FloorVO> getAllRoom(GetFloorDTO dto) {
+        QueryWrapper<Room> queryWrapper = new QueryWrapper<>();
+        Optional.ofNullable(dto.getRoomNumber())
+                .map(String::trim)
+                .ifPresent(s -> queryWrapper.likeRight("room_number", s));
+        queryWrapper.eq("house_id", dto.getHouseId())
+                .select("id", "room_number", "floor", "price", "status");
+        List<Room> roomList = roomMapper.selectList(queryWrapper);
+        return roomList.stream()
+                .map(RoomInfoVO::assemble)
+                .collect(Collectors.groupingBy(RoomInfoVO::getFloor,
+                        Collectors.collectingAndThen(Collectors.toList(), e -> {
+                            Integer floor = e.stream().findFirst().map(RoomInfoVO::getFloor).orElse(0);
+                            return new FloorVO(floor, e);
+                        })))
+                .values();
     }
 }

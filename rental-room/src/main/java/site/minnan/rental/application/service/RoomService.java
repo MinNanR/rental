@@ -1,12 +1,11 @@
 package site.minnan.rental.application.service;
 
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.RoomDropDown;
-import site.minnan.rental.domain.vo.RoomVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.userinterface.dto.*;
-import site.minnan.rental.domain.vo.RoomInfoVO;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房间相关操作
@@ -59,4 +58,11 @@ public interface RoomService {
      */
     List<RoomDropDown> getRoomDropDown(GetRoomDropDownDTO dto);
 
+    /**
+     * 获取所有房间列表
+     *
+     * @param dto
+     * @return 房间列表，按楼层归并
+     */
+    Collection<FloorVO> getAllRoom(GetFloorDTO dto);
 }

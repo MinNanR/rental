@@ -1,5 +1,6 @@
 package site.minnan.rental.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import site.minnan.rental.domain.aggregate.Room;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoomInfoVO {
 
     private Integer id;
