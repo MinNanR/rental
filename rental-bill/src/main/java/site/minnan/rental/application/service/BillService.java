@@ -15,28 +15,6 @@ import java.util.List;
 public interface BillService {
 
     /**
-     * 登记水电用量
-     *
-     * @param recordList
-     */
-    void recordUtility(List<RecordUtilityDTO> recordList);
-
-    /**
-     * 获取未登记水电的房间
-     *
-     * @param dto
-     * @return
-     */
-    List<UnrecordedBillVO> getUnrecordedBill(GetUnrecordedBillDTO dto);
-
-    /**
-     * 修改水电量
-     *
-     * @param dto
-     */
-    void updateUtility(UpdateUtilityDTO dto);
-
-    /**
      * 结算账单
      *
      * @param dto
@@ -56,22 +34,6 @@ public interface BillService {
      * @return
      */
     UtilityPrice getUtilityPrice();
-
-    /**
-     * 获取水电记录列表
-     *
-     * @param dto
-     * @return
-     */
-    ListQueryVO<UtilityVO> getUtilityList(GetUtilityListDTO dto);
-
-    /**
-     * 获取楼层下拉框
-     *
-     * @param dto
-     * @return
-     */
-    Collection<Integer> getFloorDropDown(GetFloorDropDownDTO dto);
 
     /**
      * 获取账单列表
@@ -98,9 +60,9 @@ public interface BillService {
     Collection<Integer> getUnsettledFloorDropDown(GetFloorDropDownDTO dto);
 
     /**
-     * 将到期账单设置为等待登记水电
+     * 到期账单结算
      */
-    void setBillUnrecorded();
+    void setBillUnpaid();
 
     /**
      * 获取未支付的账单

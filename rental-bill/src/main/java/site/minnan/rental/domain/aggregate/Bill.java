@@ -3,17 +3,12 @@ package site.minnan.rental.domain.aggregate;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.PaymentMethod;
-import site.minnan.rental.userinterface.dto.RecordUtilityDTO;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Optional;
@@ -94,6 +89,17 @@ public class Bill {
     private Integer rent;
 
     /**
+     * 开始使用的水电单id
+     */
+    private Integer utilityStartId;
+
+    /**
+     * 结束时使用的水电单id
+     */
+    @Setter
+    private Integer utilityEndId;
+
+    /**
      * 结束日期
      */
     private Date completedDate;
@@ -152,15 +158,6 @@ public class Bill {
         this.updateTime = time;
     }
 
-    public static Bill assemble(RecordUtilityDTO dto) {
-        return Bill.builder()
-                .id(dto.getId())
-                .waterUsage(Optional.ofNullable(dto.getWaterUsage()).orElse(BigDecimal.ZERO))
-                .electricityUsage(Optional.ofNullable(dto.getElectricityUsage()).orElse(BigDecimal.ZERO))
-                .status(BillStatus.UNSETTLED)
-                .build();
-    }
-
     public void setUpdateUser(JwtUser jwtUser) {
         this.updateUserId = jwtUser.getId();
         this.updateUserName = jwtUser.getRealName();
@@ -173,7 +170,31 @@ public class Bill {
         this.status = BillStatus.UNPAID;
     }
 
-    public BigDecimal totalCharge(){
+    /**
+     * 结算用水情况
+     *
+     * @param start 水表开始的度数
+     * @param end   水表结束时的度数
+     * @param price 水费单价
+     */
+    public void settleWater(BigDecimal start, BigDecimal end, BigDecimal price) {
+        this.waterUsage = end.subtract(start);
+        this.waterCharge = this.waterUsage.multiply(price).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    /**
+     * 结算用电情况
+     *
+     * @param start 电表开始的度数
+     * @param end   电表结算的读书
+     * @param price 电费单价
+     */
+    public void settleElectricity(BigDecimal start, BigDecimal end, BigDecimal price) {
+        this.electricityUsage = end.subtract(start);
+        this.electricityCharge = this.waterUsage.multiply(price).setScale(2, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public BigDecimal totalCharge() {
         return waterCharge.add(electricityCharge).add(BigDecimal.valueOf(rent));
     }
 }

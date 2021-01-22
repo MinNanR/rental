@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Builder;
 import lombok.Data;
-import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.aggregate.Utility;
 
 import java.math.BigDecimal;
 
@@ -31,15 +31,15 @@ public class UtilityVO {
 
     private String updateTime;
 
-    public static UtilityVO assemble(Bill bill) {
+    public static UtilityVO assemble(Utility utility) {
         return UtilityVO.builder()
-                .id(bill.getId())
-                .room(StrUtil.format("{}-{}", bill.getHouseName(), bill.getRoomNumber()))
-                .water(bill.getWaterUsage())
-                .electricity(bill.getElectricityUsage())
-                .status(bill.getStatus().getStatus())
-                .updateUserName(bill.getUpdateUserName())
-                .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd HH:mm"))
+                .id(utility.getId())
+                .room(StrUtil.format("{}-{}", utility.getHouseName(), utility.getRoomNumber()))
+                .water(utility.getWater())
+                .electricity(utility.getElectricity())
+                .status(utility.getStatus().getStatus())
+                .updateUserName(utility.getUpdateUserName())
+                .updateTime(DateUtil.format(utility.getUpdateTime(), "yyyy-MM-dd HH:mm"))
                 .build();
     }
 

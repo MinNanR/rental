@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import site.minnan.rental.application.provider.RoomProviderService;
 import site.minnan.rental.application.provider.TenantProviderService;
+import site.minnan.rental.application.provider.UtilityProviderService;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -23,8 +24,6 @@ import site.minnan.rental.domain.mapper.BillMapper;
 import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
-import site.minnan.rental.infrastructure.exception.EntityNotExistException;
-import site.minnan.rental.infrastructure.exception.UnmodifiableException;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.*;
 
@@ -48,66 +47,8 @@ public class BillServiceImpl implements BillService {
     @Reference(check = false)
     private TenantProviderService tenantProviderService;
 
-    /**
-     * 登记水电用量
-     *
-     * @param recordList
-     */
-    @Override
-    public void recordUtility(List<RecordUtilityDTO> recordList) {
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<Bill> billList = recordList.stream()
-                .map(Bill::assemble)
-                .peek(e -> e.setUpdateUser(jwtUser))
-                .collect(Collectors.toList());
-        billMapper.updateUtilityBatch(billList);
-    }
-
-    /**
-     * 获取未登记水电的房间
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public List<UnrecordedBillVO> getUnrecordedBill(GetUnrecordedBillDTO dto) {
-        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        wrapper.eq("house_id", dto.getHouseId())
-                .eq("floor", dto.getFloor())
-                .eq("year", dto.getYear())
-                .eq("month", dto.getMonth())
-                .eq("status", BillStatus.UNRECORDED);
-        List<Bill> bills = billMapper.selectList(wrapper);
-        return bills.stream().map(UnrecordedBillVO::assemble).collect(Collectors.toList());
-    }
-
-    /**
-     * 修改水电量
-     *
-     * @param dto
-     */
-    @Override
-    public void updateUtility(UpdateUtilityDTO dto) {
-        Bill bill = billMapper.selectById(dto.getId());
-        if (bill == null) {
-            throw new EntityNotExistException("账单不存在");
-        }
-        if (!BillStatus.UNRECORDED.equals(bill.getStatus()) && !BillStatus.UNSETTLED.equals(bill.getStatus())) {
-            if (BillStatus.INIT.equals(bill.getStatus())) {
-                throw new UnmodifiableException("结算月未结束");
-            } else {
-                throw new UnmodifiableException("当前账单已结算");
-            }
-        }
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UpdateWrapper<Bill> wrapper = new UpdateWrapper<>();
-        Optional.ofNullable(dto.getWaterUsage()).ifPresent(s -> wrapper.set("water_usage", s));
-        Optional.ofNullable(dto.getElectricityUsage()).ifPresent(s -> wrapper.set("electricity_usage", s));
-        wrapper.set("update_user_id", jwtUser.getId())
-                .set("update_user_name", jwtUser.getRealName())
-                .set("update_time", new Timestamp(System.currentTimeMillis()));
-        billMapper.update(null, wrapper);
-    }
+    @Reference(check = false)
+    private UtilityProviderService utilityProviderService;
 
     /**
      * 结算账单
@@ -151,45 +92,6 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
-     * 获取水电记录列表
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public ListQueryVO<UtilityVO> getUtilityList(GetUtilityListDTO dto) {
-        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
-        Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.eq("room_number", s));
-        Optional.ofNullable(dto.getYear()).ifPresent(s -> wrapper.eq("year", s));
-        Optional.ofNullable(dto.getMonth()).ifPresent(s -> wrapper.eq("month", s));
-        Optional.ofNullable(dto.getStatus()).ifPresent(s -> wrapper.eq("status", s));
-        wrapper.ne("status", BillStatus.INIT)
-                .ne("status", BillStatus.UNRECORDED);
-        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
-        IPage<Bill> page = billMapper.selectPage(queryPage, wrapper);
-        List<UtilityVO> list = page.getRecords().stream().map(UtilityVO::assemble).collect(Collectors.toList());
-        return new ListQueryVO<>(list, page.getTotal());
-    }
-
-    /**
-     * 获取楼层下拉框
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public Collection<Integer> getFloorDropDown(GetFloorDropDownDTO dto) {
-        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        wrapper.eq("house_id", dto.getHouseId())
-                .eq("year", dto.getYear())
-                .eq("month", dto.getMonth())
-                .eq("status", BillStatus.UNRECORDED);
-        List<Bill> billList = billMapper.selectList(wrapper);
-        return billList.stream().map(Bill::getFloor).distinct().collect(Collectors.toList());
-    }
-
-    /**
      * 获取账单列表
      *
      * @param dto
@@ -207,7 +109,6 @@ public class BillServiceImpl implements BillService {
             wrapper.eq("status", status.get());
         } else {
             wrapper.ne("status", BillStatus.INIT)
-                    .ne("status", BillStatus.UNRECORDED)
                     .ne("status", BillStatus.UNSETTLED);
         }
         wrapper.orderByDesc("update_time");
@@ -230,11 +131,7 @@ public class BillServiceImpl implements BillService {
         Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
         wrapper.eq("status", BillStatus.UNSETTLED);
         List<Bill> billList = billMapper.selectList(wrapper);
-        UtilityPrice price = getUtilityPrice();
-        BigDecimal waterPrice = price.getWaterPrice();
-        BigDecimal electricityPrice = price.getElectricityPrice();
         return billList.stream()
-                .peek(e -> e.settle(waterPrice, electricityPrice))
                 .map(BillVO::assemble)
                 .collect(Collectors.toList());
     }
@@ -257,7 +154,7 @@ public class BillServiceImpl implements BillService {
      * 将到期账单设置为等待登记水电
      */
     @Override
-    public void setBillUnrecorded() {
+    public void setBillUnpaid() {
         //将到期账单状态设置为等待登记水电
         DateTime now = DateTime.now();
         Timestamp currentTime = new Timestamp(now.getTime());
@@ -268,14 +165,24 @@ public class BillServiceImpl implements BillService {
                 .filter(e -> DateUtil.isSameDay(e.getCompletedDate(), now))
                 .collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(initializedBillList)) {
-            List<Integer> initializedBillIdList = initBillList.stream().map(Bill::getId).collect(Collectors.toList());
-            UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.set("status", BillStatus.UNRECORDED)
-                    .set("update_user_id", 0)
-                    .set("update_user_name", "系统")
-                    .set("update_time", currentTime)
-                    .in("id", initializedBillIdList);
-            billMapper.update(null, updateWrapper);
+            List<SettleQueryDTO> queryList = initBillList.stream().map(e -> new SettleQueryDTO(e.getRoomId(),
+                    e.getUtilityStartId())).collect(Collectors.toList());
+            //获取水电情况
+            Map<Integer, SettleQueryVO> utilityMap = utilityProviderService.getUtility(queryList);
+            UtilityPrice price = getUtilityPrice();
+            //结算水电
+            for (Bill bill : initializedBillList) {
+                SettleQueryVO vo = utilityMap.get(bill.getRoomId());
+                JSONObject start = vo.getUtilityStart();
+                JSONObject end = vo.getUtilityEnd();
+                bill.settleWater(start.getBigDecimal("water"), end.getBigDecimal("water"), price.getWaterPrice());
+                bill.settleElectricity(start.getBigDecimal("electricity"), end.getBigDecimal("electricity"),
+                        price.getElectricityPrice());
+                bill.setUtilityEndId(end.getInt("id"));
+                bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
+            }
+            //更新
+            billMapper.settleBatch(initializedBillList);
 
             //生成新的账单
             List<Integer> roomIdList = initializedBillList.stream().map(Bill::getRoomId).collect(Collectors.toList());
@@ -295,6 +202,7 @@ public class BillServiceImpl implements BillService {
                             .floor(roomInfo.getInt("floor"))
                             .rent(roomInfo.getInt("price"))
                             .completedDate(oneMonthLater)
+                            .utilityStartId(utilityMap.get(roomInfo.getInt("id")).getUtilityEnd().getInt("id"))
                             .status(BillStatus.INIT)
                             .build();
                     newBill.setCreateUser(0, "系统", currentTime);
@@ -342,13 +250,14 @@ public class BillServiceImpl implements BillService {
     @Override
     public BigDecimal getMonthTotal() {
         QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("month(pay_time)", DateUtil.month(DateTime.now()) + 1)
+        queryWrapper.select("id", "water_charge", "electricity_charge", "rent")
+                .eq("month(pay_time)", DateUtil.month(DateTime.now()) + 1)
                 .and(w -> w.eq("status", BillStatus.PAID).or().eq("status", BillStatus.PRINTED));
         List<Bill> bills = billMapper.selectList(queryWrapper);
         Optional<BigDecimal> total = Optional.empty();
         if (CollectionUtil.isNotEmpty(bills)) {
             BigDecimal totalValue = bills.stream()
-                    .map(e -> e.getWaterCharge().add(e.getElectricityCharge()).add(BigDecimal.valueOf(e.getRent())))
+                    .map(Bill::totalCharge)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             total = Optional.of(totalValue);
         }

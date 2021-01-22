@@ -33,26 +33,6 @@ public class BillController {
     @Autowired
     private BillService billService;
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
-    @PostMapping("recordUtility")
-    public ResponseEntity<?> recordUtility(@RequestBody @Valid List<RecordUtilityDTO> dtoList) {
-        billService.recordUtility(dtoList);
-        return ResponseEntity.success();
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("getBillList/unrecorded")
-    public ResponseEntity<List<UnrecordedBillVO>> getUnrecordedBill(@RequestBody @Valid GetUnrecordedBillDTO dto) {
-        List<UnrecordedBillVO> billList = billService.getUnrecordedBill(dto);
-        return ResponseEntity.success(billList);
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("updateUtility")
-    public ResponseEntity<?> updateUtility(@RequestBody @Valid UpdateUtilityDTO dto) {
-        billService.updateUtility(dto);
-        return ResponseEntity.success();
-    }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("settleBill")
@@ -75,20 +55,6 @@ public class BillController {
         return ResponseEntity.success(utilityPrice);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
-    @PostMapping("getUtilityList")
-    public ResponseEntity<ListQueryVO<UtilityVO>> getUtilityList(@RequestBody @Valid GetUtilityListDTO dto) {
-        ListQueryVO<UtilityVO> vo = billService.getUtilityList(dto);
-        return ResponseEntity.success(vo);
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("getFloorDropDown")
-    public ResponseEntity<Collection<Integer>> getFloorDropDown(@RequestBody @Valid GetFloorDropDownDTO dto) {
-        Collection<Integer> floorDropDown = billService.getFloorDropDown(dto);
-        return ResponseEntity.success(floorDropDown);
-    }
-
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getUtilityStatusDropDown")
     public ResponseEntity<List<BillStatusDropDown>> getUtilityStatusDropDown() {
@@ -108,7 +74,6 @@ public class BillController {
                 .collect(Collectors.toList());
         return ResponseEntity.success(dropDownList);
     }
-
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getBillList")

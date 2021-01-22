@@ -28,9 +28,11 @@
     <!--批量结算-->
     <update id="settleBatch">
         <foreach collection="bills" item="bill" separator=";">
-            update rental_bill set water_charge = #{bill.waterCharge}, electricity_charge = #{bill.electricityCharge},
-            status = #{bill.status}, update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName},
-            update_time = #{bill.updateTime}
+            update rental_bill set water_usage = {bill.waterUsage}, water_charge = #{bill.waterCharge},
+            electricity_usage = #{bill.electricityUsage}, electricity_charge = #{bill.electricityCharge},
+            utility_end_id = #{bill.utilityEndId}, status = #{bill.status},create_user_id = #{bill.createUserId},
+            create_user_name = #{bill.createUserName}, create_time = #{bill.createTiem},
+            update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName}, update_time = #{bill.updateTime}
         </foreach>
     </update>
 
