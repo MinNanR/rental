@@ -4,6 +4,8 @@ spring:
     username: Minnan
     password: minnan
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 600000
 
   redis:
     host: minnan.site
