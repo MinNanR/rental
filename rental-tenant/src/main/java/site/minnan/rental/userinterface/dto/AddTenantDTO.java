@@ -20,18 +20,6 @@ public class AddTenantDTO {
     @NotEmpty(message = "房客姓名不能为空")
     private String name;
 
-    @NotNull(message = "未指定房屋")
-    private Integer houseId;
-
-    @NotNull(message = "未指定房屋")
-    private String houseName;
-
-    @NotNull(message = "未指定房间")
-    private Integer roomId;
-
-    @NotEmpty(message = "未指定房间")
-    private String roomNumber;
-
     @NotEmpty(message = "性别未填写")
     private String gender;
 
@@ -43,9 +31,6 @@ public class AddTenantDTO {
     @Pattern(regexp = "^[1-9]\\d{5}(18|19|20|(3\\d))\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$",
             message = "身份证号码格式不正确")
     private String identificationNumber;
-
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "UTC+8:00")
-    private Date birthday;
 
     private String hometownProvince;
 

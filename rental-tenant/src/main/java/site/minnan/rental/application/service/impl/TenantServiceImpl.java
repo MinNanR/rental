@@ -61,55 +61,65 @@ public class TenantServiceImpl implements TenantService {
      */
     @Override
     @Transactional
-    public void addTenant(AddTenantDTO dto) {
+    public void addTenant(RegisterAddTenantDTO dto) {
         JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer check = tenantMapper.checkTenantExistByIdentificationNumber(dto.getIdentificationNumber());
-        if (check != null) {
-            throw new EntityAlreadyExistException("房客已存在");
-        }
-        AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
-                .phone(dto.getPhone())
-                .realName(dto.getName())
-                .userId(jwtUser.getId())
-                .userName(jwtUser.getRealName())
-                .build();
-        ResponseEntity<Integer> newUser = userProviderService.createTenantUser(tenantUserDTO);
-        if (!ResponseCode.SUCCESS.code().equals(newUser.getCode())) {
-            throw new EntityAlreadyExistException(newUser.getMessage());
-        }
-        Integer userId = newUser.getData();
-        Tenant tenant = Tenant.builder()
-                .name(dto.getName())
-                .gender(Gender.valueOf(dto.getGender()))
-                .birthday(dto.getBirthday())
-                .phone(dto.getPhone())
-                .identificationNumber(dto.getIdentificationNumber())
-                .hometownProvince(dto.getHometownProvince())
-                .hometownCity(dto.getHometownCity())
-                .houseId(dto.getHouseId())
-                .houseName(dto.getHouseName())
-                .roomId(dto.getRoomId())
-                .roomNumber(dto.getRoomNumber())
-                .userId(userId)
-                .status(TenantStatus.LIVING)
-                .build();
-        tenant.setCreateUser(jwtUser);
-        tenantMapper.insert(tenant);
-        UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
-                .id(dto.getRoomId())
-                .status(RoomStatus.ON_RENT.getValue())
-                .userId(jwtUser.getId())
-                .userName(jwtUser.getRealName())
-                .build();
-        JSONObject room = roomProviderService.updateRoomStatus(updateRoomStatusDTO);
-        if (RoomStatus.VACANT.getValue().equals(room.getStr("status"))) {
-            CreateBillDTO createBillDTO = CreateBillDTO.builder()
-                    .roomId(dto.getRoomId())
+        List<AddTenantUserDTO> addUserDTO = new ArrayList<>();
+        for (AddTenantDTO tenant : dto.getTenantList()) {
+            //TODO 添加房客用户
+            AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
+                    .phone(tenant.getPhone())
+                    .realName(tenant.getName())
                     .userId(jwtUser.getId())
                     .userName(jwtUser.getRealName())
                     .build();
-            billProviderService.createBill(createBillDTO);
+            addUserDTO.add(tenantUserDTO);
         }
+        List<Integer> userIdList = userProviderService.createTenantUserBatch(addUserDTO);
+        Iterator<Integer> idIterator = userIdList.iterator();
+
+//        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        Integer check = tenantMapper.checkTenantExistByIdentificationNumber(dto.getIdentificationNumber());
+//        if (check != null) {
+//            throw new EntityAlreadyExistException("房客已存在");
+//        }
+//        AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
+//                .phone(dto.getPhone())
+//                .realName(dto.getName())
+//                .userId(jwtUser.getId())
+//                .userName(jwtUser.getRealName())
+//                .build();
+//        ResponseEntity<Integer> newUser = userProviderService.createTenantUser(tenantUserDTO);
+//        if (!ResponseCode.SUCCESS.code().equals(newUser.getCode())) {
+//            throw new EntityAlreadyExistException(newUser.getMessage());
+//        }
+//        Integer userId = newUser.getData();
+//        Tenant tenant = Tenant.builder()
+//                .name(dto.getName())
+//                .gender(Gender.valueOf(dto.getGender()))
+//                .phone(dto.getPhone())
+//                .identificationNumber(dto.getIdentificationNumber())
+//                .hometownProvince(dto.getHometownProvince())
+//                .hometownCity(dto.getHometownCity())
+//                .userId(userId)
+//                .status(TenantStatus.LIVING)
+//                .build();
+//        tenant.setCreateUser(jwtUser);
+//        tenantMapper.insert(tenant);
+//        UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
+//                .id(dto.getRoomId())
+//                .status(RoomStatus.ON_RENT.getValue())
+//                .userId(jwtUser.getId())
+//                .userName(jwtUser.getRealName())
+//                .build();
+//        JSONObject room = roomProviderService.updateRoomStatus(updateRoomStatusDTO);
+//        if (RoomStatus.VACANT.getValue().equals(room.getStr("status"))) {
+//            CreateBillDTO createBillDTO = CreateBillDTO.builder()
+//                    .roomId(dto.getRoomId())
+//                    .userId(jwtUser.getId())
+//                    .userName(jwtUser.getRealName())
+//                    .build();
+//            billProviderService.createBill(createBillDTO);
+//        }
 
     }
 
@@ -249,15 +259,15 @@ public class TenantServiceImpl implements TenantService {
             userProviderService.enableTenantUserBatch(enableTenantUserBatchDTO);
         }
 
-        //房间原本为空闲状态则创建账单
-        if (checkRoomOnRent == null) {
-            CreateBillDTO createBillDTO = CreateBillDTO.builder()
-                    .roomId(dto.getRoomId())
-                    .userId(jwtUser.getId())
-                    .userName(jwtUser.getRealName())
-                    .build();
-            billProviderService.createBill(createBillDTO);
-        }
+//        //房间原本为空闲状态则创建账单
+//        if (checkRoomOnRent == null) {
+//            CreateBillDTO createBillDTO = CreateBillDTO.builder()
+//                    .roomId(dto.getRoomId())
+//                    .userId(jwtUser.getId())
+//                    .userName(jwtUser.getRealName())
+//                    .build();
+//            billProviderService.createBill(createBillDTO);
+//        }
     }
 
     /**
@@ -323,5 +333,17 @@ public class TenantServiceImpl implements TenantService {
                 .updateUserName(jwtUser.getRealName())
                 .build();
         userProviderService.disableTenantUser(disableTenantUserDTO);
+    }
+
+    /**
+     * 检查身份证号码是否存在
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public Boolean checkIdentificationNumberExist(CheckIdentificationNumberDTO dto) {
+        Integer id = tenantMapper.checkTenantExistByIdentificationNumber(dto.getIdentificationNumber());
+        return id != null;
     }
 }

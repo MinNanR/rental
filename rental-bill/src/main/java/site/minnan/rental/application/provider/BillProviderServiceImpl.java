@@ -10,11 +10,15 @@ import com.alibaba.dubbo.config.annotation.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.entity.BillTenantRelevance;
 import site.minnan.rental.domain.mapper.BillMapper;
+import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
 
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service(timeout = 5000, interfaceClass = BillProviderService.class)
 @Slf4j
@@ -22,6 +26,9 @@ public class BillProviderServiceImpl implements BillProviderService {
 
     @Autowired
     private BillMapper billMapper;
+
+    @Autowired
+    private BillTenantRelevanceMapper billTenantRelevanceMapper;
 
     @Reference(check = false)
     private RoomProviderService roomProviderService;
@@ -54,6 +61,9 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .build();
         bill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
         billMapper.insert(bill);
+        List<BillTenantRelevance> relevanceList =
+                dto.getTenantIdList().stream().map(e -> BillTenantRelevance.of(bill.getId(), e)).collect(Collectors.toList());
+        billTenantRelevanceMapper.insertBatch(relevanceList);
     }
 
     @Override

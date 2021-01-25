@@ -28,7 +28,7 @@ public class TenantController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("addTenant")
-    public ResponseEntity<?> addTenant(@RequestBody @Valid AddTenantDTO dto) {
+    public ResponseEntity<?> addTenant(@RequestBody @Valid RegisterAddTenantDTO dto) {
         tenantService.addTenant(dto);
         return ResponseEntity.success();
     }
@@ -42,7 +42,7 @@ public class TenantController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getTenantByRoom")
-    public ResponseEntity<List<TenantVO>> getTenantByRoom(@RequestBody @Valid GetTenantByRoomDTO dto){
+    public ResponseEntity<List<TenantVO>> getTenantByRoom(@RequestBody @Valid GetTenantByRoomDTO dto) {
         List<TenantVO> tenantList = tenantService.getTenantByRoom(dto);
         return ResponseEntity.success(tenantList);
     }
@@ -80,5 +80,12 @@ public class TenantController {
     public ResponseEntity<?> surrender(@RequestBody @Valid SurrenderDTO dto) {
         tenantService.surrender(dto);
         return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
+    @PostMapping("checkIdNumber")
+    public ResponseEntity<Boolean> checkIdentificationNumberExist(CheckIdentificationNumberDTO dto) {
+        Boolean check = tenantService.checkIdentificationNumberExist(dto);
+        return ResponseEntity.success(check);
     }
 }

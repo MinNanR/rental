@@ -16,6 +16,9 @@ import site.minnan.rental.userinterface.dto.EnableTenantUserBatchDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service(timeout = 5000, interfaceClass = UserProviderService.class)
 @Slf4j
@@ -94,5 +97,32 @@ public class UserProviderServiceImpl implements UserProviderService {
                 .in("id", dto.getUserIdList());
         userMapper.update(null, wrapper);
         return ResponseEntity.success();
+    }
+
+    /**
+     * 批量创建租客用户
+     *
+     * @param userList
+     * @return
+     */
+    @Override
+    public List<Integer> createTenantUserBatch(List<AddTenantUserDTO> userList) {
+        List<AuthUser> newUserList = new ArrayList<>();
+        for (AddTenantUserDTO dto : userList) {
+            String passwordMd5 = MD5.create().digestHex(dto.getPhone().substring(dto.getPhone().length() - 6));
+            String encodedPassword = passwordEncoder.encode(passwordMd5);
+            AuthUser authUser = AuthUser.builder()
+                    .username(dto.getPhone())
+                    .password(encodedPassword)
+                    .phone(dto.getPhone())
+                    .realName(dto.getRealName())
+                    .role(Role.TENANT)
+                    .enabled(AuthUser.ENABLE)
+                    .build();
+            authUser.setCreateUser(dto.getUserId(), dto.getUserName());
+            newUserList.add(authUser);
+        }
+        userMapper.addUserBatch(newUserList);
+        return newUserList.stream().map(AuthUser::getId).collect(Collectors.toList());
     }
 }

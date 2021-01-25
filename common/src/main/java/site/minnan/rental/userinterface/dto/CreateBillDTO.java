@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 房间状态由空闲转为在租时创建账单参数
@@ -16,6 +17,8 @@ public class CreateBillDTO implements Serializable {
 
 
     private Integer roomId;
+
+    private List<Integer> tenantIdList;
 
     private Integer userId;
 

@@ -31,4 +31,6 @@ public interface TenantProviderService {
      * @return
      */
     Map<Integer, JSONObject> getTenantInfoByRoomIds(Collection<Integer> ids);
+
+    Map<Integer, List<Integer>> getTenantIdByRoomId(Collection<Integer> ids);
 }

@@ -51,4 +51,14 @@ public class TenantProviderServiceImpl implements TenantProviderService {
                     return jsonObject.putOpt("name", nameStr).putOpt("phone", phone);
                 })));
     }
+
+    @Override
+    public Map<Integer, List<Integer>> getTenantIdByRoomId(Collection<Integer> ids) {
+        QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "room_id")
+                .in("roo_id", ids);
+        List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
+        return tenantList.stream().collect(Collectors.groupingBy(Tenant::getRoomId,
+                Collectors.mapping(Tenant::getId, Collectors.toList())));
+    }
 }

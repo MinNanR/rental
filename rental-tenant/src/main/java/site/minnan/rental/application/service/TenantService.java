@@ -20,7 +20,7 @@ public interface TenantService {
      *
      * @param dto
      */
-    void addTenant(AddTenantDTO dto);
+    void addTenant(RegisterAddTenantDTO dto);
 
     /**
      * 列表查询房客
@@ -32,6 +32,7 @@ public interface TenantService {
 
     /**
      * 查询该房间所住的房客
+     *
      * @param dto
      * @return
      */
@@ -73,4 +74,12 @@ public interface TenantService {
      * @param dto
      */
     void surrender(SurrenderDTO dto);
+
+    /**
+     * 检查身份证号码是否存在
+     *
+     * @param dto
+     * @return
+     */
+    Boolean checkIdentificationNumberExist(CheckIdentificationNumberDTO dto);
 }

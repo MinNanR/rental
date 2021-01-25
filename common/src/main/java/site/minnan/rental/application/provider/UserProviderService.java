@@ -5,6 +5,8 @@ import site.minnan.rental.userinterface.dto.DisableTenantUserDTO;
 import site.minnan.rental.userinterface.dto.EnableTenantUserBatchDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
+import java.util.List;
+
 /**
  * 用户服务
  *
@@ -19,6 +21,14 @@ public interface UserProviderService {
      * @return 新用户id
      */
     ResponseEntity<Integer> createTenantUser(AddTenantUserDTO dto);
+
+    /**
+     * 批量创建租客用户
+     *
+     * @param userList
+     * @return
+     */
+    List<Integer> createTenantUserBatch(List<AddTenantUserDTO> userList);
 
     /**
      * 房客退租后禁用用户

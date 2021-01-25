@@ -8,7 +8,6 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,10 @@ import site.minnan.rental.application.provider.TenantProviderService;
 import site.minnan.rental.application.provider.UtilityProviderService;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.entity.BillTenantRelevance;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.BillMapper;
+import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
 import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
@@ -49,6 +50,9 @@ public class BillServiceImpl implements BillService {
 
     @Reference(check = false)
     private UtilityProviderService utilityProviderService;
+
+    @Autowired
+    private BillTenantRelevanceMapper billTenantRelevanceMapper;
 
     /**
      * 结算账单
@@ -210,6 +214,12 @@ public class BillServiceImpl implements BillService {
                 }
             }
             billMapper.insertBatch(newBillList);
+            Map<Integer, List<Integer>> tenantIdMap = tenantProviderService.getTenantIdByRoomId(roomIdList);
+            List<BillTenantRelevance> relevanceList = newBillList.stream()
+                    .flatMap(e -> tenantIdMap.get(e.getRoomId()).stream().map(e1 -> BillTenantRelevance.of(e.getId(),
+                            e1)))
+                    .collect(Collectors.toList());
+            billTenantRelevanceMapper.insertBatch(relevanceList);
         }
     }
 
