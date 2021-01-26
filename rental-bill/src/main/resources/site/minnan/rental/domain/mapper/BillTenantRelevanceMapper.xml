@@ -5,7 +5,7 @@
 <mapper namespace="site.minnan.rental.domain.mapper.BillTenantRelevanceMapper">
     <!--批量插入关联关系-->
     <insert id="insertBatch">
-        insert into rental_bill_tenant (bill_id, tenant_id)
+        insert into rental_bill_tenant_relevance (bill_id, tenant_id)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.billId}, #{item.tenantId})

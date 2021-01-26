@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service(timeout = 5000, interfaceClass = RoomProviderService.class)
+@Service(timeout = 30000, interfaceClass = RoomProviderService.class)
 @Slf4j
 public class RoomProviderServiceImpl implements RoomProviderService {
 

@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service(timeout = 5000, interfaceClass = BillProviderService.class)
+@Service(timeout = 30000, interfaceClass = BillProviderService.class)
 @Slf4j
 public class BillProviderServiceImpl implements BillProviderService {
 

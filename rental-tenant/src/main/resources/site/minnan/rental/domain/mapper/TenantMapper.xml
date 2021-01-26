@@ -3,6 +3,19 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="site.minnan.rental.domain.mapper.TenantMapper">
+<!--    批量新增房客-->
+    <insert id="addTenantBatch" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into rental_tenant (name, gender, phone, birthday, hometown_province, hometown_city,
+        identification_number, house_id, house_name, room_id, room_number, user_id, status, create_user_id,
+        create_user_name, create_time, update_user_id, update_user_name, update_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.name}, #{item.gender}, #{item.phone}, #{item.birthday}, #{item.hometownProvince},
+            #{item.hometownCity}, #{item.identificationNumber}, #{item.houseId}, #{item.houseName}, #{item.roomId},
+            #{item.roomNumber}, #{item.userId}, #{item.status}, #{item.createUserId}, #{item.createUserName},
+            #{item.createTime}, #{item.updateUserId}, #{item.updateUserName}, #{item.updateTime})
+        </foreach>
+    </insert>
 
     <select id="getTenantByRoomIds" resultType="site.minnan.rental.domain.aggregate.Tenant">
         select id id, name name, room_id roomId, phone phone from rental_tenant where room_id in

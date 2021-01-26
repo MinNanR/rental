@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 import site.minnan.rental.domain.aggregate.Tenant;
-import site.minnan.rental.domain.vo.TenantDropDownVO;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,13 +20,18 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     @Select("select id from rental_tenant where room_id = #{roomId} limit 1")
     Integer checkRoomOnRentByRoomId(@Param("roomId") Integer roomId);
 
-    @Select("select name, phone from rental_tenant where room_id = #{roomId}")
-    List<Tenant> getTenantInfoByRoomId(@Param("roomId")Integer id);
+    /**
+     * 批量添加房客
+     *
+     * @param tenantList
+     */
+    void addTenantBatch(@Param("list") List<Tenant> tenantList);
 
     /**
      * 批量根据房间id获取房客名称
+     *
      * @param ids
      * @return
      */
-    List<Tenant> getTenantByRoomIds(@Param("ids")Collection<Integer> ids);
+    List<Tenant> getTenantByRoomIds(@Param("ids") Collection<Integer> ids);
 }

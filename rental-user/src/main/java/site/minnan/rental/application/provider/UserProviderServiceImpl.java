@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service(timeout = 5000, interfaceClass = UserProviderService.class)
+@Service(timeout = 30000, interfaceClass = UserProviderService.class)
 @Slf4j
 public class UserProviderServiceImpl implements UserProviderService {
 

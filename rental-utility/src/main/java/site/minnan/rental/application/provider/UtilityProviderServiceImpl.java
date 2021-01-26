@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Service(timeout = 5000, interfaceClass = RoomProviderService.class)
+@Service(timeout = 30000, interfaceClass = UtilityProviderService.class)
 public class UtilityProviderServiceImpl implements UtilityProviderService {
 
     @Autowired

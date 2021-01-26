@@ -1,5 +1,8 @@
 package site.minnan.rental.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +14,10 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @AllArgsConstructor
+@TableName("rental_bill_tenant_relevance")
 public class BillTenantRelevance {
 
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**

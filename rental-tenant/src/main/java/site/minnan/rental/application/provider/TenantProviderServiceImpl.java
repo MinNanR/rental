@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Service(timeout = 5000, interfaceClass = TenantProviderService.class)
+@Service(timeout = 30000, interfaceClass = TenantProviderService.class)
 public class TenantProviderServiceImpl implements TenantProviderService {
 
     @Autowired
