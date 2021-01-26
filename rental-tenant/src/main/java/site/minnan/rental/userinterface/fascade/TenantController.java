@@ -4,15 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.minnan.rental.application.service.TenantService;
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.TenantDropDownVO;
-import site.minnan.rental.domain.vo.TenantInfoVO;
-import site.minnan.rental.domain.vo.TenantVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房客信息控制器
@@ -87,5 +85,12 @@ public class TenantController {
     public ResponseEntity<Boolean> checkIdentificationNumberExist(CheckIdentificationNumberDTO dto) {
         Boolean check = tenantService.checkIdentificationNumberExist(dto);
         return ResponseEntity.success(check);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getTenantList/app")
+    public ResponseEntity<List<TenantPinyinVO>> getTenantList() {
+        List<TenantPinyinVO> vo = tenantService.getTenantList();
+        return ResponseEntity.success(vo);
     }
 }

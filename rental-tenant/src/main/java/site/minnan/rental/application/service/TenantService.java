@@ -1,12 +1,10 @@
 package site.minnan.rental.application.service;
 
-import site.minnan.rental.domain.vo.ListQueryVO;
-import site.minnan.rental.domain.vo.TenantDropDownVO;
-import site.minnan.rental.domain.vo.TenantInfoVO;
-import site.minnan.rental.domain.vo.TenantVO;
+import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.userinterface.dto.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 房客相关服务
@@ -82,4 +80,11 @@ public interface TenantService {
      * @return
      */
     Boolean checkIdentificationNumberExist(CheckIdentificationNumberDTO dto);
+
+    /**
+     * 获取房客列表
+     *
+     * @return
+     */
+    List<TenantPinyinVO> getTenantList();
 }

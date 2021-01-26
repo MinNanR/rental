@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
@@ -34,8 +36,10 @@ import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseCode;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
+import java.sql.Struct;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -352,8 +356,19 @@ public class TenantServiceImpl implements TenantService {
      * @return
      */
     @Override
-    public Map<String, List<TenantAppVO>> getTenantList() {
-
-        return null;
+    public List<TenantPinyinVO> getTenantList() {
+        QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "name", "house_name", "room_number")
+                .eq("status", TenantStatus.LIVING);
+        List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
+        Map<Character, List<TenantAppVO>> groupByPinyin = tenantList.stream()
+                .collect(Collectors.groupingBy(e -> PinyinUtil.getFirstLetter(e.getName().charAt(0)),
+                        Collectors.collectingAndThen(Collectors.toList(), (e -> e.stream()
+                                .sorted(Comparator.comparing(t1 -> PinyinUtil.getPinyin(t1.getName())))
+                                .map(TenantAppVO::assemble)
+                                .collect(Collectors.toList())))));
+        return groupByPinyin.entrySet().stream()
+                .map(e -> new TenantPinyinVO((char) (e.getKey() - 32), e.getValue()))
+                .collect(Collectors.toList());
     }
 }

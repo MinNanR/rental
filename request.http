@@ -524,3 +524,10 @@ Authorization: {{admin_token}}
   "year": 2020,
   "month": 12
 }
+
+###
+POST {{tenantUrl}}/tenant/getTenantList/app
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{}
