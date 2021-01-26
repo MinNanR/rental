@@ -19,11 +19,14 @@ public class TenantAppVO {
 
     private String room;
 
+    private String phone;
+
     public static TenantAppVO assemble(Tenant tenant){
         return TenantAppVO.builder()
                 .id(tenant.getId())
                 .name(tenant.getName())
                 .room(StrUtil.format("{}-{}", tenant.getHouseName(), tenant.getRoomNumber()))
+                .phone(tenant.getPhone())
                 .build();
     }
 

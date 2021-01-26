@@ -7,6 +7,8 @@ import cn.hutool.extra.pinyin.engine.pinyin4j.Pinyin4jEngine;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import site.minnan.rental.domain.aggregate.Bill;
@@ -68,15 +70,18 @@ public class BillProviderServiceImpl implements BillProviderService {
 
     @Override
     public void completeBillWithSurrender(Integer roomId) {
-//        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("room_id", roomId)
-//                .eq("status", BillStatus.INIT);
-//        Bill bill = billMapper.selectOne(queryWrapper);
-//        if (bill != null) {
-//            UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
-//            updateWrapper.set("status", BillStatus.UNRECORDED)
-//                    .eq("id", bill.getId());
-//            billMapper.update(null, updateWrapper);
-//        }
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("room_id", roomId)
+                .eq("status", BillStatus.INIT);
+        Bill bill = billMapper.selectOne(queryWrapper);
+        if (bill != null) {
+            Integer currentUtilityId = utilityProviderService.getCurrentUtility(roomId);
+            UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.set("utility_end_id", currentUtilityId)
+                    .set("status", BillStatus.UNPAID)
+                    .eq("id", bill.getId());
+            billMapper.update(null, updateWrapper);
+        }
+
     }
 }

@@ -358,7 +358,7 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public List<TenantPinyinVO> getTenantList() {
         QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id", "name", "house_name", "room_number")
+        queryWrapper.select("id", "name", "house_name", "room_number", "phone")
                 .eq("status", TenantStatus.LIVING);
         List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
         Map<Character, List<TenantAppVO>> groupByPinyin = tenantList.stream()
@@ -369,6 +369,7 @@ public class TenantServiceImpl implements TenantService {
                                 .collect(Collectors.toList())))));
         return groupByPinyin.entrySet().stream()
                 .map(e -> new TenantPinyinVO((char) (e.getKey() - 32), e.getValue()))
+                .sorted(Comparator.comparing(TenantPinyinVO::getKey))
                 .collect(Collectors.toList());
     }
 }
