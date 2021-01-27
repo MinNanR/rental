@@ -87,4 +87,11 @@ public class RoomController {
         Collection<FloorVO> vo = roomService.getAllRoom(dto);
         return ResponseEntity.success(vo);
     }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
+    @PostMapping("getFloorDropDown")
+    public ResponseEntity<Collection<FloorDropDown>> getFloorDropDown(){
+        Collection<FloorDropDown> vo = roomService.getFloorDropDown();
+        return ResponseEntity.success(vo);
+    }
 }

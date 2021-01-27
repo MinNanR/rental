@@ -516,3 +516,10 @@ Authorization: {{admin_token}}
   "water": 14,
   "electricity": 23
 }
+
+###
+POST {{roomUrl}}/room/getFloorDropDown
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{}

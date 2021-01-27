@@ -6,6 +6,7 @@ import site.minnan.rental.userinterface.dto.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 房间相关操作
@@ -65,4 +66,11 @@ public interface RoomService {
      * @return 房间列表，按楼层归并
      */
     Collection<FloorVO> getAllRoom(GetFloorDTO dto);
+
+    /**
+     * 获取楼层下拉框
+     *
+     * @return
+     */
+    Collection<FloorDropDown> getFloorDropDown();
 }

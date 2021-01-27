@@ -160,4 +160,24 @@ public class RooServiceImpl implements RoomService {
                         })))
                 .values();
     }
+
+    /**
+     * 获取楼层下拉框
+     *
+     * @return
+     */
+    @Override
+    public Collection<FloorDropDown> getFloorDropDown() {
+        QueryWrapper<Room> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("floor", "house_id", "house_name")
+                .groupBy("floor", "house_id", "house_name");
+        List<Room> rooms = roomMapper.selectList(queryWrapper);
+        return rooms.stream().collect(Collectors.groupingBy(Room::getHouseId,
+                Collectors.collectingAndThen(Collectors.toList(), e -> {
+                    Room room = e.stream().findFirst().get();
+                    List<Integer> floorList = e.stream().map(Room::getFloor).collect(Collectors.toList());
+                    return new FloorDropDown(room.getHouseId(), room.getHouseName(), floorList);
+                })))
+                .values();
+    }
 }
