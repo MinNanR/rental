@@ -30,9 +30,6 @@ public class UpdateTenantDTO {
             message = "身份证号码格式不正确")
     private String identificationNumber;
 
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "UTF+08:00")
-    private Date birthday;
-
     private String hometownProvince;
 
     private String hometownCity;

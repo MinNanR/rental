@@ -289,8 +289,12 @@ public class TenantServiceImpl implements TenantService {
         Optional.ofNullable(dto.getName()).ifPresent(s -> wrapper.set("name", s));
         Optional.ofNullable(dto.getGender()).ifPresent(s -> wrapper.set("gender", s));
         Optional.ofNullable(dto.getPhone()).ifPresent(s -> wrapper.set("phone", s));
-        Optional.ofNullable(dto.getIdentificationNumber()).ifPresent(s -> wrapper.set("identification_number", s));
-        Optional.ofNullable(dto.getBirthday()).ifPresent(s -> wrapper.set("birthday", s));
+        Optional.ofNullable(dto.getIdentificationNumber()).ifPresent(s -> {
+            String birthdayString = tenant.getIdentificationNumber().substring(6, 14);
+            DateTime birthday = DateUtil.parse(birthdayString, "yyyyMMdd");
+            wrapper.set("identification_number", s);
+            wrapper.set("birthday", birthday);
+        });
         Optional.ofNullable(dto.getHometownProvince()).ifPresent(s -> wrapper.set("hometown_province", s));
         Optional.ofNullable(dto.getHometownCity()).ifPresent(s -> wrapper.set("hometown_city", s));
         wrapper.set("update_user_id", user.getId());

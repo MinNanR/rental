@@ -17,4 +17,8 @@ public class GetUtilityDTO extends ListQueryDTO {
     private Integer year;
 
     private Integer month;
+
+    private String date;
+
+    private Integer roomId;
 }

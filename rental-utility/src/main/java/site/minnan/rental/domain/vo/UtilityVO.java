@@ -39,7 +39,7 @@ public class UtilityVO {
                 .electricity(utility.getElectricity())
                 .status(utility.getStatus().getStatus())
                 .updateUserName(utility.getUpdateUserName())
-                .updateTime(DateUtil.format(utility.getUpdateTime(), "yyyy-MM-dd HH:mm"))
+                .updateTime(DateUtil.format(utility.getUpdateTime(), "yyyy年MM月dd日 HH:mm"))
                 .build();
     }
 

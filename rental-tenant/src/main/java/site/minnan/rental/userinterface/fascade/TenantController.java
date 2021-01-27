@@ -47,7 +47,7 @@ public class TenantController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getTenantInfo")
-    public ResponseEntity<?> getTenantInfo(@RequestBody @Valid DetailsQueryDTO dto) {
+    public ResponseEntity<TenantInfoVO> getTenantInfo(@RequestBody @Valid DetailsQueryDTO dto) {
         TenantInfoVO vo = tenantService.getTenantInfo(dto);
         return ResponseEntity.success(vo);
     }
@@ -82,7 +82,7 @@ public class TenantController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
     @PostMapping("checkIdNumber")
-    public ResponseEntity<Boolean> checkIdentificationNumberExist(CheckIdentificationNumberDTO dto) {
+    public ResponseEntity<Boolean> checkIdentificationNumberExist(@RequestBody @Valid CheckIdentificationNumberDTO dto) {
         Boolean check = tenantService.checkIdentificationNumberExist(dto);
         return ResponseEntity.success(check);
     }
