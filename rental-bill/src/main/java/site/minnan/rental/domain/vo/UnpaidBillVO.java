@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import site.minnan.rental.domain.aggregate.Bill;
 
 import java.math.BigDecimal;
@@ -28,8 +29,10 @@ public class UnpaidBillVO {
 
     private String time;
 
+    @Setter
     private String livingPeople;
 
+    @Setter
     private String phone;
 
     private String updateTime;
@@ -46,6 +49,11 @@ public class UnpaidBillVO {
                 .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
                 .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
                 .build();
+    }
+
+    public void setTenantInfo(String livingPeople,String phone){
+        this.livingPeople = livingPeople;
+        this.phone = phone;
     }
 
 }

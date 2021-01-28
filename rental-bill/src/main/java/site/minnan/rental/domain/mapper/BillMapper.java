@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.entity.BillTenantEntity;
+import site.minnan.rental.infrastructure.enumerate.BillStatus;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,4 +31,22 @@ public interface BillMapper extends BaseMapper<Bill> {
      * @param bills
      */
     void insertBatch(@Param("bills") Collection<Bill> bills);
+
+    /**
+     * 查询账单
+     *
+     * @param status
+     * @param start
+     * @param pageSize
+     * @return
+     */
+    List<BillTenantEntity> getBillList(@Param("status") BillStatus status, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
+
+    /**
+     * 计算数量
+     *
+     * @param status
+     * @return
+     */
+    Long countBill(@Param("status") BillStatus status);
 }

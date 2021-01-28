@@ -24,13 +24,21 @@ public interface TenantProviderService {
     JSONArray getTenantInfoByRoomId(Integer id);
 
     /**
-     * 批量根据房间id获取房客信息
+     * 批量根据房客id获取房客信息
      * 所有的房客名称，第一个房客的电话号码
      *
      * @param ids
      * @return
      */
-    Map<Integer, JSONObject> getTenantInfoByRoomIds(Collection<Integer> ids);
+    Map<Integer, JSONObject> getTenantInfoByTenantIds(Collection<Integer> ids);
 
     Map<Integer, List<Integer>> getTenantIdByRoomId(Collection<Integer> ids);
+
+    /**
+     * 根据房客id获取信息
+     *
+     * @param ids
+     * @return
+     */
+    JSONArray getTenantByIds(List<Integer> ids);
 }

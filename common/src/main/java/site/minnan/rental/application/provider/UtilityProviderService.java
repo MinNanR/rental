@@ -26,8 +26,16 @@ public interface UtilityProviderService {
     /**
      * 获取房间当前水电度数记录id
      *
-     * @param roomId  房间id
+     * @param roomId 房间id
      * @return 当前水电度数记录id
      */
     Integer getCurrentUtility(Integer roomId);
+
+    /**
+     * 查询水电
+     *
+     * @param dto
+     * @return
+     */
+    SettleQueryVO getUtility(SettleQueryDTO dto);
 }

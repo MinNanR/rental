@@ -202,4 +202,8 @@ public class Bill {
     public BigDecimal totalCharge() {
         return waterCharge.add(electricityCharge).add(BigDecimal.valueOf(rent));
     }
+
+    public void settled() {
+        this.status = BillStatus.UNPAID;
+    }
 }

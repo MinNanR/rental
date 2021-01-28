@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
  */
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @TableName("rental_bill_tenant_relevance")
 public class BillTenantRelevance {
 

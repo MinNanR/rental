@@ -68,4 +68,24 @@ public class UtilityProviderServiceImpl implements UtilityProviderService {
         Utility utility = utilityMapper.selectOne(queryWrapper);
         return utility.getId();
     }
+
+    /**
+     * 查询水电
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public SettleQueryVO getUtility(SettleQueryDTO dto) {
+        QueryWrapper<Utility> endQueryWrapper = new QueryWrapper<>();
+        endQueryWrapper.select("id", "room_id", "water", "electricity", "create_time")
+                .eq("status", UtilityStatus.RECORDING)
+                .in("room_id", dto.getRoomId());
+        Utility end = utilityMapper.selectOne(endQueryWrapper);
+        QueryWrapper<Utility> startQueryWrapper = new QueryWrapper<>();
+        startQueryWrapper.select("id", "room_id", "water", "electricity", "create_time")
+                .eq("id", dto.getStartUtilityId());
+        Utility start = utilityMapper.selectOne(startQueryWrapper);
+        return new SettleQueryVO(new JSONObject(start), new JSONObject(end));
+    }
 }

@@ -28,16 +28,29 @@
     <!--批量结算-->
     <update id="settleBatch">
         <foreach collection="bills" item="bill" separator=";">
-            update rental_bill set water_usage = {bill.waterUsage}, water_charge = #{bill.waterCharge},
+            update rental_bill set water_usage = #{bill.waterUsage}, water_charge = #{bill.waterCharge},
             electricity_usage = #{bill.electricityUsage}, electricity_charge = #{bill.electricityCharge},
             utility_end_id = #{bill.utilityEndId}, status = #{bill.status},create_user_id = #{bill.createUserId},
-            create_user_name = #{bill.createUserName}, create_time = #{bill.createTiem},
-            update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName}, update_time = #{bill.updateTime}
+            create_user_name = #{bill.createUserName}, create_time = #{bill.createTime},
+            update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName}, update_time =
+            #{bill.updateTime}
         </foreach>
     </update>
 
     <!--获取本月支付的账单-->
-    <select id="getPaidBillInThisMonth" resultType="site.minnan.rental.domain.aggregate.Bill">
-        select id,
+    <select id="getBillList" resultType="site.minnan.rental.domain.entity.BillTenantEntity">
+        select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge, t1.electricity_charge electricityCharge,
+        t1.rent rent, t1.update_time updateTime, t3.name name, t3.phone phone,t1.house_name houseName, t1.room_id roomId,
+        t1.room_number roomNumber
+        from rental_bill t1
+        left join rental_bill_tenant_relevance t2 on t1.id = t2.bill_id
+        left join rental_tenant t3 on t2.tenant_id = t3.id
+        where t1.status = #{status}
+        order by t1.update_time desc
+        limit #{start}, #{pageSize}
+    </select>
+
+    <select id="countBill" resultType="long">
+        select count(1) from rental_bill where status = #{status}
     </select>
 </mapper>

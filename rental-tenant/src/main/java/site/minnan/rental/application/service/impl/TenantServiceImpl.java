@@ -384,6 +384,7 @@ public class TenantServiceImpl implements TenantService {
      * @param dto
      */
     @Override
+    @Transactional
     public void surrenderAll(AllSurrenderDTO dto) {
         List<Tenant> tenantList = tenantMapper.selectBatchIds(dto.getIdList());
         if (CollectionUtil.isEmpty(tenantList) || tenantList.size() < dto.getIdList().size()) {

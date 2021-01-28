@@ -2,23 +2,26 @@ package site.minnan.rental.application.provider;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.lang.Console;
-import cn.hutool.extra.pinyin.engine.pinyin4j.Pinyin4jEngine;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
 import site.minnan.rental.domain.entity.BillTenantRelevance;
+import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.BillMapper;
 import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
+import site.minnan.rental.domain.vo.SettleQueryVO;
+import site.minnan.rental.domain.vo.UtilityPrice;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
+import site.minnan.rental.userinterface.dto.SettleQueryDTO;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +34,9 @@ public class BillProviderServiceImpl implements BillProviderService {
 
     @Autowired
     private BillTenantRelevanceMapper billTenantRelevanceMapper;
+
+    @Autowired
+    private BillService billService;
 
     @Reference(check = false)
     private RoomProviderService roomProviderService;
@@ -75,12 +81,17 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .eq("status", BillStatus.INIT);
         Bill bill = billMapper.selectOne(queryWrapper);
         if (bill != null) {
-            Integer currentUtilityId = utilityProviderService.getCurrentUtility(roomId);
-            UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.set("utility_end_id", currentUtilityId)
-                    .set("status", BillStatus.UNPAID)
-                    .eq("id", bill.getId());
-            billMapper.update(null, updateWrapper);
+            SettleQueryDTO dto = new SettleQueryDTO(bill.getRoomId(), bill.getUtilityStartId());
+            SettleQueryVO settle = utilityProviderService.getUtility(dto);
+            JSONObject start = settle.getUtilityStart();
+            JSONObject end = settle.getUtilityEnd();
+            UtilityPrice price = billService.getUtilityPrice();
+            bill.settleWater(start.getBigDecimal("water"), end.getBigDecimal("water"), price.getWaterPrice());
+            bill.settleElectricity(start.getBigDecimal("electricity"), end.getBigDecimal("electricity"), price.getElectricityPrice());
+            bill.setUtilityEndId(end.getInt("id"));
+            bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
+            bill.settled();
+            billMapper.settleBatch(Collections.singletonList(bill));
         }
 
     }

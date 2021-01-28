@@ -41,8 +41,8 @@ public class TenantProviderServiceImpl implements TenantProviderService {
      * @return
      */
     @Override
-    public Map<Integer, JSONObject> getTenantInfoByRoomIds(Collection<Integer> ids) {
-        List<Tenant> tenantList = tenantMapper.getTenantByRoomIds(ids);
+    public Map<Integer, JSONObject> getTenantInfoByTenantIds(Collection<Integer> ids) {
+        List<Tenant> tenantList = tenantMapper.selectBatchIds(ids);
         return tenantList.stream().collect(Collectors.groupingBy(Tenant::getRoomId,
                 Collectors.collectingAndThen(Collectors.toList(), e -> {
                     String nameStr = e.stream().map(Tenant::getName).collect(Collectors.joining("、"));
@@ -60,5 +60,20 @@ public class TenantProviderServiceImpl implements TenantProviderService {
         List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
         return tenantList.stream().collect(Collectors.groupingBy(Tenant::getRoomId,
                 Collectors.mapping(Tenant::getId, Collectors.toList())));
+    }
+
+    /**
+     * 根据房客id获取信息
+     *
+     * @param ids
+     * @return
+     */
+    @Override
+    public JSONArray getTenantByIds(List<Integer> ids) {
+        QueryWrapper<Tenant> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "name", "phone")
+                .in("id", ids);
+        List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
+        return tenantList.stream().map(JSONObject::new).collect(JSONArray::new, JSONArray::add, JSONArray::addAll);
     }
 }

@@ -1,6 +1,7 @@
 package site.minnan.rental.application.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -18,6 +19,7 @@ import site.minnan.rental.application.provider.TenantProviderService;
 import site.minnan.rental.application.provider.UtilityProviderService;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.entity.BillTenantEntity;
 import site.minnan.rental.domain.entity.BillTenantRelevance;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.BillMapper;
@@ -28,6 +30,7 @@ import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.*;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
@@ -184,6 +187,7 @@ public class BillServiceImpl implements BillService {
                         price.getElectricityPrice());
                 bill.setUtilityEndId(end.getInt("id"));
                 bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
+                bill.settled();
             }
             //更新
             billMapper.settleBatch(initializedBillList);
@@ -231,25 +235,26 @@ public class BillServiceImpl implements BillService {
      */
     @Override
     public ListQueryVO<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto) {
-        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", BillStatus.UNPAID);
-        queryWrapper.orderByDesc("update_time");
-        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
-        IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
-        List<Bill> records = page.getRecords();
-        Optional<List<UnpaidBillVO>> opt = Optional.empty();
-        if (CollectionUtil.isNotEmpty(records)) {
-            List<UnpaidBillVO> list = records.stream().map(UnpaidBillVO::assemble).collect(Collectors.toList());
-            Set<Integer> ids = records.stream().map(Bill::getRoomId).collect(Collectors.toSet());
-            Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByRoomIds(ids);
-            list.forEach(e -> {
-                JSONObject info = tenantInfo.get(e.getRoomId());
-                e.setLivingPeople(info.getStr("name"));
-                e.setPhone(info.getStr("phone"));
-            });
-            opt = Optional.of(list);
+        Long count = billMapper.countBill(BillStatus.UNPAID);
+        if (count == 0) {
+            return new ListQueryVO<>(new ArrayList<>(), 0L);
         }
-        return new ListQueryVO<>(opt.orElseGet(ArrayList::new), page.getTotal());
+        Integer pageIndex = dto.getPageIndex();
+        Integer pageSize = dto.getPageSize();
+        Integer start = (pageIndex - 1) * pageSize;
+        List<BillTenantEntity> list = billMapper.getBillList(BillStatus.UNPAID, start, pageSize);
+        Collection<UnpaidBillVO> collection = list.stream().collect(Collectors.groupingBy(Bill::getId, Collectors.collectingAndThen(Collectors.toList(), e -> {
+            BillTenantEntity entity = e.stream().findFirst().get();
+            String name = e.stream().map(BillTenantEntity::getName).collect(Collectors.joining("、"));
+            UnpaidBillVO vo = UnpaidBillVO.assemble(entity);
+            vo.setTenantInfo(name, entity.getPhone());
+            return vo;
+        })))
+                .values();
+        ArrayList<UnpaidBillVO> vo = ListUtil.toList(collection);
+        return new ListQueryVO<>(vo, count);
+
+
     }
 
     /**
@@ -292,7 +297,7 @@ public class BillServiceImpl implements BillService {
         if (CollectionUtil.isNotEmpty(records)) {
             List<PaidBillVO> list = records.stream().map(PaidBillVO::assemble).collect(Collectors.toList());
             Set<Integer> ids = records.stream().map(Bill::getRoomId).collect(Collectors.toSet());
-            Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByRoomIds(ids);
+            Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByTenantIds(ids);
             list.forEach(e -> {
                 JSONObject info = tenantInfo.get(e.getRoomId());
                 e.setLivingPeople(info.getStr("name"));
@@ -311,8 +316,15 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillInfoVO getBillInfo(DetailsQueryDTO dto) {
         Bill bill = billMapper.selectById(dto.getId());
+        QueryWrapper<BillTenantRelevance> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("bill_id", bill.getId());
+        billTenantRelevanceMapper.selectList(queryWrapper);
+        List<Integer> tenantIds = billTenantRelevanceMapper.selectList(queryWrapper)
+                .stream()
+                .map(BillTenantRelevance::getTenantId)
+                .collect(Collectors.toList());
         BillInfoVO vo = BillInfoVO.assemble(bill);
-        JSONArray tenantInfo = tenantProviderService.getTenantInfoByRoomId(bill.getRoomId());
+        JSONArray tenantInfo = tenantProviderService.getTenantByIds(tenantIds);
         for (int i = 0; i < tenantInfo.size(); i++) {
             JSONObject info = tenantInfo.getJSONObject(i);
             TenantInfoVO t = new TenantInfoVO(info.getStr("name"), info.getStr("phone"));
