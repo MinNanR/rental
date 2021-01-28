@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 import site.minnan.rental.domain.aggregate.Room;
 import site.minnan.rental.domain.vo.RoomDropDown;
+import site.minnan.rental.domain.vo.UtilityInitVO;
 
 import java.util.List;
 
@@ -30,4 +31,7 @@ public interface RoomMapper extends BaseMapper<Room> {
 
     @Select("select distinct floor from rental_room where house_id = #{houseId}")
     List<Integer> getFloorDropDown(@Param("houseId") Integer houseId);
+
+    List<UtilityInitVO> getRoomList(@Param("houseId")Integer houseId, @Param("floor")Integer floor,
+                                    @Param("status") String status);
 }

@@ -23,8 +23,8 @@ jwt:
 
 mybatis-plus:
   mapper-locations: /site/minnan/rental/domain/mapper/*.xml
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 dubbo:
   application:

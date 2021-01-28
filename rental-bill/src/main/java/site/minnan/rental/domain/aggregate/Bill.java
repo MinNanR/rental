@@ -120,6 +120,11 @@ public class Bill {
     private BillStatus status;
 
     /**
+     * 收据url地址
+     */
+    private String receiptUrl;
+
+    /**
      * 创建人id
      */
     private Integer createUserId;

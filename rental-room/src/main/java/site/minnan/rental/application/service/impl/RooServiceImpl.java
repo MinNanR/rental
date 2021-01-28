@@ -180,4 +180,16 @@ public class RooServiceImpl implements RoomService {
                 })))
                 .values();
     }
+
+    /**
+     * 获取指定楼层的房间，并记录水电
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public Collection<UtilityInitVO> getRoomToRecord(GetRoomToRecordDTO dto) {
+        List<UtilityInitVO> roomList = roomMapper.getRoomList(dto.getHouseId(), dto.getFloor(), "RECORDING");
+        return roomList;
+    }
 }

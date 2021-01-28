@@ -1,6 +1,7 @@
 package site.minnan.rental.application.provider;
 
 import site.minnan.rental.userinterface.dto.AddTenantUserDTO;
+import site.minnan.rental.userinterface.dto.BatchDisableUserDTO;
 import site.minnan.rental.userinterface.dto.DisableTenantUserDTO;
 import site.minnan.rental.userinterface.dto.EnableTenantUserBatchDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
@@ -34,15 +35,20 @@ public interface UserProviderService {
      * 房客退租后禁用用户
      *
      * @param dto
-     * @return
      */
-    ResponseEntity<?> disableTenantUser(DisableTenantUserDTO dto);
+    void disableTenantUser(DisableTenantUserDTO dto);
+
+    /**
+     * 房客退租后批量禁用用户
+     *
+     * @param dto
+     */
+    void disableTenantUserBatch(BatchDisableUserDTO dto);
 
     /**
      * 启用用户（租客退租后重新入住）
      *
      * @param dto
-     * @return
      */
-    ResponseEntity<?> enableTenantUserBatch(EnableTenantUserBatchDTO dto);
+    void enableTenantUserBatch(EnableTenantUserBatchDTO dto);
 }

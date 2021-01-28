@@ -11,6 +11,7 @@ import site.minnan.rental.domain.aggregate.AuthUser;
 import site.minnan.rental.domain.mapper.UserMapper;
 import site.minnan.rental.infrastructure.enumerate.Role;
 import site.minnan.rental.userinterface.dto.AddTenantUserDTO;
+import site.minnan.rental.userinterface.dto.BatchDisableUserDTO;
 import site.minnan.rental.userinterface.dto.DisableTenantUserDTO;
 import site.minnan.rental.userinterface.dto.EnableTenantUserBatchDTO;
 import site.minnan.rental.userinterface.response.ResponseEntity;
@@ -67,28 +68,41 @@ public class UserProviderServiceImpl implements UserProviderService {
      * 房客退租后禁用用户
      *
      * @param dto
-     * @return
      */
     @Override
-    public ResponseEntity<?> disableTenantUser(DisableTenantUserDTO dto) {
+    public void disableTenantUser(DisableTenantUserDTO dto) {
         UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
-        wrapper.set("enabled", 0)
+        wrapper.set("enabled", AuthUser.DISABLE)
                 .set("update_user_id", dto.getUpdateUserId())
                 .set("update_user_name", dto.getUpdateUserName())
                 .set("update_time", new Timestamp(System.currentTimeMillis()))
                 .eq("id", dto.getUserId());
         userMapper.update(null, wrapper);
-        return ResponseEntity.success();
+    }
+
+    /**
+     * 房客退租后批量禁用用户
+     *
+     * @param dto
+     */
+    @Override
+    public void disableTenantUserBatch(BatchDisableUserDTO dto) {
+        UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
+        wrapper.set("enabled", AuthUser.DISABLE)
+                .set("update_user_id", dto.getUserId())
+                .set("update_user_name", dto.getUserName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .in("id", dto.getIdList());
+        userMapper.update(null, wrapper);
     }
 
     /**
      * 启用用户（租客退租后重新入住）
      *
      * @param dto
-     * @return
      */
     @Override
-    public ResponseEntity<?> enableTenantUserBatch(EnableTenantUserBatchDTO dto) {
+    public void enableTenantUserBatch(EnableTenantUserBatchDTO dto) {
         UpdateWrapper<AuthUser> wrapper = new UpdateWrapper<>();
         wrapper.set("enabled", 1)
                 .set("update_user_id", dto.getUserId())
@@ -96,7 +110,6 @@ public class UserProviderServiceImpl implements UserProviderService {
                 .set("update_time", new Timestamp(System.currentTimeMillis()))
                 .in("id", dto.getUserIdList());
         userMapper.update(null, wrapper);
-        return ResponseEntity.success();
     }
 
     /**

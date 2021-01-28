@@ -93,4 +93,11 @@ public class TenantController {
         List<TenantPinyinVO> vo = tenantService.getTenantList();
         return ResponseEntity.success(vo);
     }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("surrenderAll")
+    public ResponseEntity<?> surrenderAll(@RequestBody @Valid AllSurrenderDTO dto){
+        tenantService.surrenderAll(dto);
+        return ResponseEntity.success();
+    }
 }

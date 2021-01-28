@@ -73,4 +73,12 @@ public interface RoomService {
      * @return
      */
     Collection<FloorDropDown> getFloorDropDown();
+
+    /**
+     * 获取指定楼层的房间，并记录水电
+     *
+     * @param dto
+     * @return
+     */
+    Collection<UtilityInitVO> getRoomToRecord(GetRoomToRecordDTO dto);
 }

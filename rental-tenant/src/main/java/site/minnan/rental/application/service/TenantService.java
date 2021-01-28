@@ -88,5 +88,10 @@ public interface TenantService {
      */
     List<TenantPinyinVO> getTenantList();
 
-
+    /**
+     * 全部退租
+     *
+     * @param dto
+     */
+    void surrenderAll(AllSurrenderDTO dto);
 }

@@ -523,3 +523,13 @@ Content-Type: application/json
 Authorization: {{admin_token}}
 
 {}
+
+###
+POST {{roomUrl}}/room/getRoomByFloor
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "houseId": 1,
+  "floor": 2
+}

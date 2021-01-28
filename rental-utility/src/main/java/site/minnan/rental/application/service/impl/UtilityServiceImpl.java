@@ -1,6 +1,9 @@
 package site.minnan.rental.application.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -29,6 +32,7 @@ import site.minnan.rental.userinterface.dto.GetUtilityDTO;
 import site.minnan.rental.userinterface.dto.UpdateUtilityDTO;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -146,6 +150,7 @@ public class UtilityServiceImpl implements UtilityService {
     public ListQueryVO<UtilityRecordVO> getRecordList(GetRecordListDTO dto) {
         QueryWrapper<UtilityRecord> queryWrapper = new QueryWrapper<>();
         Optional.ofNullable(dto.getHouseId()).ifPresent(s -> queryWrapper.eq("house_id", s));
+        queryWrapper.orderByDesc("record_date");
         Page<UtilityRecord> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
         IPage<UtilityRecord> page = utilityRecordMapper.selectPage(queryPage, queryWrapper);
         List<UtilityRecordVO> list =
@@ -158,10 +163,12 @@ public class UtilityServiceImpl implements UtilityService {
         Object haveRecord = redisUtil.getValue("haveRecord_" + first.getHouseId());
         if (haveRecord == null) {
             DateTime now = DateTime.now();
+            DateTime endOfDay = DateUtil.endOfDay(now);
+            long timeout = DateUtil.between(now, endOfDay, DateUnit.SECOND);
             String recordName = StrUtil.format("{}{}记录", first.getHouseName(), now.toString("yyyy年M月d日"));
             UtilityRecord record = new UtilityRecord(first.getHouseId(), first.getHouseName(), recordName, now);
             utilityRecordMapper.insert(record);
-            redisUtil.valueSet("haveRecord_" + first.getHouseId(), true);
+            redisUtil.valueSet("haveRecord_" + first.getHouseId(), true, Duration.ofSeconds(timeout));
         }
     }
 }

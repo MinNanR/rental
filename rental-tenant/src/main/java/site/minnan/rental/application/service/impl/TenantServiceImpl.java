@@ -1,6 +1,7 @@
 package site.minnan.rental.application.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -326,7 +327,7 @@ public class TenantServiceImpl implements TenantService {
         Integer check = tenantMapper.checkRoomOnRentByRoomId(tenant.getRoomId());
         if (check == null) {
             UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
-                    .id(tenant.getId())
+                    .id(tenant.getRoomId())
                     .status(RoomStatus.VACANT.getValue())
                     .userId(jwtUser.getId())
                     .userName(jwtUser.getRealName())
@@ -375,5 +376,39 @@ public class TenantServiceImpl implements TenantService {
                 .map(e -> new TenantPinyinVO((char) (e.getKey() - 32), e.getValue()))
                 .sorted(Comparator.comparing(TenantPinyinVO::getKey))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 全部退租
+     *
+     * @param dto
+     */
+    @Override
+    public void surrenderAll(AllSurrenderDTO dto) {
+        List<Tenant> tenantList = tenantMapper.selectBatchIds(dto.getIdList());
+        if (CollectionUtil.isEmpty(tenantList) || tenantList.size() < dto.getIdList().size()) {
+            throw new EntityNotExistException("房客不存在");
+        }
+        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UpdateWrapper<Tenant> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("status", TenantStatus.LEFT)
+                .set("update_user_id", jwtUser.getId())
+                .set("update_user_name", jwtUser.getRealName())
+                .set("update_time", new Timestamp(System.currentTimeMillis()))
+                .in("id", dto.getIdList());
+        tenantMapper.update(null, updateWrapper);
+        Integer roomId = tenantList.get(0).getRoomId();
+        UpdateRoomStatusDTO updateRoomStatusDTO = UpdateRoomStatusDTO.builder()
+                .id(roomId)
+                .status(RoomStatus.VACANT.getValue())
+                .userId(jwtUser.getId())
+                .userName(jwtUser.getRealName())
+                .build();
+        roomProviderService.updateRoomStatus(updateRoomStatusDTO);
+        billProviderService.completeBillWithSurrender(roomId);
+        List<Integer> userIdList = tenantList.stream().map(Tenant::getUserId).collect(Collectors.toList());
+        BatchDisableUserDTO batchDisableUserDTO = new BatchDisableUserDTO(jwtUser.getId(), jwtUser.getRealName(),
+                userIdList);
+        userProviderService.disableTenantUserBatch(batchDisableUserDTO);
     }
 }
