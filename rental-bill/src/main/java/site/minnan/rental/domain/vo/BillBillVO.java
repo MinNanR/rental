@@ -1,6 +1,5 @@
 package site.minnan.rental.domain.vo;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,7 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class PaidBillVO {
+public class BillBillVO {
 
     private Integer id;
 
@@ -30,12 +29,8 @@ public class PaidBillVO {
 
     private String livingPeople;
 
-    private String payTime;
-
-    private String paymentMethod;
-
-    public static PaidBillVO assemble(Bill bill){
-        return PaidBillVO.builder()
+    public static BillBillVO assemble(Bill bill){
+        return BillBillVO.builder()
                 .id(bill.getId())
                 .roomId(bill.getRoomId())
                 .roomNumber(StrUtil.format("{}-{}", bill.getHouseName(), bill.getRoomNumber()))
@@ -44,8 +39,6 @@ public class PaidBillVO {
                 .rent(bill.getRent())
                 .totalCharge(bill.totalCharge())
                 .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
-                .payTime(DateUtil.format(bill.getPayTime(), "yyyy-MM-dd"))
-                .paymentMethod(bill.getPaymentMethod().getMethod())
                 .build();
     }
 }

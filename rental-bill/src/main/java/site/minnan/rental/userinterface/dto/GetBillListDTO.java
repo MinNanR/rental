@@ -1,6 +1,7 @@
 package site.minnan.rental.userinterface.dto;
 
 import lombok.Data;
+import site.minnan.rental.infrastructure.enumerate.BillStatus;
 
 /**
  * 获取账单列表参数
@@ -17,5 +18,5 @@ public class GetBillListDTO extends ListQueryDTO{
 
     private Integer month;
 
-    private String status;
+    private BillStatus status;
 }

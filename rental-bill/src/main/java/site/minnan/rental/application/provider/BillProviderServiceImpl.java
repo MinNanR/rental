@@ -90,7 +90,7 @@ public class BillProviderServiceImpl implements BillProviderService {
             bill.settleElectricity(start.getBigDecimal("electricity"), end.getBigDecimal("electricity"), price.getElectricityPrice());
             bill.setUtilityEndId(end.getInt("id"));
             bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
-            bill.settled();
+            bill.unsettled();
             billMapper.settleBatch(Collections.singletonList(bill));
         }
 

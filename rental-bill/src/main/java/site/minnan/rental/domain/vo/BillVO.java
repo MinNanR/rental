@@ -4,26 +4,22 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Setter;
 import site.minnan.rental.domain.aggregate.Bill;
 
 import java.math.BigDecimal;
 
-/**
- * @author Minnan on 2021/1/12
- */
 @Data
 @Builder
 public class BillVO {
 
     private Integer id;
 
+    private Integer roomId;
+
     private String roomNumber;
 
-    private BigDecimal waterUsage;
-
     private BigDecimal waterCharge;
-
-    private BigDecimal electricityUsage;
 
     private BigDecimal electricityCharge;
 
@@ -33,23 +29,31 @@ public class BillVO {
 
     private String time;
 
-    private String updateUserName;
+    @Setter
+    private String livingPeople;
+
+    @Setter
+    private String phone;
 
     private String updateTime;
 
-    public static BillVO assemble(Bill bill) {
+    public static BillVO assemble(Bill bill){
         return BillVO.builder()
                 .id(bill.getId())
+                .roomId(bill.getRoomId())
                 .roomNumber(StrUtil.format("{}-{}", bill.getHouseName(), bill.getRoomNumber()))
-                .waterUsage(bill.getWaterUsage())
                 .waterCharge(bill.getWaterCharge())
-                .electricityUsage(bill.getElectricityUsage())
                 .electricityCharge(bill.getElectricityCharge())
                 .rent(bill.getRent())
                 .totalCharge(bill.totalCharge())
                 .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
-                .updateUserName(bill.getUpdateUserName())
-                .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"))
+                .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
                 .build();
     }
+
+    public void setTenantInfo(String livingPeople,String phone){
+        this.livingPeople = livingPeople;
+        this.phone = phone;
+    }
+
 }

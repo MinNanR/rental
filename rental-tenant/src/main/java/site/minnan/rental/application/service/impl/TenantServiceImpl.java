@@ -5,6 +5,7 @@ import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.pinyin.PinyinUtil;
 import cn.hutool.json.JSONArray;
@@ -33,10 +34,13 @@ import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.enumerate.TenantStatus;
 import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
+import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.*;
 import site.minnan.rental.userinterface.response.ResponseCode;
 import site.minnan.rental.userinterface.response.ResponseEntity;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.sql.Struct;
 import java.sql.Timestamp;
 import java.util.*;
@@ -49,6 +53,9 @@ public class TenantServiceImpl implements TenantService {
 
     @Autowired
     private TenantMapper tenantMapper;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Reference(check = false)
     private UserProviderService userProviderService;
@@ -84,16 +91,20 @@ public class TenantServiceImpl implements TenantService {
         List<Tenant> newTenantList = new ArrayList<>();
         for (AddTenantDTO tenant : dto.getTenantList()) {
             //构建新房客对象
-            String birthdayString = tenant.getIdentificationNumber().substring(6, 14);
-            DateTime birthday = DateUtil.parse(birthdayString, "yyyyMMdd");
+            String identificationNumber = tenant.getIdentificationNumber();
+            DateTime birthday = IdcardUtil.getBirthDate(identificationNumber);
+            int gender = IdcardUtil.getGenderByIdCard(identificationNumber);
+            List<String> region = Optional.ofNullable((List<String>) redisUtil.getHashValue("region",
+                    identificationNumber.substring(0, 6)))
+                    .orElseGet(() -> CollectionUtil.newArrayList("", ""));
             Tenant newTenant = Tenant.builder()
                     .name(tenant.getName())
-                    .gender(Gender.valueOf(tenant.getGender().toUpperCase()))
+                    .gender(Gender.values()[gender])
                     .phone(tenant.getPhone())
-                    .hometownProvince(tenant.getHometownProvince())
-                    .hometownCity(tenant.getHometownCity())
+                    .hometownProvince(region.get(0))
+                    .hometownCity(region.get(1))
                     .userId(idIterator.next())
-                    .identificationNumber(tenant.getIdentificationNumber())
+                    .identificationNumber(identificationNumber)
                     .birthday(birthday)
                     .houseId(dto.getHouseId())
                     .houseName(dto.getHouseName())
@@ -288,16 +299,20 @@ public class TenantServiceImpl implements TenantService {
         JwtUser user = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UpdateWrapper<Tenant> wrapper = new UpdateWrapper<>();
         Optional.ofNullable(dto.getName()).ifPresent(s -> wrapper.set("name", s));
-        Optional.ofNullable(dto.getGender()).ifPresent(s -> wrapper.set("gender", s));
         Optional.ofNullable(dto.getPhone()).ifPresent(s -> wrapper.set("phone", s));
-        Optional.ofNullable(dto.getIdentificationNumber()).ifPresent(s -> {
-            String birthdayString = tenant.getIdentificationNumber().substring(6, 14);
-            DateTime birthday = DateUtil.parse(birthdayString, "yyyyMMdd");
-            wrapper.set("identification_number", s);
-            wrapper.set("birthday", birthday);
-        });
-        Optional.ofNullable(dto.getHometownProvince()).ifPresent(s -> wrapper.set("hometown_province", s));
-        Optional.ofNullable(dto.getHometownCity()).ifPresent(s -> wrapper.set("hometown_city", s));
+        if(dto.getIdentificationNumber() != null) {
+            String identificationNumber = dto.getIdentificationNumber();
+            DateTime birthday = IdcardUtil.getBirthDate(identificationNumber);
+            int gender = IdcardUtil.getGenderByIdCard(identificationNumber);
+            List<String> region = Optional.ofNullable((List<String>) redisUtil.getHashValue("region",
+                    identificationNumber.substring(0, 6)))
+                    .orElseGet(() -> CollectionUtil.newArrayList("", ""));
+            wrapper.set("identification_number", identificationNumber)
+                    .set("birthday", birthday)
+                    .set("gender", Gender.values()[gender])
+                    .set("hometown_province", region.get(0))
+                    .set("hometown_city", region.get(1));
+        }
         wrapper.set("update_user_id", user.getId());
         wrapper.set("update_user_name", user.getRealName());
         wrapper.set("update_time", new Timestamp(System.currentTimeMillis()));

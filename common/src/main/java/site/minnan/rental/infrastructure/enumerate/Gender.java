@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum Gender {
 
-    MALE("MALE", "男"),
-    FEMALE("FEMALE", "女");
+    FEMALE("FEMALE", "女"),
+    MALE("MALE", "男");
 
     @EnumValue
     private final String value;

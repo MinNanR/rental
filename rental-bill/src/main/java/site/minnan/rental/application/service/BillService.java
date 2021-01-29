@@ -44,33 +44,9 @@ public interface BillService {
     ListQueryVO<BillVO> getBillList(GetBillListDTO dto);
 
     /**
-     * 获取未结算的账单
-     *
-     * @param dto
-     * @return
-     */
-    List<BillVO> getUnsettledBill(GetUnsettledBillDTO dto);
-
-    /**
-     * 获取未结算的楼层下拉框
-     *
-     * @param dto
-     * @return
-     */
-    Collection<Integer> getUnsettledFloorDropDown(GetFloorDropDownDTO dto);
-
-    /**
      * 到期账单结算
      */
     void setBillUnpaid();
-
-    /**
-     * 获取未支付的账单
-     *
-     * @param dto
-     * @return
-     */
-    ListQueryVO<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto);
 
     /**
      * 获取本月总额
@@ -78,14 +54,6 @@ public interface BillService {
      * @return
      */
     BigDecimal getMonthTotal();
-
-    /**
-     * 获取已支付且未打印的账单
-     *
-     * @param dto
-     * @return
-     */
-    ListQueryVO<PaidBillVO> getPaidBillList(ListQueryDTO dto);
 
     /**
      * 获取账单详情

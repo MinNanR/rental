@@ -17,7 +17,7 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     @Select("select id from rental_tenant where identification_number = #{identificationNumber} limit 1")
     Integer checkTenantExistByIdentificationNumber(@Param("identificationNumber") String identificationNumber);
 
-    @Select("select id from rental_tenant where room_id = #{roomId} limit 1")
+    @Select("select id from rental_tenant where room_id = #{roomId} and status = 'LIVING' limit 1")
     Integer checkRoomOnRentByRoomId(@Param("roomId") Integer roomId);
 
     /**

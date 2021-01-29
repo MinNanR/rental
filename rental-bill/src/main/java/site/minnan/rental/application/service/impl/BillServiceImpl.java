@@ -9,8 +9,6 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,7 +28,10 @@ import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.*;
 
-import javax.validation.constraints.NotNull;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
@@ -99,65 +100,6 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
-     * 获取账单列表
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public ListQueryVO<BillVO> getBillList(GetBillListDTO dto) {
-        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
-        Optional.ofNullable(dto.getRoomNumber()).ifPresent(s -> wrapper.eq("room_number", s));
-        Optional.ofNullable(dto.getYear()).ifPresent(s -> wrapper.eq("year", s));
-        Optional.ofNullable(dto.getMonth()).ifPresent(s -> wrapper.eq("month", s));
-        Optional<String> status = Optional.ofNullable(dto.getStatus());
-        if (status.isPresent()) {
-            wrapper.eq("status", status.get());
-        } else {
-            wrapper.ne("status", BillStatus.INIT)
-                    .ne("status", BillStatus.UNSETTLED);
-        }
-        wrapper.orderByDesc("update_time");
-        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
-        IPage<Bill> page = billMapper.selectPage(queryPage, wrapper);
-        List<BillVO> list = page.getRecords().stream().map(BillVO::assemble).collect(Collectors.toList());
-        long total = page.getTotal();
-        return new ListQueryVO<>(list, total);
-    }
-
-    /**
-     * 获取未结算的账单
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public List<BillVO> getUnsettledBill(GetUnsettledBillDTO dto) {
-        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        Optional.ofNullable(dto.getHouseId()).ifPresent(s -> wrapper.eq("house_id", s));
-        wrapper.eq("status", BillStatus.UNSETTLED);
-        List<Bill> billList = billMapper.selectList(wrapper);
-        return billList.stream()
-                .map(BillVO::assemble)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 获取未结算的楼层下拉框
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public Collection<Integer> getUnsettledFloorDropDown(GetFloorDropDownDTO dto) {
-        QueryWrapper<Bill> wrapper = new QueryWrapper<>();
-        wrapper.eq("house_id", dto.getHouseId())
-                .eq("status", BillStatus.UNSETTLED);
-        return billMapper.selectList(wrapper).stream().map(Bill::getFloor).collect(Collectors.toList());
-    }
-
-    /**
      * 将到期账单设置为等待登记水电
      */
     @Override
@@ -187,7 +129,7 @@ public class BillServiceImpl implements BillService {
                         price.getElectricityPrice());
                 bill.setUtilityEndId(end.getInt("id"));
                 bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
-                bill.settled();
+                bill.unsettled();
             }
             //更新
             billMapper.settleBatch(initializedBillList);
@@ -234,7 +176,7 @@ public class BillServiceImpl implements BillService {
      * @return
      */
     @Override
-    public ListQueryVO<UnpaidBillVO> getUnpaidBillList(ListQueryDTO dto) {
+    public ListQueryVO<BillVO> getBillList(GetBillListDTO dto) {
         Long count = billMapper.countBill(BillStatus.UNPAID);
         if (count == 0) {
             return new ListQueryVO<>(new ArrayList<>(), 0L);
@@ -242,19 +184,17 @@ public class BillServiceImpl implements BillService {
         Integer pageIndex = dto.getPageIndex();
         Integer pageSize = dto.getPageSize();
         Integer start = (pageIndex - 1) * pageSize;
-        List<BillTenantEntity> list = billMapper.getBillList(BillStatus.UNPAID, start, pageSize);
-        Collection<UnpaidBillVO> collection = list.stream().collect(Collectors.groupingBy(Bill::getId, Collectors.collectingAndThen(Collectors.toList(), e -> {
+        List<BillTenantEntity> list = billMapper.getBillList(dto.getStatus(), start, pageSize);
+        Collection<BillVO> collection = list.stream().collect(Collectors.groupingBy(Bill::getId, Collectors.collectingAndThen(Collectors.toList(), e -> {
             BillTenantEntity entity = e.stream().findFirst().get();
             String name = e.stream().map(BillTenantEntity::getName).collect(Collectors.joining("、"));
-            UnpaidBillVO vo = UnpaidBillVO.assemble(entity);
+            BillVO vo = BillVO.assemble(entity);
             vo.setTenantInfo(name, entity.getPhone());
             return vo;
         })))
                 .values();
-        ArrayList<UnpaidBillVO> vo = ListUtil.toList(collection);
+        ArrayList<BillVO> vo = ListUtil.toList(collection);
         return new ListQueryVO<>(vo, count);
-
-
     }
 
     /**
@@ -277,34 +217,6 @@ public class BillServiceImpl implements BillService {
             total = Optional.of(totalValue);
         }
         return total.orElse(BigDecimal.ZERO);
-    }
-
-    /**
-     * 获取已支付且未打印的账单
-     *
-     * @param dto
-     * @return
-     */
-    @Override
-    public ListQueryVO<PaidBillVO> getPaidBillList(ListQueryDTO dto) {
-        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", BillStatus.PAID);
-        queryWrapper.orderByAsc("pay_time");
-        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
-        IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
-        List<Bill> records = page.getRecords();
-        Optional<List<PaidBillVO>> opt = Optional.empty();
-        if (CollectionUtil.isNotEmpty(records)) {
-            List<PaidBillVO> list = records.stream().map(PaidBillVO::assemble).collect(Collectors.toList());
-            Set<Integer> ids = records.stream().map(Bill::getRoomId).collect(Collectors.toSet());
-            Map<Integer, JSONObject> tenantInfo = tenantProviderService.getTenantInfoByTenantIds(ids);
-            list.forEach(e -> {
-                JSONObject info = tenantInfo.get(e.getRoomId());
-                e.setLivingPeople(info.getStr("name"));
-            });
-            opt = Optional.of(list);
-        }
-        return new ListQueryVO<>(opt.orElseGet(ArrayList::new), page.getTotal());
     }
 
     /**
@@ -332,4 +244,5 @@ public class BillServiceImpl implements BillService {
         }
         return vo;
     }
+
 }

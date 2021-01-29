@@ -47,7 +47,7 @@ public class TenantVO {
                 .gender(tenant.getGender().getGender())
                 .phone(tenant.getPhone())
                 .hometown(hometown.toString())
-                .identificationNumber(StrUtil.replace(tenant.getIdentificationNumber(), 6, 15, '*'))
+                .identificationNumber(StrUtil.replace(tenant.getIdentificationNumber(), 4, 16, '*'))
                 .birthday(DateUtil.format(tenant.getBirthday(), "yyyy年M月d日"))
                 .status(tenant.getStatus().getStatus())
                 .updateUserName(tenant.getUpdateUserName())
