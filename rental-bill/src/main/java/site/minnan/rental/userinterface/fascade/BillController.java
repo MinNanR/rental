@@ -80,13 +80,6 @@ public class BillController {
         return ResponseEntity.success(vo);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
-    @PostMapping("getUnsettledFloorDropDown")
-    public ResponseEntity<Collection<Integer>> getUnsettledFloorDropDown(@RequestBody @Valid GetFloorDropDownDTO dto) {
-        Collection<Integer> floorDropDown = billService.getUnsettledFloorDropDown(dto);
-        return ResponseEntity.success(floorDropDown);
-    }
-
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getMonthTotal")

@@ -1,0 +1,225 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <style type="text/css">
+
+        .main {
+            width: 800px;
+            height: 480px;
+            margin: 0px auto;
+            margin-top: 20px;
+            display: flex;
+            padding-left: 15px;
+            padding-right: 20px;
+        }
+
+        .body {
+            width: 95%;
+            height: 480px;
+        }
+
+        .title {
+            width: 100%;
+            height: 40px;
+            display: flex;
+        }
+
+        .title .div1 {
+            width: 60%;
+            text-align: right;
+        }
+
+        .title .div1 .divCtn {
+            width: 230px;
+            height: 40px;
+            float: right;
+        }
+
+        .title .div1 .divCtn .titleCtn {
+            width: 230px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .title .div1 .divCtn .titleUdeLine {
+            width: 230px;
+            height: 6px;
+            border-bottom: solid 2px #9C5223;
+            border-top: solid 2px #9C5223;
+        }
+
+        .title .div2 {
+            width: 40%;
+            text-align: right;
+            height: 40px;
+            line-height: 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .date {
+            width: 100%;
+            height: 40px;
+            display: flex;
+        }
+
+        .date .deDiv1 {
+            width: 60%;
+            height: 40px;
+            line-height: 40px;
+            text-align: right;
+            font-size: 18px;
+        }
+
+        .date .deDiv2 {
+            width: 40%;
+            height: 40px;
+            line-height: 40px;
+            text-align: right;
+            font-size: 18px;
+        }
+
+        .tempTr1 td {
+            text-align: center;
+        }
+
+        table tr td {
+            padding: 5px;
+        }
+
+        .tempTr2 td {
+            height: 40px;
+            text-align: center;
+        }
+
+        .line td {
+            border: 1px solid;
+        }
+    </style>
+</head>
+
+<body>
+<div class="main">
+    <div class="body">
+        <div class="title">
+            <div class="div1">
+                <div class="divCtn">
+                    <div class="titleCtn">收&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;据</div>
+                    <div class="titleUdeLine"></div>
+                </div>
+            </div>
+            <div class="div2">NO：<span style="color: #9C5223;">2396827</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        </div>
+        <div style="width: 100%;height: 20px;padding:10px 0px;">
+            <div style="float: left;">
+                客户&nbsp;&nbsp;<span th:text="${roomNumber}"></span>号房
+            </div>
+            <div style="float: right;">
+                <span th:text="${startDate}"></span>至<span th:text="${endDate}"></span>
+            </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr class="line">
+                <td colspan="6" rowspan="2" style="width: 60%;text-align: center">摘&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;要</td>
+                <td rowspan="2" style="text-align: center">数量</td>
+                <td rowspan="2" style="text-align: center">单位</td>
+                <td rowspan="2" style="text-align: center">单价</td>
+                <td colspan="7" style="width: 10%;text-align: center">金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额</td>
+            </tr>
+            <tr class="tempTr1 line">
+                <td>万</td>
+                <td>千</td>
+                <td>百</td>
+                <td>十</td>
+                <td>元</td>
+                <td>角</td>
+                <td>分</td>
+            </tr>
+            <tr class="tempTr2 line">
+                <td>水</td>
+                <td>上月行度</td>
+                <td th:text="${waterStart}"></td>
+                <td>本月行度</td>
+                <td th:text="${waterEnd}"></td>
+                <td>实用水量</td>
+                <td th:text="${waterUsage}"></td>
+                <td>度</td>
+                <td th:text="${waterPrice}"></td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 4" th:text="${water}">
+                </td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 3" th:text="${water}">
+                </td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 2" th:text="${water}">
+                </td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 1" th:text="${water}">
+                </td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 0" th:text="${water}">
+                </td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr class="tempTr2 line">
+                <td>电</td>
+                <td>上月行度</td>
+                <td th:text="${electricityStart}"></td>
+                <td>本月行度</td>
+                <td th:text="${electricityEnd}"></td>
+                <td>实用电量</td>
+                <td th:text="${electricityUsage}"></td>
+                <td>度</td>
+                <td th:text="${electricityPrice}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 4"
+                    th:text="${electricity}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 3"
+                    th:text="${electricity}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 2"
+                    th:text="${electricity}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 1"
+                    th:text="${electricity}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 0"
+                    th:text="${electricity}"></td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr class=" tempTr2 line
+                ">
+                <td colspan="9">本月租金</td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 4" th:text="${r}"></td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 3" th:text="${r}"></td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 2" th:text="${r}"></td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 1" th:text="${r}"></td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 0" th:text="${r}"></td>
+                </td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr class="tempTr2">
+                <td colspan="3" style="border-left: 1px solid;border-bottom: 1px solid;">
+                    合计人民币（大写）&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </td>
+                <td colspan="9" style="border-bottom: 1px solid;">
+                    <b th:each="t,iter : ${total}" th:if="${iter.index} == 4" th:text="${t}"></b>万&nbsp;&nbsp;
+                    <b th:each="t,iter : ${total}" th:if="${iter.index} == 3" th:text="${t}"></b>&nbsp;&nbsp;仟&nbsp;&nbsp;
+                    <b th:each="t,iter : ${total}" th:if="${iter.index} == 2" th:text="${t}"></b>&nbsp;&nbsp;佰&nbsp;&nbsp;
+                    <b th:each="t,iter : ${total}" th:if="${iter.index} == 1" th:text="${t}"></b>&nbsp;&nbsp;拾&nbsp;&nbsp;
+                    <b th:each="t,iter : ${total}" th:if="${iter.index} == 0" th:text="${t}"></b>
+                    &nbsp;&nbsp;元&nbsp;&nbsp;×&nbsp;&nbsp;角&nbsp;&nbsp;×&nbsp;&nbsp;分&nbsp;&nbsp;
+                </td>
+                <td colspan="4" style="border-right: 1px solid;border-bottom: 1px solid;font-size: 22px">
+                    <span>￥<u th:text="${totalCharge}">&nbsp;}元&nbsp;&nbsp;</u></span>
+                </td>
+            </tr>
+            <tr class="tempTr2">
+                <td colspan="8"></td>
+                <td colspan="8" style="text-align: left;">经手人：</td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+
+</html>
