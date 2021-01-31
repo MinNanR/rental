@@ -47,7 +47,10 @@
         left join rental_tenant t3 on t2.tenant_id = t3.id
         where t1.status = #{status}
         order by t1.update_time desc
-        limit #{start}, #{pageSize}
+        <if test="start != null and start != '' and pageSize != null and pageSize != ''">
+            limit #{start}, #{pageSize}
+        </if>
+
     </select>
 
     <select id="countBill" resultType="long">
@@ -57,13 +60,40 @@
 
     <select id="getBillDetails" resultType="site.minnan.rental.domain.entity.BillDetails">
         select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge,t1.water_usage waterUsage,
-         t1.electricity_charge electricityCharge, t1.electricity_usage electricityUsage,
+        t1.electricity_charge electricityCharge, t1.electricity_usage electricityUsage,
         t1.rent rent, t1.room_number roomNumber, t1.create_time createTime, t1.completed_date completedDate,
         t2.water waterStart, t3.water waterEnd, t2.electricity electricityStart, t3.electricity electricityEnd
         from rental_bill t1
         left join rental_utility t2
         on t1.utility_start_id = t2.id
         left join rental_utility t3 on t1.utility_end_id = t3.id
-        where t1.id = #{id};
+        where id = #{id}
     </select>
+
+    <select id="getBillDetailsByRoomId" resultType="site.minnan.rental.domain.entity.BillDetails">
+        select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge,t1.water_usage waterUsage,
+        t1.electricity_charge electricityCharge, t1.electricity_usage electricityUsage,
+        t1.rent rent, t1.room_number roomNumber, t1.create_time createTime, t1.completed_date completedDate,
+        t2.water waterStart, t3.water waterEnd, t2.electricity electricityStart, t3.electricity electricityEnd
+        from rental_bill t1
+        left join rental_utility t2
+        on t1.utility_start_id = t2.id
+        left join rental_utility t3 on t1.utility_end_id = t3.id
+        where room_id = #{id} and status = 'INIT'
+    </select>
+
+
+    <select id="getInitBillList" resultType="site.minnan.rental.domain.entity.BillDetails">
+        select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge,t1.water_usage waterUsage,
+        t1.electricity_charge electricityCharge, t1.electricity_usage electricityUsage,
+        t1.rent rent, t1.room_number roomNumber, t1.create_time createTime, t1.completed_date completedDate,
+        t2.water waterStart, t3.water waterEnd, t2.electricity electricityStart, t3.electricity electricityEnd
+        from rental_bill t1
+        left join rental_utility t2
+        on t1.utility_start_id = t2.id
+        left join rental_utility t3 on t1.utility_end_id = t3.id
+        where status = #{status}
+    </select>
+
+
 </mapper>

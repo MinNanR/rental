@@ -9,6 +9,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import site.minnan.rental.application.provider.TenantProviderService;
 import site.minnan.rental.application.provider.UtilityProviderService;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.entity.BillDetails;
 import site.minnan.rental.domain.entity.BillTenantEntity;
 import site.minnan.rental.domain.entity.BillTenantRelevance;
 import site.minnan.rental.domain.entity.JwtUser;
@@ -25,19 +27,18 @@ import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
 import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
+import site.minnan.rental.infrastructure.utils.ReceiptUtils;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.*;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BillServiceImpl implements BillService {
 
     @Autowired
@@ -45,6 +46,9 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private ReceiptUtils receiptUtils;
 
     @Reference(check = false)
     private RoomProviderService roomProviderService;
@@ -107,10 +111,8 @@ public class BillServiceImpl implements BillService {
         //将到期账单状态设置为等待登记水电
         DateTime now = DateTime.now();
         Timestamp currentTime = new Timestamp(now.getTime());
-        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", BillStatus.INIT);
-        List<Bill> initBillList = billMapper.selectList(queryWrapper);
-        List<Bill> initializedBillList = initBillList.stream()
+        List<BillDetails> initBillList = billMapper.getInitBillList(BillStatus.INIT);
+        List<BillDetails> initializedBillList = initBillList.stream()
                 .filter(e -> DateUtil.isSameDay(e.getCompletedDate(), now))
                 .collect(Collectors.toList());
         if (CollectionUtil.isNotEmpty(initializedBillList)) {
@@ -120,7 +122,7 @@ public class BillServiceImpl implements BillService {
             Map<Integer, SettleQueryVO> utilityMap = utilityProviderService.getUtility(queryList);
             UtilityPrice price = getUtilityPrice();
             //结算水电
-            for (Bill bill : initializedBillList) {
+            for (BillDetails bill : initializedBillList) {
                 SettleQueryVO vo = utilityMap.get(bill.getRoomId());
                 JSONObject start = vo.getUtilityStart();
                 JSONObject end = vo.getUtilityEnd();
@@ -130,6 +132,11 @@ public class BillServiceImpl implements BillService {
                 bill.setUtilityEndId(end.getInt("id"));
                 bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
                 bill.unsettled();
+                try {
+                    receiptUtils.generateReceipt(bill);
+                } catch (IOException e) {
+                    log.error("生成收据失败，账单id={}", bill.getId());
+                }
             }
             //更新
             billMapper.settleBatch(initializedBillList);

@@ -24,7 +24,7 @@ public interface BillMapper extends BaseMapper<Bill> {
      *
      * @param bills
      */
-    void settleBatch(@Param("bills") Collection<Bill> bills);
+    void settleBatch(@Param("bills") Collection<? extends Bill> bills);
 
     /**
      * 批量插入
@@ -53,8 +53,24 @@ public interface BillMapper extends BaseMapper<Bill> {
 
     /**
      * 获取账单所有信息
+     *
      * @param id
      * @return
      */
-    BillDetails getBillDetails(@Param("id")Integer id);
+    BillDetails getBillDetails(@Param("id") Integer id);
+
+    /**
+     * 获取处于初始化的账单
+     *
+     * @return
+     */
+    List<BillDetails> getInitBillList(@Param("status") BillStatus status);
+
+    /**
+     * 根据房间id获取账单信息
+     *
+     * @param roomId
+     * @return
+     */
+    BillDetails getBillDetailsByRoomId(@Param("id") Integer roomId);
 }

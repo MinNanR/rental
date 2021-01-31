@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import site.minnan.rental.application.service.BillService;
 import site.minnan.rental.domain.aggregate.Bill;
+import site.minnan.rental.domain.entity.BillDetails;
 import site.minnan.rental.domain.entity.BillTenantRelevance;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.BillMapper;
@@ -17,9 +18,11 @@ import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
 import site.minnan.rental.domain.vo.SettleQueryVO;
 import site.minnan.rental.domain.vo.UtilityPrice;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
+import site.minnan.rental.infrastructure.utils.ReceiptUtils;
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
 import site.minnan.rental.userinterface.dto.SettleQueryDTO;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +40,9 @@ public class BillProviderServiceImpl implements BillProviderService {
 
     @Autowired
     private BillService billService;
+
+    @Autowired
+    private ReceiptUtils receiptUtils;
 
     @Reference(check = false)
     private RoomProviderService roomProviderService;
@@ -76,10 +82,7 @@ public class BillProviderServiceImpl implements BillProviderService {
 
     @Override
     public void completeBillWithSurrender(Integer roomId) {
-        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("room_id", roomId)
-                .eq("status", BillStatus.INIT);
-        Bill bill = billMapper.selectOne(queryWrapper);
+        BillDetails bill = billMapper.getBillDetailsByRoomId(roomId);
         if (bill != null) {
             SettleQueryDTO dto = new SettleQueryDTO(bill.getRoomId(), bill.getUtilityStartId());
             SettleQueryVO settle = utilityProviderService.getUtility(dto);
@@ -91,6 +94,11 @@ public class BillProviderServiceImpl implements BillProviderService {
             bill.setUtilityEndId(end.getInt("id"));
             bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
             bill.unsettled();
+            try {
+                receiptUtils.generateReceipt(bill);
+            } catch (IOException e) {
+                log.error("生成收据失败");
+            }
             billMapper.settleBatch(Collections.singletonList(bill));
         }
 

@@ -28,6 +28,10 @@
         <module>rental-utility</module>
     </modules>
 
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

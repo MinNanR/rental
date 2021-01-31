@@ -19,7 +19,9 @@ public class UtilityVO {
 
     private Integer id;
 
-    private String room;
+    private String houseName;
+
+    private String roomNumber;
 
     private BigDecimal water;
 
@@ -34,7 +36,8 @@ public class UtilityVO {
     public static UtilityVO assemble(Utility utility) {
         return UtilityVO.builder()
                 .id(utility.getId())
-                .room(StrUtil.format("{}-{}", utility.getHouseName(), utility.getRoomNumber()))
+                .houseName(utility.getHouseName())
+                .roomNumber(utility.getRoomNumber())
                 .water(utility.getWater())
                 .electricity(utility.getElectricity())
                 .status(utility.getStatus().getStatus())
