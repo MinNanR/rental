@@ -80,6 +80,13 @@ public class BillController {
         return ResponseEntity.success(vo);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getBillList")
+    public ResponseEntity<ListQueryVO<BillVO>> getBillList(@RequestBody @Valid ListQueryDTO dto){
+        ListQueryVO<BillVO> vo = billService.getBillList(dto);
+        return ResponseEntity.success(vo);
+    }
+
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getMonthTotal")

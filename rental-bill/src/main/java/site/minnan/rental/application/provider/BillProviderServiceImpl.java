@@ -1,7 +1,9 @@
 package site.minnan.rental.application.provider;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
@@ -18,8 +20,8 @@ import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
 import site.minnan.rental.domain.vo.SettleQueryVO;
 import site.minnan.rental.domain.vo.UtilityPrice;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
-import site.minnan.rental.infrastructure.utils.ReceiptUtils;
 import site.minnan.rental.infrastructure.enumerate.BillType;
+import site.minnan.rental.infrastructure.utils.ReceiptUtils;
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
 import site.minnan.rental.userinterface.dto.SettleQueryDTO;
 
@@ -95,12 +97,16 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .completedDate(nextMonth)
                 .utilityStartId(currentUtilityId)
                 .status(BillStatus.INIT)
+                .type(BillType.MONTHLY)
                 .build();
-        bill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
-        billMapper.insert(bill);
-        List<BillTenantRelevance> relevanceList =
-                dto.getTenantIdList().stream().map(e -> BillTenantRelevance.of(bill.getId(), e)).collect(Collectors.toList());
+        monthlyBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
+        billMapper.insertBatch(CollectionUtil.newArrayList(checkInBill, monthlyBill));
+        List<BillTenantRelevance> relevanceList = dto.getTenantIdList().stream()
+                .flatMap(e -> Stream.of(BillTenantRelevance.of(checkInBill.getId(), e),
+                        BillTenantRelevance.of(monthlyBill.getId(), e)))
+                .collect(Collectors.toList());
         billTenantRelevanceMapper.insertBatch(relevanceList);
+        //TODO 生成入住收据
     }
 
     @Override

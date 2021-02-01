@@ -44,6 +44,14 @@ public interface BillService {
     ListQueryVO<BillVO> getBillList(GetBillListDTO dto);
 
     /**
+     * 获取账单列表
+     *
+     * @param dto
+     * @return
+     */
+    ListQueryVO<BillVO> getBillList(ListQueryDTO dto);
+
+    /**
      * 到期账单结算
      */
     void setBillUnpaid();

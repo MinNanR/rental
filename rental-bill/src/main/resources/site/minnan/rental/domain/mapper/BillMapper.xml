@@ -63,7 +63,7 @@
         left join rental_utility t2
         on t1.utility_start_id = t2.id
         left join rental_utility t3 on t1.utility_end_id = t3.id
-        where id = #{id}
+        where t1.id = #{id}
     </select>
 
     <select id="getBillDetailsByRoomId" resultType="site.minnan.rental.domain.entity.BillDetails">

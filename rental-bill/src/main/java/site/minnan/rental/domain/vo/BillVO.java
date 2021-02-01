@@ -37,6 +37,10 @@ public class BillVO {
 
     private String updateTime;
 
+    private String status;
+
+    private String statusCode;
+
     public static BillVO assemble(Bill bill){
         return BillVO.builder()
                 .id(bill.getId())
@@ -46,6 +50,8 @@ public class BillVO {
                 .electricityCharge(bill.getElectricityCharge())
                 .rent(bill.getRent())
                 .totalCharge(bill.totalCharge())
+                .status(bill.getStatus().getStatus())
+                .statusCode(bill.getStatus().getValue())
                 .time(StrUtil.format("{}年{}月", bill.getYear(), bill.getMonth()))
                 .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
                 .build();

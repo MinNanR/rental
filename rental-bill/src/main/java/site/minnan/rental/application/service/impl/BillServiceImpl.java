@@ -9,6 +9,8 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -254,4 +256,20 @@ public class BillServiceImpl implements BillService {
         return vo;
     }
 
+
+    /**
+     * 获取账单列表
+     *
+     * @param dto
+     * @return
+     */
+    @Override
+    public ListQueryVO<BillVO> getBillList(ListQueryDTO dto) {
+        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("update_time");
+        IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
+        List<BillVO> list = page.getRecords().stream().map(BillVO::assemble).collect(Collectors.toList());
+        return new ListQueryVO<>(list,page.getTotal());
+    }
 }
