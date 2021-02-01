@@ -110,4 +110,12 @@ public class TenantController {
         tenantService.surrenderAll(dto);
         return ResponseEntity.success();
     }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
+    @PostMapping("checkIn")
+    public ResponseEntity<?> checkIn(@RequestBody @Valid CheckInDTO dto){
+        tenantService.checkIn(dto);
+        return ResponseEntity.success();
+    }
+
 }

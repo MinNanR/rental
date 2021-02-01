@@ -89,6 +89,8 @@ public class BillServiceImpl implements BillService {
     public void setUtilityPrice(SetUtilityPriceDTO dto) {
         Optional.ofNullable(dto.getWaterPrice()).ifPresent(s -> redisUtil.valueSet("water_price", s));
         Optional.ofNullable(dto.getElectricityPrice()).ifPresent(s -> redisUtil.valueSet("electricity_price", s));
+        Optional.ofNullable(dto.getAccessCardPrice()).ifPresent(s -> redisUtil.valueSet("access_card_price", s));
+
     }
 
     /**
@@ -100,7 +102,8 @@ public class BillServiceImpl implements BillService {
     public UtilityPrice getUtilityPrice() {
         BigDecimal waterPrice = (BigDecimal) redisUtil.getValue("water_price");
         BigDecimal electricPrice = (BigDecimal) redisUtil.getValue("electricity_price");
-        return new UtilityPrice(waterPrice, electricPrice);
+        Integer accessCardPrice = (int)redisUtil.getValue("access_card_price");
+        return new UtilityPrice(waterPrice, electricPrice, accessCardPrice);
     }
 
     /**
@@ -156,7 +159,6 @@ public class BillServiceImpl implements BillService {
                             .houseName(roomInfo.getStr("houseName"))
                             .roomId(roomInfo.getInt("id"))
                             .roomNumber(roomInfo.getStr("roomNumber"))
-                            .floor(roomInfo.getInt("floor"))
                             .rent(roomInfo.getInt("price"))
                             .completedDate(oneMonthLater)
                             .utilityStartId(utilityMap.get(roomInfo.getInt("id")).getUtilityEnd().getInt("id"))

@@ -376,8 +376,10 @@ Content-Type: application/json
 Authorization: {{admin_token}}
 
 {
-  "waterPrice": 1.35,
-  "electricityPrice": 0.35
+  "waterPrice": 1,
+  "electricityPrice": 4,
+  "accessCardPrice": 25
+
 }
 
 ###

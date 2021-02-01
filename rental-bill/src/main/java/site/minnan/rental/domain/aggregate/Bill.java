@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
+import site.minnan.rental.infrastructure.enumerate.BillType;
 import site.minnan.rental.infrastructure.enumerate.PaymentMethod;
 
 import java.math.BigDecimal;
@@ -59,11 +60,6 @@ public class Bill {
     private String roomNumber;
 
     /**
-     * 楼层
-     */
-    private Integer floor;
-
-    /**
      * 用水量
      */
     private BigDecimal waterUsage;
@@ -84,6 +80,21 @@ public class Bill {
     private BigDecimal electricityCharge;
 
     /**
+     * 门禁卡数量
+     */
+    private Integer accessCardQuantity;
+
+    /**
+     * 门禁卡收费
+     */
+    private Integer accessCardCharge;
+
+    /**
+     * 押金
+     */
+    private Integer deposit;
+
+    /**
      * 房租
      */
     private Integer rent;
@@ -98,6 +109,11 @@ public class Bill {
      */
     @Setter
     private Integer utilityEndId;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
     /**
      * 结束日期
@@ -118,6 +134,11 @@ public class Bill {
      * 账单状态
      */
     private BillStatus status;
+
+    /**
+     * 账单类型
+     */
+    private BillType type;
 
     /**
      * 收据url地址
@@ -205,5 +226,9 @@ public class Bill {
 
     public void unsettled() {
         this.status = BillStatus.UNSETTLED;
+    }
+
+    public void surrenderCompleted(Date time){
+        this.completedDate = time;
     }
 }

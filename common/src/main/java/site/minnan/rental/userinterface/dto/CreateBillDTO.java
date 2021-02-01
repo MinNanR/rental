@@ -15,8 +15,13 @@ import java.util.List;
 @Builder
 public class CreateBillDTO implements Serializable {
 
-
     private Integer roomId;
+
+    private Integer deposit;
+
+    private Integer cardQuantity;
+
+    private String remark;
 
     private List<Integer> tenantIdList;
 

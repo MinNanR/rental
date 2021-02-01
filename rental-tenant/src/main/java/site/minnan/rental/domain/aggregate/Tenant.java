@@ -90,6 +90,7 @@ public class Tenant {
     /**
      * 用户账号id
      */
+    @Setter
     private Integer userId;
 
     /**

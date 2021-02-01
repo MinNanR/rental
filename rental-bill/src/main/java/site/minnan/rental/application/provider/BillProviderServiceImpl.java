@@ -19,14 +19,17 @@ import site.minnan.rental.domain.vo.SettleQueryVO;
 import site.minnan.rental.domain.vo.UtilityPrice;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.utils.ReceiptUtils;
+import site.minnan.rental.infrastructure.enumerate.BillType;
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
 import site.minnan.rental.userinterface.dto.SettleQueryDTO;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service(timeout = 30000, interfaceClass = BillProviderService.class)
 @Slf4j
@@ -60,16 +63,36 @@ public class BillProviderServiceImpl implements BillProviderService {
         DateTime now = DateTime.now();
         JSONObject roomInfo = roomProviderService.getRoomInfo(dto.getRoomId());
         Integer currentUtilityId = utilityProviderService.getCurrentUtility(dto.getRoomId());
-        Bill bill = Bill.builder()
+        UtilityPrice price = billService.getUtilityPrice();
+        //入住账单
+        Bill checkInBill = Bill.builder()
                 .year(now.year())
                 .month(now.month() + 1)
                 .houseId(roomInfo.getInt("houseId"))
                 .houseName(roomInfo.getStr("houseName"))
                 .roomId(dto.getRoomId())
                 .roomNumber(roomInfo.getStr("roomNumber"))
-                .floor(roomInfo.getInt("floor"))
+                .accessCardQuantity(dto.getCardQuantity())
+                .accessCardCharge(dto.getCardQuantity() * price.getAccessCardPrice())
+                .deposit(dto.getDeposit())
                 .rent(roomInfo.getInt("price"))
-                .completedDate(now.offsetNew(DateField.MONTH, 1))
+                .remark(dto.getRemark())
+                .completedDate(now)
+                .utilityStartId(currentUtilityId)
+                .status(BillStatus.PAID)//TODO 确认是否当面收款
+                .type(BillType.CHECK_IN)
+                .build();
+        checkInBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
+        DateTime nextMonth = now.offsetNew(DateField.MONTH, 1);
+        Bill monthlyBill = Bill.builder()
+                .year(now.year())
+                .month(nextMonth.month() + 1)
+                .houseId(roomInfo.getInt("houseId"))
+                .houseName(roomInfo.getStr("houseName"))
+                .roomId(dto.getRoomId())
+                .roomNumber(roomInfo.getStr("roomNumber"))
+                .rent(0)
+                .completedDate(nextMonth)
                 .utilityStartId(currentUtilityId)
                 .status(BillStatus.INIT)
                 .build();
@@ -90,7 +113,8 @@ public class BillProviderServiceImpl implements BillProviderService {
             JSONObject end = settle.getUtilityEnd();
             UtilityPrice price = billService.getUtilityPrice();
             bill.settleWater(start.getBigDecimal("water"), end.getBigDecimal("water"), price.getWaterPrice());
-            bill.settleElectricity(start.getBigDecimal("electricity"), end.getBigDecimal("electricity"), price.getElectricityPrice());
+            bill.settleElectricity(start.getBigDecimal("electricity"), end.getBigDecimal("electricity"),
+                    price.getElectricityPrice());
             bill.setUtilityEndId(end.getInt("id"));
             bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
             bill.unsettled();
@@ -99,6 +123,8 @@ public class BillProviderServiceImpl implements BillProviderService {
             } catch (IOException e) {
                 log.error("生成收据失败");
             }
+            Date date = new Date();
+            bill.surrenderCompleted(date);
             billMapper.settleBatch(Collections.singletonList(bill));
         }
 

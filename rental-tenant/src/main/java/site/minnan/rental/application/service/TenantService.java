@@ -94,4 +94,11 @@ public interface TenantService {
      * @param dto
      */
     void surrenderAll(AllSurrenderDTO dto);
+
+    /**
+     * 登记入住
+     *
+     * @param dto
+     */
+    void checkIn(CheckInDTO dto);
 }
