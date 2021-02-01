@@ -15,4 +15,6 @@ public class SetUtilityPriceDTO {
     private BigDecimal waterPrice;
 
     private BigDecimal electricityPrice;
+
+    private Integer accessCardPrice;
 }
