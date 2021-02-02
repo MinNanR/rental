@@ -54,6 +54,10 @@ public class BillInfoVO {
 
     private String statusCode;
 
+    private String type;
+
+    private String typeCode;
+
     public static BillInfoVO assemble(Bill bill) {
         return BillInfoVO.builder()
                 .id(bill.getId())
@@ -72,6 +76,8 @@ public class BillInfoVO {
                 .paymentMethodCode(Optional.ofNullable(bill.getPaymentMethod()).map(PaymentMethod::getValue).orElse(""))
                 .status(bill.getStatus().getStatus())
                 .statusCode(bill.getStatus().getValue())
+                .type(bill.getType().getType())
+                .typeCode(bill.getType().getValue())
                 .tenantList(new ArrayList<>())
                 .build();
     }
