@@ -218,7 +218,7 @@ public class BillServiceImpl implements BillService {
         QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "water_charge", "electricity_charge", "rent")
                 .eq("month(pay_time)", DateUtil.month(DateTime.now()) + 1)
-                .and(w -> w.eq("status", BillStatus.PAID).or().eq("status", BillStatus.PRINTED));
+                .eq("status", BillStatus.PAID);
         List<Bill> bills = billMapper.selectList(queryWrapper);
         Optional<BigDecimal> total = Optional.empty();
         if (CollectionUtil.isNotEmpty(bills)) {
@@ -267,7 +267,7 @@ public class BillServiceImpl implements BillService {
     public ListQueryVO<BillVO> getBillList(ListQueryDTO dto) {
         Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
         QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("update_time");
+        queryWrapper.ne("status", BillStatus.INIT).orderByDesc("update_time");
         IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
         List<BillVO> list = page.getRecords().stream().map(BillVO::assemble).collect(Collectors.toList());
         return new ListQueryVO<>(list,page.getTotal());

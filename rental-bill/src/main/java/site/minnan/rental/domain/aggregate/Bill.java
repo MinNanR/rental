@@ -205,7 +205,8 @@ public class Bill {
      */
     public void settleWater(BigDecimal start, BigDecimal end, BigDecimal price) {
         this.waterUsage = end.subtract(start);
-        this.waterCharge = this.waterUsage.multiply(price).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal waterUsage = BigDecimal.ONE.compareTo(this.waterUsage) > 0 ? BigDecimal.ONE : this.waterUsage;
+        this.waterCharge = waterUsage.multiply(price).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     /**
@@ -221,14 +222,24 @@ public class Bill {
     }
 
     public BigDecimal totalCharge() {
-        return waterCharge.add(electricityCharge).add(BigDecimal.valueOf(rent));
+        BigDecimal totalCharge = BigDecimal.ZERO;
+        switch (type) {
+            case MONTHLY:
+                totalCharge = waterCharge.add(electricityCharge).add(BigDecimal.valueOf(rent));
+                break;
+            case CHECK_IN:
+                totalCharge = BigDecimal.valueOf(rent + +deposit + accessCardCharge);
+                break;
+            default:
+        }
+        return totalCharge;
     }
 
     public void unsettled() {
         this.status = BillStatus.UNSETTLED;
     }
 
-    public void surrenderCompleted(Date time){
+    public void surrenderCompleted(Date time) {
         this.completedDate = time;
     }
 }

@@ -2,6 +2,8 @@ package site.minnan.rental.application.provider;
 
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
 
+import java.io.IOException;
+
 /**
  * 水电记录，账单服务
  */

@@ -118,7 +118,7 @@
                 客户&nbsp;&nbsp;<span th:text="${roomNumber}"></span>号房
             </div>
             <div style="float: right;">
-                <span th:text="${startDate}"></span>至<span th:text="${endDate}"></span>
+                <span th:text="${startDate}"></span><span th:text="${endDate}"></span>
             </div>
         </div>
 
@@ -149,6 +149,10 @@
                 <td th:text="${waterUsage}"></td>
                 <td>度</td>
                 <td th:text="${waterPrice}"></td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 6" th:text="${water}">
+                </td>
+                <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 5" th:text="${water}">
+                </td>
                 <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 4" th:text="${water}">
                 </td>
                 <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 3" th:text="${water}">
@@ -159,8 +163,6 @@
                 </td>
                 <td th:each="water, iter:${waterCharge}" th:if="${iter.index} == 0" th:text="${water}">
                 </td>
-                <td>0</td>
-                <td>0</td>
             </tr>
             <tr class="tempTr2 line">
                 <td>电</td>
@@ -172,6 +174,10 @@
                 <td th:text="${electricityUsage}"></td>
                 <td>度</td>
                 <td th:text="${electricityPrice}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 6"
+                    th:text="${electricity}"></td>
+                <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 5"
+                    th:text="${electricity}"></td>
                 <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 4"
                     th:text="${electricity}"></td>
                 <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 3"
@@ -182,20 +188,49 @@
                     th:text="${electricity}"></td>
                 <td th:each="electricity,iter:${electricityCharge}" th:if="${iter.index} == 0"
                     th:text="${electricity}"></td>
-                <td>0</td>
-                <td>0</td>
+            </tr>
+            <tr class="tempTr2 line">
+                <td colspan="6">门禁卡</td>
+                <td th:text="${accessCardQuantity}"></td>
+                <td>个</td>
+                <td th:text="${accessCardPrice}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 6"
+                    th:text="${accessCard}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 5"
+                    th:text="${accessCard}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 4"
+                    th:text="${accessCard}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 3"
+                    th:text="${accessCard}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 2"
+                    th:text="${accessCard}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 1"
+                    th:text="${accessCard}"></td>
+                <td th:each="accessCard,iter:${accessCardCharge}" th:if="${iter.index} == 0"
+                    th:text="${accessCard}"></td>
+
+            </tr>
+            <tr class=" tempTr2 line
+                ">
+                <td colspan="9">押金</td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 6" th:text="${d}"></td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 5" th:text="${d}"></td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 4" th:text="${d}"></td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 3" th:text="${d}"></td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 2" th:text="${d}"></td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 1" th:text="${d}"></td>
+                <td th:each="d, iter:${deposit}" th:if="${iter.index} == 0" th:text="${d}"></td>
             </tr>
             <tr class=" tempTr2 line
                 ">
                 <td colspan="9">本月租金</td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 6" th:text="${r}"></td>
+                <td th:each="r, iter:${rent}" th:if="${iter.index} == 5" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 4" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 3" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 2" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 1" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 0" th:text="${r}"></td>
-                </td>
-                <td>0</td>
-                <td>0</td>
             </tr>
             <tr class="tempTr2">
                 <td colspan="3" style="border-left: 1px solid;border-bottom: 1px solid;">
@@ -210,12 +245,12 @@
                     &nbsp;&nbsp;元&nbsp;&nbsp;×&nbsp;&nbsp;角&nbsp;&nbsp;×&nbsp;&nbsp;分&nbsp;&nbsp;
                 </td>
                 <td colspan="4" style="border-right: 1px solid;border-bottom: 1px solid;font-size: 22px">
-                    <span>￥<u th:text="${totalCharge}">&nbsp;}元&nbsp;&nbsp;</u></span>
+                    <span>￥<u th:text="${totalCharge}">&nbsp;元&nbsp;&nbsp;</u></span>
                 </td>
             </tr>
             <tr class="tempTr2">
                 <td colspan="8"></td>
-                <td colspan="8" style="text-align: left;">经手人：</td>
+                <td colspan="8" style="text-align: left;">收款人：</td>
             </tr>
         </table>
     </div>

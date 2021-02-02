@@ -23,6 +23,10 @@ public class CheckInDTO {
 
     private Integer cardQuantity;
 
+    private String checkInDate;
+
+    private String payMethod;
+
     private String remark;
 
     List<AddTenantDTO> tenantList;

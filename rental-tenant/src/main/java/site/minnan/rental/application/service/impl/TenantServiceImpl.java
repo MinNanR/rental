@@ -466,6 +466,8 @@ public class TenantServiceImpl implements TenantService {
                 .cardQuantity(dto.getCardQuantity())
                 .deposit(dto.getDeposit())
                 .remark(dto.getRemark())
+                .checkInDate(dto.getCheckInDate())
+                .payMethod(dto.getPayMethod())
                 .tenantIdList(tenantIdList)
                 .userId(jwtUser.getId())
                 .userName(jwtUser.getRealName())

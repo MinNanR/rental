@@ -14,18 +14,18 @@ public enum BillType {
     @EnumValue
     private final String value;
 
-    private final String status;
+    private final String type;
 
-    BillType(String value, String status) {
+    BillType(String value, String type) {
         this.value = value;
-        this.status = status;
+        this.type = type;
     }
 
     public String getValue() {
         return value;
     }
 
-    public String getStatus() {
-        return status;
+    public String getType() {
+        return type;
     }
 }

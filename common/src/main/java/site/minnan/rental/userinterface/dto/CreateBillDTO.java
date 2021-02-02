@@ -23,6 +23,10 @@ public class CreateBillDTO implements Serializable {
 
     private String remark;
 
+    private String checkInDate;
+
+    private String payMethod;
+
     private List<Integer> tenantIdList;
 
     private Integer userId;

@@ -52,11 +52,6 @@ public interface BillService {
     ListQueryVO<BillVO> getBillList(ListQueryDTO dto);
 
     /**
-     * 到期账单结算
-     */
-    void setBillUnpaid();
-
-    /**
      * 获取本月总额
      *
      * @return
@@ -70,4 +65,9 @@ public interface BillService {
      * @return
      */
     BillInfoVO getBillInfo(DetailsQueryDTO dto);
+
+    /**
+     * 到期账单结算
+     */
+    void setBillUnpaid();
 }

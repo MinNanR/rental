@@ -6,7 +6,7 @@
 
     <update id="updateRoomStatusBatch">
         <foreach collection="roomList" item="room" separator=";">
-            update rental_room set status = #{room.status}, update_user_id = #{room.updateUserId},
+            update rental_room set type = #{room.type}, update_user_id = #{room.updateUserId},
             update_user_name = #{room.updateUserName} ,update_time = #{room.updateTime}
             where id = #{room.id}
         </foreach>
@@ -15,6 +15,6 @@
     <select id="getRoomList" resultType="site.minnan.rental.domain.vo.UtilityInitVO">
         select t1.id roomId, t1.room_number roomNumber, t2.water currentWater, t2.electricity currentElectricity
         from rental_room t1 left join rental_utility t2 on t1.id = t2.room_id
-        where t1.house_id = #{houseId} and t1.floor = #{floor} and t2.status = #{status}
+        where t1.house_id = #{houseId} and t1.floor = #{floor} and t2.type = #{type}
     </select>
 </mapper>

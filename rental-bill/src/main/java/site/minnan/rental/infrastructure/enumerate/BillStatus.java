@@ -11,8 +11,8 @@ public enum  BillStatus {
     INIT("INIT","正在使用"),
     UNSETTLED("UNSETTLED", "待结算"),
     UNPAID("UNPAID", "未支付"),
-    PAID("PAID","已支付"),
-    PRINTED("PRINTED", "已打印收据");
+    PAID("PAID","已支付");
+//    PRINTED("PRINTED", "已打印收据");
 
     @EnumValue
     private final String value;

@@ -7,7 +7,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import site.minnan.rental.application.service.BillService;
@@ -21,6 +20,7 @@ import site.minnan.rental.domain.vo.SettleQueryVO;
 import site.minnan.rental.domain.vo.UtilityPrice;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.BillType;
+import site.minnan.rental.infrastructure.enumerate.PaymentMethod;
 import site.minnan.rental.infrastructure.utils.ReceiptUtils;
 import site.minnan.rental.userinterface.dto.CreateBillDTO;
 import site.minnan.rental.userinterface.dto.SettleQueryDTO;
@@ -62,7 +62,7 @@ public class BillProviderServiceImpl implements BillProviderService {
      */
     @Override
     public void createBill(CreateBillDTO dto) {
-        DateTime now = DateTime.now();
+        DateTime now = DateTime.of(dto.getCheckInDate(), "yyyy-MM-dd");
         JSONObject roomInfo = roomProviderService.getRoomInfo(dto.getRoomId());
         Integer currentUtilityId = utilityProviderService.getCurrentUtility(dto.getRoomId());
         UtilityPrice price = billService.getUtilityPrice();
@@ -80,8 +80,10 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .rent(roomInfo.getInt("price"))
                 .remark(dto.getRemark())
                 .completedDate(now)
+                .payTime(new Timestamp(now.getTime()))
+                .paymentMethod(PaymentMethod.valueOf(dto.getPayMethod()))
                 .utilityStartId(currentUtilityId)
-                .status(BillStatus.PAID)//TODO 确认是否当面收款
+                .status(BillStatus.PAID)
                 .type(BillType.CHECK_IN)
                 .build();
         checkInBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
@@ -107,6 +109,12 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .collect(Collectors.toList());
         billTenantRelevanceMapper.insertBatch(relevanceList);
         //TODO 生成入住收据
+        BillDetails billDetails = billMapper.getBillDetails(checkInBill.getId());
+        try {
+            receiptUtils.generateReceipt(billDetails);
+        } catch (IOException e) {
+            log.error("生成收据失败,id={}", billDetails.getId());
+        }
     }
 
     @Override
