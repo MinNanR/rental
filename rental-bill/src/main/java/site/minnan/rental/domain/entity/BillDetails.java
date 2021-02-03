@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 /**
  * 账单所有信息
+ *
  * @author Minnan on 2021/01/30
  */
 @Data
@@ -20,4 +21,11 @@ public class BillDetails extends Bill {
 
     private BigDecimal electricityEnd;
 
+    public void settleWater(BigDecimal price) {
+        super.settleWater(waterStart, waterEnd, price);
+    }
+
+    public void settleElectricity(BigDecimal price) {
+        super.settleElectricity(electricityStart, electricityEnd, price);
+    }
 }

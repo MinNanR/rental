@@ -29,6 +29,8 @@ public class UtilityVO {
 
     private String status;
 
+    private String statusCode;
+
     private String updateUserName;
 
     private String updateTime;
@@ -41,6 +43,7 @@ public class UtilityVO {
                 .water(utility.getWater())
                 .electricity(utility.getElectricity())
                 .status(utility.getStatus().getStatus())
+                .statusCode(utility.getStatus().getValue())
                 .updateUserName(utility.getUpdateUserName())
                 .updateTime(DateUtil.format(utility.getUpdateTime(), "yyyy年MM月dd日 HH:mm"))
                 .build();

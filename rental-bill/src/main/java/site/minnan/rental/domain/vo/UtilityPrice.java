@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 水电单价
@@ -17,5 +18,9 @@ public class UtilityPrice {
 
     private BigDecimal electricityPrice;
 
-    private Integer accessCardPrice;
+    private Map<String, Integer> accessCardPrice;
+
+    public Integer getAccessCardPrice(String houseName){
+        return accessCardPrice.get(houseName);
+    }
 }

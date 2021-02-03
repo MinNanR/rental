@@ -425,26 +425,30 @@ public class TenantServiceImpl implements TenantService {
         List<Tenant> newTenantList = new ArrayList<>();
         for (AddTenantDTO tenant : dto.getTenantList()) {
             //构建新房客对象
-            String identificationNumber = tenant.getIdentificationNumber();
-            DateTime birthday = IdcardUtil.getBirthDate(identificationNumber);
-            int gender = IdcardUtil.getGenderByIdCard(identificationNumber);
-            List<String> region = Optional.ofNullable((List<String>) redisUtil.getHashValue("region",
-                    identificationNumber.substring(0, 6)))
-                    .orElseGet(() -> CollectionUtil.newArrayList("", ""));
-            Tenant newTenant = Tenant.builder()
+
+            Tenant.TenantBuilder tenantBuilder = Tenant.builder()
                     .name(tenant.getName())
-                    .gender(Gender.values()[gender])
                     .phone(tenant.getPhone())
-                    .hometownProvince(region.get(0))
-                    .hometownCity(region.get(1))
-                    .identificationNumber(identificationNumber)
-                    .birthday(birthday)
                     .houseId(dto.getHouseId())
                     .houseName(dto.getHouseName())
                     .roomId(dto.getRoomId())
                     .roomNumber(dto.getRoomNumber())
-                    .status(TenantStatus.LIVING)
-                    .build();
+                    .status(TenantStatus.LIVING);
+
+            if (StrUtil.isNotBlank(tenant.getIdentificationNumber())) {
+                String identificationNumber = tenant.getIdentificationNumber();
+                DateTime birthday = IdcardUtil.getBirthDate(identificationNumber);
+                int gender = IdcardUtil.getGenderByIdCard(identificationNumber);
+                List<String> region = Optional.ofNullable((List<String>) redisUtil.getHashValue("region",
+                        identificationNumber.substring(0, 6)))
+                        .orElseGet(() -> CollectionUtil.newArrayList("", ""));
+                tenantBuilder.gender(Gender.values()[gender])
+                        .hometownProvince(region.get(0))
+                        .hometownCity(region.get(1))
+                        .identificationNumber(identificationNumber)
+                        .birthday(birthday);
+            }
+            Tenant newTenant = tenantBuilder.build();
             newTenant.setCreateUser(jwtUser);
             newTenantList.add(newTenant);
         }
@@ -481,21 +485,22 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantList
      */
     private void addTenant(List<Tenant> tenantList) {
-        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<AddTenantUserDTO> addUserDTO = new ArrayList<>();
-        for (Tenant tenant : tenantList) {
-            //添加房客用户
-            AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
-                    .phone(tenant.getPhone())
-                    .realName(tenant.getName())
-                    .userId(jwtUser.getId())
-                    .userName(jwtUser.getRealName())
-                    .build();
-            addUserDTO.add(tenantUserDTO);
-        }
-        List<Integer> userIdList = userProviderService.createTenantUserBatch(addUserDTO);
-        Iterator<Integer> idIterator = userIdList.iterator();
-        tenantList.forEach(e -> e.setUserId(idIterator.next()));
+        //TODO 暂时不创建租客用户，完成用户端小程序时放开注释
+
+//        JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        List<AddTenantUserDTO> addUserDTO = new ArrayList<>();
+//        for (Tenant tenant : tenantList) {
+//            //添加房客用户
+//            AddTenantUserDTO tenantUserDTO = AddTenantUserDTO.builder()
+//                    .phone(tenant.getPhone())
+//                    .realName(tenant.getName())
+//                    .userId(jwtUser.getId())
+//                    .userName(jwtUser.getRealName())
+//                    .build();
+//            addUserDTO.add(tenantUserDTO);
+//        }
+//        List<Integer> userIdList = userProviderService.createTenantUserBatch(addUserDTO);
+//        Iterator<Integer> idIterator = userIdList.iterator();
         tenantMapper.addTenantBatch(tenantList);
     }
 }

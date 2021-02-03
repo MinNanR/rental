@@ -2,6 +2,7 @@ package site.minnan.rental.userinterface.fascade;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.NumberUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import site.minnan.rental.userinterface.response.ResponseEntity;
 
 import javax.validation.Valid;
 import javax.websocket.server.PathParam;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("rental/bill")
+@Slf4j
 public class BillController {
 
     @Autowired
@@ -82,7 +85,7 @@ public class BillController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("getBillList")
-    public ResponseEntity<ListQueryVO<BillVO>> getBillList(@RequestBody @Valid ListQueryDTO dto){
+    public ResponseEntity<ListQueryVO<BillVO>> getBillList(@RequestBody @Valid ListQueryDTO dto) {
         ListQueryVO<BillVO> vo = billService.getBillList(dto);
         return ResponseEntity.success(vo);
     }
@@ -101,5 +104,31 @@ public class BillController {
     public ResponseEntity<BillInfoVO> getBillInfo(@RequestBody @Valid DetailsQueryDTO dto) {
         BillInfoVO vo = billService.getBillInfo(dto);
         return ResponseEntity.success(vo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("createReceipt")
+    public ResponseEntity<String> createReceipt(@RequestBody @Valid DetailsQueryDTO dto) {
+        try {
+            String url = billService.createReceipt(dto);
+            return ResponseEntity.success(url);
+        } catch (IOException e) {
+            log.error("生成收据失败：id={}", dto.getId());
+            return ResponseEntity.fail("生成收据失败");
+        }
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("correctBill")
+    public ResponseEntity<?> correctUtility(@RequestBody @Valid DetailsQueryDTO dto) {
+        billService.correctUtility(dto);
+        return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("confirmBill")
+    public ResponseEntity<?> confirm(@RequestBody @Valid DetailsQueryDTO dto){
+        billService.confirmBill(dto);
+        return ResponseEntity.success();
     }
 }

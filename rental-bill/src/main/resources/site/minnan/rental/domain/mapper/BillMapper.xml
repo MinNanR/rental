@@ -6,7 +6,7 @@
     <!--批量插入-->
     <insert id="insertBatch" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         insert into rental_bill (year, month, house_id, house_name, room_id, room_number, access_card_quantity,
-        access_card_charge, deposit, rent, utility_start_id, remark, completed_date, status, type,
+        access_card_charge, deposit, rent, utility_start_id, remark, completed_date, status, type, receipt_url,
         pay_time, payment_method, create_user_id, create_user_name, create_time, update_user_id, update_user_name,
         update_time)
         values
@@ -14,8 +14,8 @@
             (#{bill.year}, #{bill.month}, #{bill.houseId}, #{bill.houseName}, #{bill.roomId}, #{bill.roomNumber},
             #{bill.accessCardQuantity}, #{bill.accessCardCharge}, #{bill.deposit}, #{bill.rent},
             #{bill.utilityStartId}, #{bill.remark}, #{bill.completedDate}, #{bill.status}, #{bill.type},
-            #{bill.payTime}, #{bill.paymentMethod}, #{bill.createUserId}, #{bill.createUserName}, #{bill.createTime},
-            #{bill.updateUserId}, #{bill.updateUserName}, #{bill.updateTime})
+            #{bill.receiptUrl}, #{bill.payTime}, #{bill.paymentMethod}, #{bill.createUserId}, #{bill.createUserName},
+            #{bill.createTime}, #{bill.updateUserId}, #{bill.updateUserName}, #{bill.updateTime})
         </foreach>
     </insert>
 
@@ -24,21 +24,22 @@
         <foreach collection="bills" item="bill" separator=";">
             update rental_bill set water_usage = #{bill.waterUsage}, water_charge = #{bill.waterCharge},
             electricity_usage = #{bill.electricityUsage}, electricity_charge = #{bill.electricityCharge},
-            utility_end_id = #{bill.utilityEndId}, type = #{bill.type},create_user_id = #{bill.createUserId},
-            create_user_name = #{bill.createUserName}, create_time = #{bill.createTime},
-            update_user_id = #{bill.updateUserId}, update_user_name = #{bill.updateUserName}, update_time =
-            #{bill.updateTime}
-            <if test="bills.completedDate != null">
+            utility_end_id = #{bill.utilityEndId}, type = #{bill.type}, status = #{bill.status},
+            create_user_id = #{bill.createUserId},create_user_name = #{bill.createUserName}, create_time = #{bill.createTime},
+            receipt_url = #{bill.receiptUrl}, update_user_id = #{bill.updateUserId}, update_user_name =
+            #{bill.updateUserName}, update_time = #{bill.updateTime}
+            <if test="bill.completedDate != null">
                 , completed_date = #{bill.completedDate}
             </if>
+            where id = #{bill.id}
         </foreach>
     </update>
 
     <!--获取本月支付的账单-->
     <select id="getBillList" resultType="site.minnan.rental.domain.entity.BillTenantEntity">
-        select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge, t1.electricity_charge electricityCharge,
-        t1.rent rent, t1.update_time updateTime, t3.name name, t3.phone phone,t1.house_name houseName, t1.room_id roomId,
-        t1.room_number roomNumber,
+        select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge,
+        t1.electricity_charge electricityCharge,t1.rent rent, t1.update_time updateTime, t3.name name, t3.phone phone,
+        t1.house_name houseName, t1.room_id roomId, t1.room_number roomNumber, t1.remark remark
         from rental_bill t1
         left join rental_bill_tenant_relevance t2 on t1.id = t2.bill_id
         left join rental_tenant t3 on t2.tenant_id = t3.id
@@ -61,7 +62,7 @@
         t1.rent rent, t1.room_number roomNumber, t1.create_time createTime, t1.completed_date completedDate,
         t2.water waterStart, t3.water waterEnd, t2.electricity electricityStart, t3.electricity electricityEnd,
         t1.type type, t1.access_card_quantity accessCardQuantity, t1.access_card_charge accessCardCharge,
-        t1.deposit deposit
+        t1.deposit deposit,t1.remark remark
         from rental_bill t1
         left join rental_utility t2
         on t1.utility_start_id = t2.id
@@ -83,15 +84,16 @@
 
 
     <select id="getInitBillList" resultType="site.minnan.rental.domain.entity.BillDetails">
-        select t1.id id, t1.year year, t1.month month, t1.water_charge waterCharge,t1.water_usage waterUsage,
-        t1.electricity_charge electricityCharge, t1.electricity_usage electricityUsage,
+        select t1.id id, t1.year year, t1.month month,t1.room_id roomId, t1.water_charge waterCharge,
+        t1.water_usage waterUsage, t1.electricity_charge electricityCharge, t1.electricity_usage electricityUsage,
         t1.rent rent, t1.room_number roomNumber, t1.create_time createTime, t1.completed_date completedDate,
-        t2.water waterStart, t3.water waterEnd, t2.electricity electricityStart, t3.electricity electricityEnd
+        t2.water waterStart, t3.water waterEnd, t2.electricity electricityStart, t3.electricity electricityEnd,
+        t3.id utilityEndId, t1.type type
         from rental_bill t1
         left join rental_utility t2
         on t1.utility_start_id = t2.id
-        left join rental_utility t3 on t1.utility_end_id = t3.id
-        where type = #{type}
+        left join rental_utility t3 on t3.room_id = t1.room_id
+        where t1.type = #{type} and t1.status = #{status}  and t3.status = 'RECORDING'
     </select>
 
 

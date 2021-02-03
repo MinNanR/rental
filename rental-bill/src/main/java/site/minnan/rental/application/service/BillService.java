@@ -3,6 +3,7 @@ package site.minnan.rental.application.service;
 import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.userinterface.dto.*;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -65,6 +66,27 @@ public interface BillService {
      * @return
      */
     BillInfoVO getBillInfo(DetailsQueryDTO dto);
+
+    /**
+     * 生成收据
+     *
+     * @param dto
+     */
+    String createReceipt(DetailsQueryDTO dto) throws IOException;
+
+    /**
+     * 矫正水电读数
+     *
+     * @param dto
+     */
+    void correctUtility(DetailsQueryDTO dto);
+
+    /**
+     * 确认账单无误
+     *
+     * @param dto
+     */
+    void confirmBill(DetailsQueryDTO dto);
 
     /**
      * 到期账单结算

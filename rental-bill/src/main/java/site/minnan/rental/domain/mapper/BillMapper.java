@@ -8,6 +8,7 @@ import site.minnan.rental.domain.aggregate.Bill;
 import site.minnan.rental.domain.entity.BillDetails;
 import site.minnan.rental.domain.entity.BillTenantEntity;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
+import site.minnan.rental.infrastructure.enumerate.BillType;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +42,8 @@ public interface BillMapper extends BaseMapper<Bill> {
      * @param pageSize
      * @return
      */
-    List<BillTenantEntity> getBillList(@Param("status") BillStatus status, @Param("start") Integer start, @Param("pageSize") Integer pageSize);
+    List<BillTenantEntity> getBillList(@Param("status") BillStatus status, @Param("start") Integer start, @Param(
+            "pageSize") Integer pageSize);
 
     /**
      * 计算数量
@@ -64,7 +66,7 @@ public interface BillMapper extends BaseMapper<Bill> {
      *
      * @return
      */
-    List<BillDetails> getInitBillList(@Param("status") BillStatus status);
+    List<BillDetails> getInitBillList(@Param("status") BillStatus status, @Param("type") BillType type);
 
     /**
      * 根据房间id获取账单信息

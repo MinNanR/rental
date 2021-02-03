@@ -34,16 +34,16 @@ import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class ReceiptUtils {
 
     @Autowired
     private BillService billService;
+
+    @Value("${aliyun.baseUrl}")
+    private String baseUrl;
 
     @Value("${aliyun.bucketName}")
     private String bucketName;
@@ -52,6 +52,8 @@ public class ReceiptUtils {
     private OSS oss;
 
     private final static Map<Integer, String> numberChinesMap;
+
+    private final static String[] emptyNumber = new String[]{"", "", "", "", "", "", ""};
 
     static {
         numberChinesMap = new HashMap<>();
@@ -98,8 +100,13 @@ public class ReceiptUtils {
      * @return
      */
     private static String[] splitNumber(int number) {
-        String[] numberChars = new String[5];
-        Iterator<Integer> iterator = CollectionUtil.newArrayList(0, 1, 2, 3, 4).iterator();
+        if (number <= 0) {
+            return emptyNumber;
+        }
+        String[] numberChars = new String[7];
+        Iterator<Integer> iterator = CollectionUtil.newArrayList(2, 3, 4, 5, 6).iterator();
+        numberChars[0] = "0";
+        numberChars[1] = "0";
         while (iterator.hasNext() && number > 0) {
             int index = iterator.next();
             int n = number % 10;
@@ -127,34 +134,15 @@ public class ReceiptUtils {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(templateResolver);
 
-        UtilityPrice price = billService.getUtilityPrice();
-
         Context context = new Context();
-        context.setVariable("roomNumber", bill.getRoomNumber());
-        context.setVariable("startDate", DateUtil.format(bill.getCreateTime(), "yyyy年M月d日"));
-        context.setVariable("endDate", DateUtil.format(bill.getCompletedDate(), "yyyy年M月d日"));
-
-        context.setVariable("waterStart", bill.getWaterStart().intValue());
-        context.setVariable("waterEnd", bill.getWaterEnd().intValue());
-        context.setVariable("waterUsage", bill.getWaterUsage().intValue());
-        context.setVariable("waterPrice", price.getWaterPrice().intValue());
-        String[] waterCharge = splitNumber(bill.getWaterCharge().intValue());
-        context.setVariable("waterCharge", waterCharge);
-
-        context.setVariable("electricityStart", bill.getElectricityStart().intValue());
-        context.setVariable("electricityEnd", bill.getElectricityEnd().intValue());
-        context.setVariable("electricityUsage", bill.getElectricityUsage().intValue());
-        context.setVariable("electricityPrice", price.getElectricityPrice().intValue());
-        String[] electricityCharge = splitNumber(bill.getElectricityCharge().intValue());
-        context.setVariable("electricityCharge", electricityCharge);
-
-        String[] rent = splitNumber(bill.getRent());
-        context.setVariable("rent", rent);
-        BigDecimal totalCharge = bill.totalCharge();
-        String[] total = parseNumberToChinese(totalCharge.intValue());
-        context.setVariable("total", total);
-        context.setVariable("totalCharge", totalCharge);
-//        context.setVariable("to", "123");
+        switch (bill.getType()) {
+            case MONTHLY:
+                monthly(context, bill);
+                break;
+            case CHECK_IN:
+                checkIn(context, bill);
+                break;
+        }
         return templateEngine.process("thymeleaf/receipt", context);
     }
 
@@ -179,11 +167,10 @@ public class ReceiptUtils {
         iElements.forEach(iElement -> document.add((IBlockElement) iElement));
         document.close();
         return temp;
-//        RenderingProperties
     }
 
     /**
-     * 将pdf转换成图片
+     * 将pdf转换成图片，并保存到阿里云oss
      *
      * @param documentStream pdf输入流流
      * @throws IOException
@@ -197,6 +184,7 @@ public class ReceiptUtils {
         ImageIO.write(bufferedImage, "png", os);
         InputStream imageStream = new ByteArrayInputStream(os.toByteArray());
         oss.putObject(bucketName, ossKey, imageStream);
+        document.close();
     }
 
     /**
@@ -211,7 +199,87 @@ public class ReceiptUtils {
         pipedInputStream.connect(pipedOutputStream);
         File file = transferHtmlToPdf(html, pipedOutputStream);
         savePdfAsImageToOss(new FileInputStream(file), bill.getId());
+        bill.setReceiptUrl(StrUtil.format("{}/receipt/{}.png", baseUrl, bill.getId()));
+
     }
 
+    private void checkIn(Context context, BillDetails bill) {
+        UtilityPrice price = billService.getUtilityPrice();
+        //抬头
+        context.setVariable("no", StrUtil.fillBefore(bill.getId().toString(), '0', 7));
+        context.setVariable("houseName", bill.getHouseName());
+        context.setVariable("roomNumber", bill.getRoomNumber());
+        context.setVariable("startDate", DateUtil.format(bill.getCreateTime(), "yyyy年M月d日"));
+        //水费
+        context.setVariable("waterStart", bill.getWaterStart().intValue());
+        context.setVariable("waterEnd", "");
+        context.setVariable("waterUsage", "");
+        context.setVariable("waterPrice", "");
+        context.setVariable("waterCharge", emptyNumber);
+        //电费
+        context.setVariable("electricityStart", bill.getElectricityStart().intValue());
+        context.setVariable("electricityEnd", "");
+        context.setVariable("electricityUsage", "");
+        context.setVariable("electricityPrice", "");
+        context.setVariable("electricityCharge", emptyNumber);
+        //门禁卡
+        Integer accessCardPrice = price.getAccessCardPrice(bill.getHouseName());
+        context.setVariable("accessCardQuantity", bill.getAccessCardQuantity());
+        context.setVariable("accessCardPrice", accessCardPrice);
+        String[] accessCardCharge = splitNumber(bill.getAccessCardCharge());
+        context.setVariable("accessCardCharge", accessCardCharge);
+        //押金
+        String[] deposit = splitNumber(bill.getDeposit());
+        context.setVariable("deposit", deposit);
+        //房租
+        String[] rent = splitNumber(bill.getRent());
+        context.setVariable("rent", rent);
+        //总额
+        BigDecimal totalCharge = bill.totalCharge();
+        String[] total = parseNumberToChinese(totalCharge.intValue());
+        context.setVariable("total", total);
+        context.setVariable("totalCharge", totalCharge);
+        //备注
+        context.setVariable("remark", "备注：" + Optional.ofNullable(bill.getRemark()).orElse(""));
+    }
 
+    private void monthly(Context context, BillDetails bill) {
+        UtilityPrice price = billService.getUtilityPrice();
+        //抬头
+        context.setVariable("no", StrUtil.fillBefore(bill.getId().toString(), '0', 7));
+        context.setVariable("houseName", bill.getHouseName());
+        context.setVariable("roomNumber", bill.getRoomNumber());
+        context.setVariable("startDate", DateUtil.format(bill.getCreateTime(), "yyyy年M月d日"));
+        context.setVariable("endDate", "至" + DateUtil.format(bill.getCompletedDate(), "yyyy年M月d日"));
+        //水费
+        context.setVariable("waterStart", bill.getWaterStart().intValue());
+        context.setVariable("waterEnd", bill.getWaterEnd().intValue());
+        context.setVariable("waterUsage", bill.getWaterUsage());
+        context.setVariable("waterPrice", price.getWaterPrice());
+        String[] waterCharge = splitNumber(bill.getWaterCharge().intValue());
+        context.setVariable("waterCharge", waterCharge);
+        //电费
+        context.setVariable("electricityStart", bill.getElectricityStart().intValue());
+        context.setVariable("electricityEnd", bill.getElectricityEnd().intValue());
+        context.setVariable("electricityUsage", bill.getElectricityUsage());
+        context.setVariable("electricityPrice", price.getElectricityPrice());
+        String[] electricityCharge = splitNumber(bill.getElectricityCharge().intValue());
+        context.setVariable("electricityCharge", electricityCharge);
+        //门禁卡
+        context.setVariable("accessCardQuantity", "");
+        context.setVariable("accessCardPrice", "");
+        context.setVariable("accessCardCharge", emptyNumber);
+        //押金
+        context.setVariable("deposit", emptyNumber);
+        //房租
+        String[] rent = splitNumber(bill.getRent());
+        context.setVariable("rent", rent);
+        //总额
+        BigDecimal totalCharge = bill.totalCharge();
+        String[] total = parseNumberToChinese(totalCharge.intValue());
+        context.setVariable("total", total);
+        context.setVariable("totalCharge", totalCharge);
+        //备注
+        context.setVariable("remark", "备注：" + Optional.ofNullable(bill.getRemark()).orElse(""));
+    }
 }

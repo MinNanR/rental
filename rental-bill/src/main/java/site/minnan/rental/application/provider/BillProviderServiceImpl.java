@@ -3,7 +3,6 @@ package site.minnan.rental.application.provider;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
@@ -75,7 +74,7 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .roomId(dto.getRoomId())
                 .roomNumber(roomInfo.getStr("roomNumber"))
                 .accessCardQuantity(dto.getCardQuantity())
-                .accessCardCharge(dto.getCardQuantity() * price.getAccessCardPrice())
+                .accessCardCharge(dto.getCardQuantity() * price.getAccessCardPrice(roomInfo.getStr("houseName")))
                 .deposit(dto.getDeposit())
                 .rent(roomInfo.getInt("price"))
                 .remark(dto.getRemark())
@@ -131,7 +130,7 @@ public class BillProviderServiceImpl implements BillProviderService {
                     price.getElectricityPrice());
             bill.setUtilityEndId(end.getInt("id"));
             bill.setUpdateUser(JwtUser.builder().id(0).realName("系统").build());
-            bill.unsettled();
+            bill.unconfirmed();
             try {
                 receiptUtils.generateReceipt(bill);
             } catch (IOException e) {

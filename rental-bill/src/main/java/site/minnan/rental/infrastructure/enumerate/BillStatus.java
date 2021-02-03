@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum  BillStatus {
 
     INIT("INIT","正在使用"),
-    UNSETTLED("UNSETTLED", "待结算"),
+    UNCONFIRMED("UNCONFIRMED", "未确认"),
     UNPAID("UNPAID", "未支付"),
     PAID("PAID","已支付");
 //    PRINTED("PRINTED", "已打印收据");

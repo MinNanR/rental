@@ -12,7 +12,6 @@ import site.minnan.rental.infrastructure.enumerate.PaymentMethod;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * 账单
@@ -143,6 +142,7 @@ public class Bill {
     /**
      * 收据url地址
      */
+    @Setter
     private String receiptUrl;
 
     /**
@@ -218,11 +218,11 @@ public class Bill {
      */
     public void settleElectricity(BigDecimal start, BigDecimal end, BigDecimal price) {
         this.electricityUsage = end.subtract(start);
-        this.electricityCharge = this.waterUsage.multiply(price).setScale(2, BigDecimal.ROUND_HALF_UP);
+        this.electricityCharge = this.electricityUsage.multiply(price).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     public BigDecimal totalCharge() {
-        BigDecimal totalCharge = BigDecimal.ZERO;
+        BigDecimal totalCharge;
         switch (type) {
             case MONTHLY:
                 totalCharge = waterCharge.add(electricityCharge).add(BigDecimal.valueOf(rent));
@@ -231,12 +231,13 @@ public class Bill {
                 totalCharge = BigDecimal.valueOf(rent + +deposit + accessCardCharge);
                 break;
             default:
+                totalCharge = BigDecimal.ZERO;
         }
         return totalCharge;
     }
 
-    public void unsettled() {
-        this.status = BillStatus.UNSETTLED;
+    public void unconfirmed() {
+        this.status = BillStatus.UNCONFIRMED;
     }
 
     public void surrenderCompleted(Date time) {

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum BillType {
 
     CHECK_IN("CHECK_IN","入住账单"),
-    MONTHLY("UNSETTLED", "月度账单");
+    MONTHLY("MONTHLY", "月度账单");
 
     @EnumValue
     private final String value;

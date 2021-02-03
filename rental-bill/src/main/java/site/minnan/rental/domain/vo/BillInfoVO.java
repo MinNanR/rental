@@ -58,6 +58,8 @@ public class BillInfoVO {
 
     private String typeCode;
 
+    private String receiptUrl;
+
     public static BillInfoVO assemble(Bill bill) {
         return BillInfoVO.builder()
                 .id(bill.getId())
@@ -78,6 +80,7 @@ public class BillInfoVO {
                 .statusCode(bill.getStatus().getValue())
                 .type(bill.getType().getType())
                 .typeCode(bill.getType().getValue())
+                .receiptUrl(bill.getReceiptUrl())
                 .tenantList(new ArrayList<>())
                 .build();
     }

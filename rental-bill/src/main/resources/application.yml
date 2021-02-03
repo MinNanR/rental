@@ -39,4 +39,4 @@ mybatis-plus:
 
 aliyun:
   bucketName: link-server
-  baseUrl: http://minnan.site:2002
+  baseUrl: http://minnan.site:2000

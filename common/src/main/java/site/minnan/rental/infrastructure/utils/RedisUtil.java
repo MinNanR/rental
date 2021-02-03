@@ -83,6 +83,7 @@ public class RedisUtil {
         redisTemplate.opsForHash().putAll(key, map);
     }
 
+
     /**
      * 将一个bean按hash键方式存入redis
      * @param key 键名
@@ -151,8 +152,8 @@ public class RedisUtil {
      * @param key 键名
      * @return key-value形式返回hash类型上的所有值
      */
-    public Map<String, Object> getHash(String key){
-        return (Map<String, Object>) redisTemplate.opsForHash().entries(key);
+    public <T> Map<String, T> getHash(String key){
+        return (Map<String, T>) redisTemplate.opsForHash().entries(key);
     }
 
     /**

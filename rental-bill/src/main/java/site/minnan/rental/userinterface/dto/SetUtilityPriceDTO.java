@@ -3,6 +3,7 @@ package site.minnan.rental.userinterface.dto;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * 设置水电单价参数
@@ -16,5 +17,5 @@ public class SetUtilityPriceDTO {
 
     private BigDecimal electricityPrice;
 
-    private Integer accessCardPrice;
+    private Map<String, Integer> accessCardPrice;
 }

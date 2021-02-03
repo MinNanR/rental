@@ -111,11 +111,12 @@
                     <div class="titleUdeLine"></div>
                 </div>
             </div>
-            <div class="div2">NO：<span style="color: #9C5223;">2396827</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+            <div class="div2">NO：<span style="color: #9C5223;"
+                                       th:text="${no}"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
         </div>
         <div style="width: 100%;height: 20px;padding:10px 0px;">
             <div style="float: left;">
-                客户&nbsp;&nbsp;<span th:text="${roomNumber}"></span>号房
+                客户&nbsp;&nbsp;<span th:text="${houseName}"></span>&nbsp;&nbsp;<span th:text="${roomNumber}"></span>号房
             </div>
             <div style="float: right;">
                 <span th:text="${startDate}"></span><span th:text="${endDate}"></span>
@@ -231,6 +232,9 @@
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 2" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 1" th:text="${r}"></td>
                 <td th:each="r, iter:${rent}" th:if="${iter.index} == 0" th:text="${r}"></td>
+            </tr>
+            <tr class="tempTr2 line">
+                <td colspan="16" th:text="${remark}" style="text-align: left"></td>
             </tr>
             <tr class="tempTr2">
                 <td colspan="3" style="border-left: 1px solid;border-bottom: 1px solid;">

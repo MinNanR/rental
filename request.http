@@ -378,7 +378,10 @@ Authorization: {{admin_token}}
 {
   "waterPrice": 1,
   "electricityPrice": 4,
-  "accessCardPrice": 25
+  "accessCardPrice": {
+    "永泰街": 25,
+    "三甲1号": 20
+  }
 
 }
 
@@ -544,4 +547,13 @@ Authorization: {{admin_token}}
 {
   "pageSize": 10,
   "pageIndex": 1
+}
+
+###
+POST {{billUrl}}/bill/createReceipt
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "id": 114
 }
