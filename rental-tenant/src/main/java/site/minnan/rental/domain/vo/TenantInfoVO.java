@@ -18,7 +18,7 @@ public class TenantInfoVO {
 
     private String name;
 
-    private Gender gender;
+    private String gender;
 
     private String phone;
 
@@ -43,21 +43,25 @@ public class TenantInfoVO {
     private String statusCode;
 
     public static TenantInfoVO assemble(Tenant tenant) {
-        return TenantInfoVO.builder()
+        TenantInfoVOBuilder builder = TenantInfoVO.builder()
                 .id(tenant.getId())
                 .name(tenant.getName())
-                .gender(tenant.getGender())
                 .phone(tenant.getPhone())
-                .birthday(DateUtil.format(tenant.getBirthday(), "yyyy-MM-dd"))
-                .hometownProvince(tenant.getHometownProvince())
-                .hometownCity(tenant.getHometownCity())
-                .identificationNumber(tenant.getIdentificationNumber())
+
                 .houseId(tenant.getHouseId())
                 .houseName(tenant.getHouseName())
                 .roomId(tenant.getRoomId())
                 .roomNumber(tenant.getRoomNumber())
                 .status(tenant.getStatus().getStatus())
-                .statusCode(tenant.getStatus().getValue())
-                .build();
+                .statusCode(tenant.getStatus().getValue());
+        if (tenant.getIdentificationNumber() != null) {
+            builder.gender(tenant.getGender().getGender())
+                    .identificationNumber(tenant.getIdentificationNumber())
+                    .hometownProvince(tenant.getHometownProvince())
+                    .hometownCity(tenant.getHometownCity())
+                    .birthday(DateUtil.format(tenant.getBirthday(), "yyyy-MM-dd"));
+        }
+        return builder.build();
+
     }
 }

@@ -38,20 +38,22 @@ public class TenantVO {
     private String updateTime;
 
     public static TenantVO assemble(Tenant tenant) {
-        StringBuilder hometown = new StringBuilder();
-        Optional.ofNullable(tenant.getHometownProvince()).ifPresent(hometown::append);
-        Optional.ofNullable(tenant.getHometownCity()).ifPresent(hometown::append);
-        return TenantVO.builder()
+        TenantVOBuilder builder = TenantVO.builder()
                 .id(tenant.getId())
                 .name(tenant.getName())
-                .gender(tenant.getGender().getGender())
                 .phone(tenant.getPhone())
-                .hometown(hometown.toString())
-                .identificationNumber(StrUtil.replace(tenant.getIdentificationNumber(), 4, 16, '*'))
-                .birthday(DateUtil.format(tenant.getBirthday(), "yyyy年M月d日"))
                 .status(tenant.getStatus().getStatus())
                 .updateUserName(tenant.getUpdateUserName())
-                .updateTime(DateUtil.format(tenant.getUpdateTime(), "yyyy-MM-dd HH:mm"))
-                .build();
+                .updateTime(DateUtil.format(tenant.getUpdateTime(), "yyyy-MM-dd HH:mm"));
+        if(tenant.getIdentificationNumber() != null){
+            StringBuilder hometown = new StringBuilder();
+            Optional.ofNullable(tenant.getHometownProvince()).ifPresent(hometown::append);
+            Optional.ofNullable(tenant.getHometownCity()).ifPresent(hometown::append);
+            builder.gender(tenant.getGender().getGender())
+                    .hometown(hometown.toString())
+                    .identificationNumber(StrUtil.replace(tenant.getIdentificationNumber(), 4, 16, '*'))
+                    .birthday(DateUtil.format(tenant.getBirthday(), "yyyy年M月d日"));
+        }
+        return builder.build();
     }
 }

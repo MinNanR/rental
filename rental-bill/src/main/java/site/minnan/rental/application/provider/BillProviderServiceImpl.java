@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import site.minnan.rental.application.service.BillService;
@@ -111,6 +112,10 @@ public class BillProviderServiceImpl implements BillProviderService {
         BillDetails billDetails = billMapper.getBillDetails(checkInBill.getId());
         try {
             receiptUtils.generateReceipt(billDetails);
+            UpdateWrapper<Bill> updateWrapper= new UpdateWrapper<>();
+            updateWrapper.set("receipt_url", billDetails.getReceiptUrl())
+                    .eq("id", billDetails.getId());
+            billMapper.update(null, updateWrapper);
         } catch (IOException e) {
             log.error("生成收据失败,id={}", billDetails.getId());
         }

@@ -188,7 +188,7 @@ public class BillServiceImpl implements BillService {
      */
     @Override
     public ListQueryVO<BillVO> getBillList(GetBillListDTO dto) {
-        Long count = billMapper.countBill(BillStatus.UNPAID);
+        Long count = billMapper.countBill(dto.getStatus());
         if (count == 0) {
             return new ListQueryVO<>(new ArrayList<>(), 0L);
         }

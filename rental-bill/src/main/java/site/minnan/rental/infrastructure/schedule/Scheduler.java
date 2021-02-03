@@ -13,7 +13,7 @@ public class Scheduler {
     @Autowired
     private BillService billService;
 
-//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void billTask(){
         log.info("修改账单状态开始");
         billService.setBillUnpaid();
