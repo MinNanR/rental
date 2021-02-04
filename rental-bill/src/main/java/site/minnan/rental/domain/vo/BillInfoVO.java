@@ -24,6 +24,8 @@ public class BillInfoVO {
 
     private Integer roomId;
 
+    private Integer houseId;
+
     private String houseName;
 
     private String roomNumber;
@@ -39,6 +41,10 @@ public class BillInfoVO {
     private BigDecimal electricityCharge;
 
     private Integer rent;
+
+    private Integer deposit;
+
+    private Integer accessCardCharge;
 
     private BigDecimal totalCharge;
 
@@ -63,6 +69,7 @@ public class BillInfoVO {
     public static BillInfoVO assemble(Bill bill) {
         return BillInfoVO.builder()
                 .id(bill.getId())
+                .houseId(bill.getHouseId())
                 .houseName(bill.getHouseName())
                 .roomId(bill.getRoomId())
                 .roomNumber(bill.getRoomNumber())
@@ -71,6 +78,8 @@ public class BillInfoVO {
                 .electricityUsage(bill.getElectricityUsage())
                 .electricityCharge(bill.getElectricityCharge())
                 .rent(bill.getRent())
+                .deposit(bill.getDeposit())
+                .accessCardCharge(bill.getAccessCardCharge())
                 .totalCharge(bill.totalCharge())
                 .updateTime(DateUtil.format(bill.getUpdateTime(), "yyyy-MM-dd"))
                 .payTime(DateUtil.format(bill.getPayTime(), "yyyy-MM-dd"))
@@ -85,7 +94,7 @@ public class BillInfoVO {
                 .build();
     }
 
-    public void addTenant(TenantInfoVO vo){
+    public void addTenant(TenantInfoVO vo) {
         tenantList.add(vo);
     }
 }

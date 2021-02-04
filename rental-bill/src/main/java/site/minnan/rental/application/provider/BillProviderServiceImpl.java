@@ -52,7 +52,7 @@ public class BillProviderServiceImpl implements BillProviderService {
     @Reference(check = false)
     private RoomProviderService roomProviderService;
 
-    @Reference(check = false)
+    @Autowired
     private UtilityProviderService utilityProviderService;
 
     /**

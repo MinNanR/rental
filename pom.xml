@@ -19,18 +19,39 @@
         <module>rental-tenant</module>
         <module>rental-landlord</module>
         <module>rental-room</module>
-        <module>rental-house</module>
         <module>rental-payment</module>
         <module>rental-bill</module>
         <module>common</module>
         <module>rental-user</module>
         <module>rental-config</module>
-        <module>rental-utility</module>
     </modules>
 
     <properties>
         <skipTests>true</skipTests>
     </properties>
+
+    <profiles>
+        <profile>
+            <!-- 本地开发环境 -->
+            <id>dev</id>
+            <properties>
+                <env>dev</env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <!-- 阿里云开发环境 -->
+            <id>aliyun</id>
+            <properties>
+                <env>aliyun</env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>

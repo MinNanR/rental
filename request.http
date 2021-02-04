@@ -264,16 +264,6 @@ Authorization: {{admin_token}}
 }
 
 ###
-POST {{tenantUrl}}/tenant/getTenantDropDown
-Content-Type: application/json
-Authorization: {{admin_token}}
-
-{
-  "roomId": 6,
-  "name": "张"
-}
-
-###
 POST {{tenantUrl}}/tenant/tenantMove
 Content-Type: application/json
 Authorization: {{admin_token}}
@@ -333,7 +323,7 @@ Content-Type: application/json
 Authorization: {{admin_token}}
 
 {
-  "id": 10
+  "id": 1
 }
 
 ###
@@ -346,18 +336,6 @@ Authorization: {{admin_token}}
   "pageSize": 10,
   "houseId": 1,
   "year": 2020
-}
-
-###
-POST {{roomUrl}}/room/getRoomToRecordUtility
-Content-Type: application/json
-Authorization: {{admin_token}}
-
-{
-  "houseId": 1,
-  "year": 2020,
-  "month": 10,
-  "floor": 1
 }
 
 ###
@@ -441,7 +419,7 @@ Content-Type: application/json
 Authorization: {{admin_token}}
 
 {
-  "id": 7
+  "id": 115
 }
 
 ###

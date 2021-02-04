@@ -15,6 +15,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.font.FontProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -37,6 +38,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Component
+@Slf4j
 public class ReceiptUtils {
 
     @Autowired
@@ -200,7 +202,7 @@ public class ReceiptUtils {
         File file = transferHtmlToPdf(html, pipedOutputStream);
         savePdfAsImageToOss(new FileInputStream(file), bill.getId());
         bill.setReceiptUrl(StrUtil.format("{}/receipt/{}.png", baseUrl, bill.getId()));
-
+        log.info("生成账单成功，id={}", bill.getId());
     }
 
     private void checkIn(Context context, BillDetails bill) {

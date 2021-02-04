@@ -31,6 +31,7 @@ import site.minnan.rental.domain.mapper.BillTenantRelevanceMapper;
 import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.BillStatus;
 import site.minnan.rental.infrastructure.enumerate.BillType;
+import site.minnan.rental.infrastructure.enumerate.PaymentMethod;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.infrastructure.utils.ReceiptUtils;
@@ -62,7 +63,7 @@ public class BillServiceImpl implements BillService {
     @Reference(check = false)
     private TenantProviderService tenantProviderService;
 
-    @Reference(check = false)
+    @Autowired
     private UtilityProviderService utilityProviderService;
 
     @Autowired
@@ -349,7 +350,27 @@ public class BillServiceImpl implements BillService {
             throw new EntityNotExistException("账单不存在");
         }
         UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.set("status", BillStatus.UNCONFIRMED).eq("id", dto.getId());
+        updateWrapper.set("status", BillStatus.UNPAID).eq("id", dto.getId());
+        billMapper.update(null, updateWrapper);
+    }
+
+    /**
+     * 房客已支付
+     *
+     * @param dto
+     */
+    @Override
+    public void billPaid(BillPaidDTO dto) {
+        Bill bill = billMapper.selectById(dto.getId());
+        if (bill == null) {
+            throw new EntityNotExistException("账单不存在");
+        }
+        PaymentMethod paymentMethod = PaymentMethod.valueOf(dto.getPaymentMethod().toUpperCase());
+        UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.set("status", BillStatus.PAID)
+                .set("payment_method", paymentMethod)
+                .set("pay_time", new Timestamp(System.currentTimeMillis()))
+                .eq("id", dto.getId());
         billMapper.update(null, updateWrapper);
     }
 }

@@ -420,12 +420,12 @@ public class TenantServiceImpl implements TenantService {
      * @param dto
      */
     @Override
+    @Transactional
     public void checkIn(CheckInDTO dto) {
         JwtUser jwtUser = (JwtUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Tenant> newTenantList = new ArrayList<>();
         for (AddTenantDTO tenant : dto.getTenantList()) {
             //构建新房客对象
-
             Tenant.TenantBuilder tenantBuilder = Tenant.builder()
                     .name(tenant.getName())
                     .phone(tenant.getPhone())

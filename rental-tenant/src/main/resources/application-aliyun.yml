@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:mysql://minnan.site:3306/rental?serverTimezone=Asia/Shanghai
+    username: Minnan
+    password: minnan
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      max-lifetime: 600000
+
+  redis:
+    host: minnan.site
+    port: 6379
+    database: 1
+    password: minnan
+
+server:
+  port: 8104
+
+jwt:
+  header: Authorization
+  expiration: 604800
+  scret: min107
+
+mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+dubbo:
+  application:
+    name: rental-tenant
+  registry:
+    address: zookeeper://minnan.site:2181
+  protocol:
+    name: dubbo
+    port: 20885
+
+logging:
+  file:
+    name: ./logs/rental-tenant/rental-tenant.log

@@ -89,6 +89,12 @@ public interface BillService {
     void confirmBill(DetailsQueryDTO dto);
 
     /**
+     * 房客已支付
+     * @param dto
+     */
+    void billPaid(BillPaidDTO dto);
+
+    /**
      * 到期账单结算
      */
     void setBillUnpaid();

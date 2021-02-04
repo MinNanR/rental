@@ -127,8 +127,15 @@ public class BillController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
     @PostMapping("confirmBill")
-    public ResponseEntity<?> confirm(@RequestBody @Valid DetailsQueryDTO dto){
+    public ResponseEntity<?> confirm(@RequestBody @Valid DetailsQueryDTO dto) {
         billService.confirmBill(dto);
+        return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','LANDLORD')")
+    @PostMapping("paid")
+    public ResponseEntity<?> paid(@RequestBody @Valid BillPaidDTO dto) {
+        billService.billPaid(dto);
         return ResponseEntity.success();
     }
 }
