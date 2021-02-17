@@ -62,14 +62,14 @@ public class BillProviderServiceImpl implements BillProviderService {
      */
     @Override
     public void createBill(CreateBillDTO dto) {
-        DateTime now = DateTime.of(dto.getCheckInDate(), "yyyy-MM-dd");
+        DateTime checkDate = DateTime.of(dto.getCheckInDate(), "yyyy-MM-dd");
         JSONObject roomInfo = roomProviderService.getRoomInfo(dto.getRoomId());
         Integer currentUtilityId = utilityProviderService.getCurrentUtility(dto.getRoomId());
         UtilityPrice price = billService.getUtilityPrice();
         //入住账单
         Bill checkInBill = Bill.builder()
-                .year(now.year())
-                .month(now.month() + 1)
+                .year(checkDate.year())
+                .month(checkDate.month() + 1)
                 .houseId(roomInfo.getInt("houseId"))
                 .houseName(roomInfo.getStr("houseName"))
                 .roomId(dto.getRoomId())
@@ -79,17 +79,17 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .deposit(dto.getDeposit())
                 .rent(roomInfo.getInt("price"))
                 .remark(dto.getRemark())
-                .completedDate(now)
-                .payTime(new Timestamp(now.getTime()))
+                .completedDate(checkDate)
+                .payTime(new Timestamp(checkDate.getTime()))
                 .paymentMethod(PaymentMethod.valueOf(dto.getPayMethod()))
                 .utilityStartId(currentUtilityId)
                 .status(BillStatus.PAID)
                 .type(BillType.CHECK_IN)
                 .build();
-        checkInBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
-        DateTime nextMonth = now.offsetNew(DateField.MONTH, 1);
+        checkInBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(checkDate.getTime()));
+        DateTime nextMonth = checkDate.offsetNew(DateField.MONTH, 1);
         Bill monthlyBill = Bill.builder()
-                .year(now.year())
+                .year(checkDate.year())
                 .month(nextMonth.month() + 1)
                 .houseId(roomInfo.getInt("houseId"))
                 .houseName(roomInfo.getStr("houseName"))
@@ -101,18 +101,18 @@ public class BillProviderServiceImpl implements BillProviderService {
                 .status(BillStatus.INIT)
                 .type(BillType.MONTHLY)
                 .build();
-        monthlyBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(now.getTime()));
+        monthlyBill.setCreateUser(dto.getUserId(), dto.getUserName(), new Timestamp(checkDate.getTime()),
+                new Timestamp(System.currentTimeMillis()));
         billMapper.insertBatch(CollectionUtil.newArrayList(checkInBill, monthlyBill));
         List<BillTenantRelevance> relevanceList = dto.getTenantIdList().stream()
                 .flatMap(e -> Stream.of(BillTenantRelevance.of(checkInBill.getId(), e),
                         BillTenantRelevance.of(monthlyBill.getId(), e)))
                 .collect(Collectors.toList());
         billTenantRelevanceMapper.insertBatch(relevanceList);
-        //TODO 生成入住收据
         BillDetails billDetails = billMapper.getBillDetails(checkInBill.getId());
         try {
             receiptUtils.generateReceipt(billDetails);
-            UpdateWrapper<Bill> updateWrapper= new UpdateWrapper<>();
+            UpdateWrapper<Bill> updateWrapper = new UpdateWrapper<>();
             updateWrapper.set("receipt_url", billDetails.getReceiptUrl())
                     .eq("id", billDetails.getId());
             billMapper.update(null, updateWrapper);

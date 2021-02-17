@@ -184,6 +184,15 @@ public class Bill {
         this.updateTime = time;
     }
 
+    public void setCreateUser(Integer userId, String userName, Timestamp createTime, Timestamp updateTime) {
+        this.createUserId = userId;
+        this.createUserName = userName;
+        this.createTime = createTime;
+        this.updateUserId = userId;
+        this.updateUserName = userName;
+        this.updateTime = updateTime;
+    }
+
     public void setUpdateUser(JwtUser jwtUser) {
         this.updateUserId = jwtUser.getId();
         this.updateUserName = jwtUser.getRealName();

@@ -1,12 +1,13 @@
 package site.minnan.rental.application.service;
 
-import site.minnan.rental.domain.vo.*;
+import site.minnan.rental.domain.vo.BillInfoVO;
+import site.minnan.rental.domain.vo.BillVO;
+import site.minnan.rental.domain.vo.ListQueryVO;
+import site.minnan.rental.domain.vo.UtilityPrice;
 import site.minnan.rental.userinterface.dto.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 账单服务
@@ -51,6 +52,12 @@ public interface BillService {
      * @return
      */
     ListQueryVO<BillVO> getBillList(ListQueryDTO dto);
+
+    /**
+     * 获取房间账单列表
+     */
+    ListQueryVO<BillVO> getRoomBillList(GetBillListDTO dto);
+
 
     /**
      * 获取本月总额

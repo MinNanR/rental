@@ -182,7 +182,7 @@ public class BillServiceImpl implements BillService {
     }
 
     /**
-     * 获取未支付的账单
+     * 获取账单列表
      *
      * @param dto
      * @return
@@ -270,6 +270,22 @@ public class BillServiceImpl implements BillService {
         Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
         QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
         queryWrapper.ne("status", BillStatus.INIT).orderByDesc("update_time");
+        IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
+        List<BillVO> list = page.getRecords().stream().map(BillVO::assemble).collect(Collectors.toList());
+        return new ListQueryVO<>(list, page.getTotal());
+    }
+
+    /**
+     * 获取房间账单列表
+     *
+     * @param dto
+     */
+    @Override
+    public ListQueryVO<BillVO> getRoomBillList(GetBillListDTO dto) {
+        Page<Bill> queryPage = new Page<>(dto.getPageIndex(), dto.getPageSize());
+        QueryWrapper<Bill> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("room_id", dto.getRoomId())
+                .ne("status", BillStatus.INIT);
         IPage<Bill> page = billMapper.selectPage(queryPage, queryWrapper);
         List<BillVO> list = page.getRecords().stream().map(BillVO::assemble).collect(Collectors.toList());
         return new ListQueryVO<>(list, page.getTotal());

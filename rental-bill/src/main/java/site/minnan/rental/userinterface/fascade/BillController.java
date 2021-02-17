@@ -113,7 +113,7 @@ public class BillController {
             String url = billService.createReceipt(dto);
             return ResponseEntity.success(url);
         } catch (IOException e) {
-            log.error("生成收据失败：id={}", dto.getId());
+            log.error("生成收据失败, id=" + dto.getId(), e);
             return ResponseEntity.fail("生成收据失败");
         }
     }
@@ -137,5 +137,12 @@ public class BillController {
     public ResponseEntity<?> paid(@RequestBody @Valid BillPaidDTO dto) {
         billService.billPaid(dto);
         return ResponseEntity.success();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'LANDLORD')")
+    @PostMapping("getRoomBillList")
+    public ResponseEntity<?> getRoomBillList(@RequestBody @Valid GetBillListDTO dto){
+        ListQueryVO<BillVO> vo = billService.getRoomBillList(dto);
+        return ResponseEntity.success(vo);
     }
 }

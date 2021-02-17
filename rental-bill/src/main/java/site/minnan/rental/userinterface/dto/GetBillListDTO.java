@@ -14,6 +14,8 @@ public class GetBillListDTO extends ListQueryDTO{
 
     private String roomNumber;
 
+    private Integer roomId;
+
     private Integer year;
 
     private Integer month;

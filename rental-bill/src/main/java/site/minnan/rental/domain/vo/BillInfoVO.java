@@ -28,6 +28,10 @@ public class BillInfoVO {
 
     private String houseName;
 
+    private Integer year;
+
+    private Integer month;
+
     private String roomNumber;
 
     private List<TenantInfoVO> tenantList;
@@ -73,6 +77,8 @@ public class BillInfoVO {
                 .houseName(bill.getHouseName())
                 .roomId(bill.getRoomId())
                 .roomNumber(bill.getRoomNumber())
+                .year(bill.getYear())
+                .month(bill.getMonth())
                 .waterUsage(bill.getWaterUsage())
                 .waterCharge(bill.getWaterCharge())
                 .electricityUsage(bill.getElectricityUsage())

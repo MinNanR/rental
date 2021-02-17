@@ -42,14 +42,14 @@ Authorization: {{admin_token}}
 }
 
 ###
-POST {{userUrl}}/user/addUser/tenant
+POST {{userUrl}}/user/addUser/landlord
 Content-Type: application/json
 Authorization: {{admin_token}}
 
 {
-  "username": "13813812138",
-  "password": "e10adc3949ba59abbe56e057f20f883e",
-  "realName": "英"
+  "username": "18925503712",
+  "password": "d31b530952bdc79c84303e5a9705651c",
+  "realName": "强"
 }
 
 ###
@@ -534,4 +534,15 @@ Authorization: {{admin_token}}
 
 {
   "id": 114
+}
+
+###
+POST {{billUrl}}/bill/getRoomBillList
+Content-Type: application/json
+Authorization: {{admin_token}}
+
+{
+  "pageIndex": 1,
+  "pageSize": 15,
+  "roomId": 7
 }

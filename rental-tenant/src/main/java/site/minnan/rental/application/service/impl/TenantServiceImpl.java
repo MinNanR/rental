@@ -1,15 +1,11 @@
 package site.minnan.rental.application.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.extra.pinyin.PinyinEngine;
 import cn.hutool.extra.pinyin.PinyinUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -20,11 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.minnan.rental.application.provider.RoomProviderService;
-import site.minnan.rental.application.provider.UserProviderService;
 import site.minnan.rental.application.provider.BillProviderService;
+import site.minnan.rental.application.provider.RoomProviderService;
 import site.minnan.rental.application.service.TenantService;
-import site.minnan.rental.domain.aggregate.AuthUser;
 import site.minnan.rental.domain.aggregate.Tenant;
 import site.minnan.rental.domain.entity.JwtUser;
 import site.minnan.rental.domain.mapper.TenantMapper;
@@ -32,19 +26,12 @@ import site.minnan.rental.domain.vo.*;
 import site.minnan.rental.infrastructure.enumerate.Gender;
 import site.minnan.rental.infrastructure.enumerate.RoomStatus;
 import site.minnan.rental.infrastructure.enumerate.TenantStatus;
-import site.minnan.rental.infrastructure.exception.EntityAlreadyExistException;
 import site.minnan.rental.infrastructure.exception.EntityNotExistException;
 import site.minnan.rental.infrastructure.utils.RedisUtil;
 import site.minnan.rental.userinterface.dto.*;
-import site.minnan.rental.userinterface.response.ResponseCode;
-import site.minnan.rental.userinterface.response.ResponseEntity;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import java.sql.Struct;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,8 +44,12 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private RedisUtil redisUtil;
 
-    @Reference(check = false)
-    private UserProviderService userProviderService;
+    @Autowired
+    private PinyinEngine pinyinEngine;
+
+
+//    @Reference(check = false)
+//    private UserProviderService userProviderService;
 
     @Reference(check = false)
     private RoomProviderService roomProviderService;
@@ -251,14 +242,14 @@ public class TenantServiceImpl implements TenantService {
                 .filter(e -> TenantStatus.LEFT.equals(e.getStatus()))
                 .map(Tenant::getUserId)
                 .collect(Collectors.toList());
-        if (CollectionUtil.isNotEmpty(leftUserList)) {
-            EnableTenantUserBatchDTO enableTenantUserBatchDTO = EnableTenantUserBatchDTO.builder()
-                    .userIdList(leftUserList)
-                    .userId(jwtUser.getId())
-                    .userName(jwtUser.getRealName())
-                    .build();
-            userProviderService.enableTenantUserBatch(enableTenantUserBatchDTO);
-        }
+//        if (CollectionUtil.isNotEmpty(leftUserList)) {
+//            EnableTenantUserBatchDTO enableTenantUserBatchDTO = EnableTenantUserBatchDTO.builder()
+//                    .userIdList(leftUserList)
+//                    .userId(jwtUser.getId())
+//                    .userName(jwtUser.getRealName())
+//                    .build();
+//            userProviderService.enableTenantUserBatch(enableTenantUserBatchDTO);
+//        }
 
 //        //房间原本为空闲状态则创建账单
 //        if (checkRoomOnRent == null) {
@@ -336,12 +327,12 @@ public class TenantServiceImpl implements TenantService {
             roomProviderService.updateRoomStatus(updateRoomStatusDTO);
             billProviderService.completeBillWithSurrender(tenant.getRoomId());
         }
-        DisableTenantUserDTO disableTenantUserDTO = DisableTenantUserDTO.builder()
-                .userId(tenant.getUserId())
-                .updateUserId(jwtUser.getId())
-                .updateUserName(jwtUser.getRealName())
-                .build();
-        userProviderService.disableTenantUser(disableTenantUserDTO);
+//        DisableTenantUserDTO disableTenantUserDTO = DisableTenantUserDTO.builder()
+//                .userId(tenant.getUserId())
+//                .updateUserId(jwtUser.getId())
+//                .updateUserName(jwtUser.getRealName())
+//                .build();
+//        userProviderService.disableTenantUser(disableTenantUserDTO);
     }
 
     /**
@@ -356,6 +347,7 @@ public class TenantServiceImpl implements TenantService {
         return id != null;
     }
 
+
     /**
      * 获取房客列表
      *
@@ -368,7 +360,7 @@ public class TenantServiceImpl implements TenantService {
                 .eq("status", TenantStatus.LIVING);
         List<Tenant> tenantList = tenantMapper.selectList(queryWrapper);
         Map<Character, List<TenantAppVO>> groupByPinyin = tenantList.stream()
-                .collect(Collectors.groupingBy(e -> PinyinUtil.getFirstLetter(e.getName().charAt(0)),
+                .collect(Collectors.groupingBy(e -> pinyinEngine.getFirstLetter(e.getName().charAt(0)),
                         Collectors.collectingAndThen(Collectors.toList(), (e -> e.stream()
                                 .sorted(Comparator.comparing(t1 -> PinyinUtil.getPinyin(t1.getName())))
                                 .map(TenantAppVO::assemble)
@@ -409,9 +401,9 @@ public class TenantServiceImpl implements TenantService {
         roomProviderService.updateRoomStatus(updateRoomStatusDTO);
         billProviderService.completeBillWithSurrender(roomId);
         List<Integer> userIdList = tenantList.stream().map(Tenant::getUserId).collect(Collectors.toList());
-        BatchDisableUserDTO batchDisableUserDTO = new BatchDisableUserDTO(jwtUser.getId(), jwtUser.getRealName(),
-                userIdList);
-        userProviderService.disableTenantUserBatch(batchDisableUserDTO);
+//        BatchDisableUserDTO batchDisableUserDTO = new BatchDisableUserDTO(jwtUser.getId(), jwtUser.getRealName(),
+//                userIdList);
+//        userProviderService.disableTenantUserBatch(batchDisableUserDTO);
     }
 
     /**

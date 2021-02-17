@@ -21,7 +21,7 @@ jwt:
 
 logging:
   file:
-    name: ./logs/rental_bill/rental-bill.log
+    name: ./logs/rental-bill/rental-bill.log
 
 dubbo:
   application:

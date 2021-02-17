@@ -8,6 +8,8 @@ import cn.hutool.core.util.StrUtil;
 import com.aliyun.oss.OSS;
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.io.font.FontProgram;
+import com.itextpdf.io.font.TrueTypeFont;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -20,7 +22,9 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -31,7 +35,6 @@ import site.minnan.rental.domain.entity.BillDetails;
 import site.minnan.rental.domain.vo.UtilityPrice;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
@@ -49,6 +52,10 @@ public class ReceiptUtils {
 
     @Value("${aliyun.bucketName}")
     private String bucketName;
+
+    @Autowired
+    @Qualifier("simhei")
+    private FontProgram fontProgram;
 
     @Autowired
     private OSS oss;
@@ -152,14 +159,13 @@ public class ReceiptUtils {
      * 将html转换成pdf
      *
      * @param html
-     * @param outputStream
      * @throws IOException
      */
-    private File transferHtmlToPdf(String html, OutputStream outputStream) throws IOException {
+    private File transferHtmlToPdf(String html) throws IOException {
         ConverterProperties converterProperties = new ConverterProperties();
         FontProvider fontProvider = new FontProvider();
-        fontProvider.addFont(fontProvider.getClass().getClassLoader().getResource("font/simhei.ttf").getPath());
         fontProvider.addStandardPdfFonts();
+        fontProvider.addFont(fontProgram);
         converterProperties.setFontProvider(fontProvider);
         converterProperties.setCharset("utf-8");
         File temp = File.createTempFile("temp", ".pdf");
@@ -170,6 +176,7 @@ public class ReceiptUtils {
         document.close();
         return temp;
     }
+
 
     /**
      * 将pdf转换成图片，并保存到阿里云oss
@@ -199,7 +206,7 @@ public class ReceiptUtils {
         PipedInputStream pipedInputStream = new PipedInputStream();
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         pipedInputStream.connect(pipedOutputStream);
-        File file = transferHtmlToPdf(html, pipedOutputStream);
+        File file = transferHtmlToPdf(html);
         savePdfAsImageToOss(new FileInputStream(file), bill.getId());
         bill.setReceiptUrl(StrUtil.format("{}/receipt/{}.png", baseUrl, bill.getId()));
         log.info("生成账单成功，id={}", bill.getId());
